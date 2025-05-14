@@ -26,6 +26,8 @@ dist-ssr
 node_modules
 dist
 build
-.env
+.env.development
+.env.production
+
 
 
