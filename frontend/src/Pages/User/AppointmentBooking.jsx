@@ -1,64 +1,91 @@
-import React from 'react';
-import DoctorSelector from '../../Components/Admin/DoctorSelector';
-import useAppointment from '../../hooks/User/UseAppointment';
+import React, { useState } from 'react';
+import axiosInstance from '../../api/axiosInstance';
+import DoctorSelector from '../../Components/Admin/DoctorSelector'; // Adjust path if needed
 
-export default function AppointmentBooking() {
-  const {
-    selectedDoctor,
-    appointmentDate,
-    setAppointmentDate,
-    appointmentTime,
-    setAppointmentTime,
-    bookAppointment,
-    message,
-    loading,
-    handleDoctorSelect,
-  } = useAppointment();
+const AppointmentBooking = () => {
+  const [doctorId, setDoctorId] = useState('');
+  const [date, setDate] = useState('');
+  const [time, setTime] = useState('');
+  const [message, setMessage] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  if (loading) return <p>Loading doctors...</p>;
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setMessage('');
+
+    try {
+      const token = localStorage.getItem("token");
+
+      const res = await axiosInstance.post(
+        '/appointments/book',
+        { doctorId, date, time },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setMessage(res.data.message);
+    } catch (err) {
+      setMessage(err.response?.data?.message || "Booking failed");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <div className="max-w-md mx-auto p-6 bg-white shadow-md rounded-md space-y-4">
-      <h2 className="text-xl font-bold">Book an Appointment</h2>
+    <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow-lg">
+      <h2 className="text-xl font-bold mb-4">Book an Appointment</h2>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        
+        <DoctorSelector onDoctorSelect={(doctor) => setDoctorId(doctor._id)} />
 
-      {/* Doctor dropdown */}
-      <DoctorSelector onDoctorSelect={handleDoctorSelect} />
-
-      {/* Show doctor details */}
-      {selectedDoctor && (
-        <div className="p-3 bg-gray-50 border rounded">
-          <p><strong>Name:</strong> {selectedDoctor.userId?.name}</p>
-          <p><strong>Specialization:</strong> {selectedDoctor.specialization}</p>
+        <div>
+          <label className="block font-medium">Date</label>
+          <input
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            className="w-full border rounded p-2"
+            required
+          />
         </div>
-      )}
 
-      {/* Date and Time Inputs */}
-      <input
-        type="date"
-        value={appointmentDate}
-        onChange={(e) => setAppointmentDate(e.target.value)}
-        className="w-full px-4 py-2 border rounded"
-      />
-      <input
-        type="time"
-        value={appointmentTime}
-        onChange={(e) => setAppointmentTime(e.target.value)}
-        className="w-full px-4 py-2 border rounded"
-      />
+        <div>
+          <label className="block font-medium">Time</label>
+          <input
+            type="time"
+            value={time}
+            onChange={(e) => setTime(e.target.value)}
+            className="w-full border rounded p-2"
+            required
+          />
+        </div>
 
-      {/* Book Button */}
-      <button
-        onClick={bookAppointment}
-        className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
-      >
-        Book Appointment
-      </button>
+        <button
+          type="submit"
+          className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700"
+          disabled={loading}
+        >
+          {loading ? "Booking..." : "Book Appointment"}
+        </button>
 
-      {/* Feedback Message */}
-      {message && <p className="text-sm text-red-600 mt-2">{message}</p>}
+        {message && (
+          <div className="mt-4 text-center text-sm font-medium text-green-600">
+            {message}
+          </div>
+        )}
+      </form>
     </div>
   );
-}
+};
+
+export default AppointmentBooking;
+
+
+
 
 
 
