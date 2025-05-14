@@ -1,12 +1,9 @@
 import React from 'react';
-import DoctorSelector from '../../Components/Admin/DoctorSelector'; // adjust path if needed
-import useAppointment from '../../hooks/User/UseAppoinment'; // adjust path if needed
+import DoctorSelector from '../../Components/Admin/DoctorSelector';
+import useAppointment from '../../hooks/User/UseAppointment';
 
 export default function AppointmentBooking() {
   const {
-    doctors,
-    selectedDoctorId,
-    setSelectedDoctorId,
     selectedDoctor,
     appointmentDate,
     setAppointmentDate,
@@ -15,6 +12,7 @@ export default function AppointmentBooking() {
     bookAppointment,
     message,
     loading,
+    handleDoctorSelect,
   } = useAppointment();
 
   if (loading) return <p>Loading doctors...</p>;
@@ -24,14 +22,13 @@ export default function AppointmentBooking() {
       <h2 className="text-xl font-bold">Book an Appointment</h2>
 
       {/* Doctor dropdown */}
-      <DoctorSelector onDoctorSelect={setSelectedDoctorId} />
+      <DoctorSelector onDoctorSelect={handleDoctorSelect} />
 
       {/* Show doctor details */}
       {selectedDoctor && (
         <div className="p-3 bg-gray-50 border rounded">
-          <p><strong>Name:</strong> {selectedDoctor.name}</p>
+          <p><strong>Name:</strong> {selectedDoctor.userId?.name}</p>
           <p><strong>Specialization:</strong> {selectedDoctor.specialization}</p>
-          {/* Add more fields if needed like available times, etc. */}
         </div>
       )}
 
@@ -62,6 +59,7 @@ export default function AppointmentBooking() {
     </div>
   );
 }
+
 
 
 

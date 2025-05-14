@@ -1,7 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import UserLayout from '../Components/User/UserLayout';
 import UserDashboard from '../Pages/User/UserDashboard';
-import UserAppointments from '../Pages/User/AppoinmentBooking';
+import UserAppointments from '../Pages/User/AppointmentBooking';
 import UserNotifications from '../Pages/User/NotificationList';
 import UserFeedback from '../Pages/User/FeedbackComponent';
 import UserChat from '../Pages/User/ChatComponent'

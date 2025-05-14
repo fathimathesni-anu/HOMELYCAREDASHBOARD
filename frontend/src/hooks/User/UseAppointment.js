@@ -1,4 +1,3 @@
-// src/hooks/User/useAppointment.js
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 
@@ -28,15 +27,11 @@ const useAppointment = () => {
     fetchDoctors();
   }, []);
 
-  // Update selected doctor details
-  useEffect(() => {
-    if (selectedDoctorId) {
-      const doctor = doctors.find((doc) => doc.id === selectedDoctorId);
-      setSelectedDoctor(doctor);
-    } else {
-      setSelectedDoctor(null);
-    }
-  }, [selectedDoctorId, doctors]);
+  // 🔧 Handle selection of a doctor object
+  const handleDoctorSelect = (doctor) => {
+    setSelectedDoctorId(doctor._id);
+    setSelectedDoctor(doctor);
+  };
 
   // Book appointment function
   const bookAppointment = async () => {
@@ -55,7 +50,7 @@ const useAppointment = () => {
         time: appointmentTime,
       };
 
-      const response = await axios.post('/api/appointments', payload); // Adjust API route
+      await axios.post('/api/appointments', payload); // Adjust API route
       setMessage('Appointment booked successfully!');
     } catch (error) {
       console.error('Booking error:', error);
@@ -68,7 +63,6 @@ const useAppointment = () => {
   return {
     doctors,
     selectedDoctorId,
-    setSelectedDoctorId,
     selectedDoctor,
     appointmentDate,
     setAppointmentDate,
@@ -77,8 +71,10 @@ const useAppointment = () => {
     bookAppointment,
     message,
     loading,
+    handleDoctorSelect,
   };
 };
 
 export default useAppointment;
+
 
