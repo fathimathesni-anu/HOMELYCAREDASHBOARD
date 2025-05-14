@@ -1,6 +1,6 @@
 import React from 'react';
 import DoctorSelector from '../../Components/Admin/DoctorSelector'; // adjust path if needed
-import useAppointment from '../../hooks/User/useAppoinment'; // adjust path if needed
+import useAppointment from '../../hooks/User/UseAppoinment'; // adjust path if needed
 
 export default function AppointmentBooking() {
   const {
