@@ -15,8 +15,8 @@ connectDB();
 // CORS configuration
 const corsOptions = {
   origin: [
-     // your Vercel frontend domain
-    "http://localhost:5173", // your local development domain
+     "https://homelycaredashboard.vercel.app"// your Vercel frontend domain
+   , "http://localhost:5173", // your local development domain
   ],
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   credentials: true, // Allow credentials (cookies, etc.)
