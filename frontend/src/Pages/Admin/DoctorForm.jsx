@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axiosInstance from '../../api/axiosInstance';
+import axiosInstance from '../../api/axiosInstance'; // Make sure this includes auth headers if required
 
 const DoctorForm = () => {
   const [doctors, setDoctors] = useState([]);
@@ -11,6 +11,7 @@ const DoctorForm = () => {
   const [editMode, setEditMode] = useState(false);
   const [editId, setEditId] = useState(null);
   const [filter, setFilter] = useState('');
+  const [error, setError] = useState('');
 
   useEffect(() => {
     fetchDoctors();
@@ -22,6 +23,7 @@ const DoctorForm = () => {
       setDoctors(res.data);
     } catch (error) {
       console.error('Failed to fetch doctors', error);
+      setError('Failed to load doctors');
     }
   };
 
@@ -44,17 +46,25 @@ const DoctorForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
     try {
+      if (!formData.userId || !formData.specialization) {
+        setError('User ID and Specialization are required');
+        return;
+      }
+
       if (editMode) {
         await axiosInstance.put(`/doctor/update/${editId}`, formData);
       } else {
         await axiosInstance.post('/doctor/create', formData);
       }
+
       setFormData({ userId: '', specialization: '', schedule: [] });
       setEditMode(false);
       fetchDoctors();
     } catch (error) {
       console.error('Error saving doctor', error);
+      setError('Failed to save doctor. Ensure all fields are valid.');
     }
   };
 
@@ -66,6 +76,7 @@ const DoctorForm = () => {
     });
     setEditMode(true);
     setEditId(doctor._id);
+    setError('');
   };
 
   const handleDelete = async (id) => {
@@ -74,16 +85,20 @@ const DoctorForm = () => {
       fetchDoctors();
     } catch (error) {
       console.error('Error deleting doctor', error);
+      setError('Failed to delete doctor');
     }
   };
 
   const filteredDoctors = doctors.filter(doc =>
-    doc.specialization.toLowerCase().includes(filter.toLowerCase())
+    doc.specialization?.toLowerCase().includes(filter.toLowerCase())
   );
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
       <h2 className="text-2xl font-bold mb-4">{editMode ? 'Edit Doctor' : 'Add Doctor'}</h2>
+
+      {error && <div className="bg-red-100 text-red-700 p-2 rounded mb-4">{error}</div>}
+
       <form onSubmit={handleSubmit} className="space-y-4 bg-white p-4 rounded shadow">
         <input
           type="text"
@@ -94,6 +109,7 @@ const DoctorForm = () => {
           required
           className="w-full border rounded p-2"
         />
+
         <input
           type="text"
           name="specialization"
@@ -198,4 +214,5 @@ const DoctorForm = () => {
 };
 
 export default DoctorForm;
+
 

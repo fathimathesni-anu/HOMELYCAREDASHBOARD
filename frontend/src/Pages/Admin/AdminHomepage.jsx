@@ -7,6 +7,7 @@ import {
   ChartBarIcon,
   WrenchIcon,
 } from '@heroicons/react/24/outline';
+import { Link } from 'react-router-dom';
 
 export default function AdminHomepage() {
   return (
@@ -14,26 +15,32 @@ export default function AdminHomepage() {
       {/* Staff Management Widget */}
       <div className="bg-white p-6 rounded-lg shadow-lg dark:bg-gray-800">
         <h2 className="text-xl font-semibold text-gray-700 dark:text-white">Staff Management</h2>
-        <div className="mt-4 space-y-3">
-          <div className="flex items-center">
-            <UserGroupIcon className="h-5 w-5 text-indigo-500 mr-2" />
-            <span className="text-blue-500 cursor-pointer">View Staff List</span>
-          </div>
-          <div className="flex items-center">
-            <BriefcaseIcon className="h-5 w-5 text-green-500 mr-2" />
-            <span className="text-blue-500 cursor-pointer">Add New Staff</span>
-          </div>
-        </div>
+
+              <div className="mt-4 space-y-3">
+        <Link to="/admin/dashboard/staff" className="flex items-center text-blue-500 hover:underline">
+          <UserGroupIcon className="h-5 w-5 text-indigo-500 mr-2" />
+          <span>View Staff List</span>
+        </Link>
+        <Link to="/admin/dashboard/staff" className="flex items-center text-blue-500 hover:underline">
+          <BriefcaseIcon className="h-5 w-5 text-green-500 mr-2" />
+          <span>Add New Staff</span>
+        </Link>
+      </div>
       </div>
 
       {/* Appointments Overview */}
       <div className="bg-white p-6 rounded-lg shadow-lg dark:bg-gray-800">
         <h2 className="text-xl font-semibold text-gray-700 dark:text-white">Appointments Overview</h2>
         <p className="mt-4 text-gray-600 dark:text-gray-300">12 Appointments scheduled today</p>
-        <div className="mt-4 flex items-center">
+{/*         <div className="mt-4 flex items-center">
           <CalendarIcon className="h-5 w-5 text-blue-500 mr-2" />
           <span className="text-blue-500 cursor-pointer">View All Appointments</span>
-        </div>
+        </div> */}
+        <Link to="/admin/dashboard/appointments" className="flex items-center text-blue-500 hover:underline">
+          <CalendarIcon className="h-5 w-5 text-blue-500 mr-2" />
+          <span>View All Appointments</span>
+        </Link>
+
       </div>
 
       {/* Notifications */}
@@ -51,23 +58,23 @@ export default function AdminHomepage() {
         </ul>
       </div>
 
-      {/* Reports */}
-      <div className="bg-white p-6 rounded-lg shadow-lg dark:bg-gray-800">
+       {/* Reports */}
+      {/* <div className="bg-white p-6 rounded-lg shadow-lg dark:bg-gray-800">
         <h2 className="text-xl font-semibold text-gray-700 dark:text-white">Reports & Analytics</h2>
         <div className="mt-4 flex items-center">
           <ChartBarIcon className="h-5 w-5 text-blue-500 mr-2" />
           <span className="text-blue-500 cursor-pointer">View Reports</span>
         </div>
-      </div>
+      </div>  */}
 
       {/* System Settings */}
-      <div className="bg-white p-6 rounded-lg shadow-lg dark:bg-gray-800">
+{/*       <div className="bg-white p-6 rounded-lg shadow-lg dark:bg-gray-800">
         <h2 className="text-xl font-semibold text-gray-700 dark:text-white">System Settings</h2>
         <div className="mt-4 flex items-center">
           <WrenchIcon className="h-5 w-5 text-gray-500 mr-2" />
           <span className="text-blue-500 cursor-pointer">Manage System Config</span>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }

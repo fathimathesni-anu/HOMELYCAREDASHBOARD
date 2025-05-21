@@ -34,7 +34,7 @@ export const getPatientAppointments = async (req, res) => {
   try {
     const patientId = req.user.id;
     const appointments = await AppointmentSchedule.find({ patientId }).populate("doctorId");
-    res.json({ data: appointments });
+    res.json({appointments });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

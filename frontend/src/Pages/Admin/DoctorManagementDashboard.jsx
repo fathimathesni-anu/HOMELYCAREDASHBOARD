@@ -3,76 +3,58 @@ import DoctorForm from './DoctorForm';
 import ScheduleForm from './SheduleForm';
 import axiosInstance from '../../api/axiosInstance';
 
-const DoctorManagementDashboard = ({ token }) => {
+const DoctorManagementDashboard = () => {
   const [doctors, setDoctors] = useState([]);
   const [selectedDoctor, setSelectedDoctor] = useState(null);
-
-  const fetchDoctors = async () => {
-    try {
-      const response = await axiosInstance.get('/doctors', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setDoctors(response.data);
-    } catch (error) {
-      console.error('Failed to fetch doctors:', error);
-    }
-  };
+  const [showScheduleModal, setShowScheduleModal] = useState(false);
+  const [token, setToken] = useState(''); // Replace with auth token logic
 
   useEffect(() => {
     fetchDoctors();
   }, []);
 
-  const handleDoctorCreatedOrUpdated = () => {
-    fetchDoctors();
-    setSelectedDoctor(null);
-  };
-
-  const handleDeleteDoctor = async (doctorId) => {
-    if (!window.confirm('Are you sure you want to delete this doctor?')) return;
+  const fetchDoctors = async () => {
     try {
-      await axiosInstance.delete(`/doctors/${doctorId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      fetchDoctors();
-    } catch (err) {
-      console.error('Failed to delete doctor:', err);
-      alert('Failed to delete doctor');
+      const res = await axiosInstance.get('/doctor');
+      setDoctors(res.data);
+    } catch (error) {
+      console.error('Failed to fetch doctors', error);
     }
   };
 
+  const handleScheduleClick = (doctor) => {
+    setSelectedDoctor(doctor);
+    setShowScheduleModal(true);
+  };
+
+  const closeScheduleModal = () => {
+    setSelectedDoctor(null);
+    setShowScheduleModal(false);
+  };
+
   return (
-    <div className="max-w-5xl mx-auto p-6 space-y-10">
-      <h1 className="text-3xl font-bold text-center">Doctor Management Dashboard</h1>
+    <div className="p-6 max-w-6xl mx-auto">
+      <h1 className="text-3xl font-bold mb-6">Doctor Management Dashboard</h1>
 
-      <DoctorForm
-        editingDoctor={selectedDoctor}
-        token={token}
-        onSuccess={handleDoctorCreatedOrUpdated}
-      />
+      <div className="mb-10">
+        <DoctorForm />
+      </div>
 
-      <hr />
-
-      <div>
-        <h2 className="text-xl font-semibold mb-2">Doctor List</h2>
-        <ul className="space-y-2">
+      <div className="bg-white p-4 rounded shadow">
+        <h2 className="text-xl font-semibold mb-4">Doctors List</h2>
+        <ul className="divide-y divide-gray-200">
           {doctors.map((doc) => (
-            <li key={doc._id} className="border p-4 flex justify-between items-center">
+            <li key={doc._id} className="py-4 flex justify-between items-center">
               <div>
-                <p className="font-bold">{doc.userId}</p>
-                <p className="text-sm text-gray-600">Specialization: {doc.specialization}</p>
+                <p className="font-semibold">{doc.userId?.name || 'Unnamed Doctor'}</p>
+                <p className="text-sm text-gray-500">{doc.specialization}</p>
               </div>
               <div className="space-x-2">
                 <button
-                  onClick={() => setSelectedDoctor(doc)}
-                  className="px-3 py-1 bg-yellow-500 text-white rounded"
+                  onClick={() => handleScheduleClick(doc)}
+                  className="bg-blue-500 text-white px-3 py-1 rounded"
                 >
-                  Edit
-                </button>
-                <button
-                  onClick={() => handleDeleteDoctor(doc._id)}
-                  className="px-3 py-1 bg-red-600 text-white rounded"
-                >
-                  Delete
+                  Manage Schedule
                 </button>
               </div>
             </li>
@@ -80,10 +62,37 @@ const DoctorManagementDashboard = ({ token }) => {
         </ul>
       </div>
 
-      {selectedDoctor && (
-        <div className="mt-10">
-          <h2 className="text-xl font-semibold mb-4">Manage Schedules for {selectedDoctor.userId}</h2>
-          <ScheduleForm doctorId={selectedDoctor._id} token={token} />
+      {showScheduleModal && selectedDoctor && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white p-6 rounded shadow-xl w-full max-w-2xl relative">
+            <button
+              onClick={closeScheduleModal}
+              className="absolute top-2 right-2 text-gray-600 hover:text-black"
+            >
+              &times;
+            </button>
+            <h2 className="text-xl font-bold mb-4">Manage Schedule for {selectedDoctor.userId?.name}</h2>
+
+            {selectedDoctor.schedule?.map((sched, index) => (
+              <div key={index} className="mb-6">
+                <ScheduleForm
+                  doctorId={selectedDoctor._id}
+                  scheduleIndex={index}
+                  existingSchedule={sched}
+                  token={token}
+                  onSuccess={fetchDoctors}
+                />
+              </div>
+            ))}
+
+            <div className="mt-6">
+              <ScheduleForm
+                doctorId={selectedDoctor._id}
+                token={token}
+                onSuccess={fetchDoctors}
+              />
+            </div>
+          </div>
         </div>
       )}
     </div>
@@ -91,6 +100,7 @@ const DoctorManagementDashboard = ({ token }) => {
 };
 
 export default DoctorManagementDashboard;
+
 
 
 

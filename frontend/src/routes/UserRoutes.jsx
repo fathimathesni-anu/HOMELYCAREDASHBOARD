@@ -4,7 +4,9 @@ import UserDashboard from '../Pages/User/UserDashboard';
 import UserAppointments from '../Pages/User/AppointmentBooking';
 import UserNotifications from '../Pages/User/NotificationList';
 import UserFeedback from '../Pages/User/FeedbackComponent';
-import UserChat from '../Pages/User/ChatComponent'
+import UserChat from '../Pages/User/ChatComponent';
+import Profile from '../Pages/User/Profile';
+
 // Private Route for Users
 function UserPrivateRoute({ children }) {
   const user = JSON.parse(localStorage.getItem("user"));
@@ -25,10 +27,12 @@ function UserRoutes() {
         <Route path="notifications" element={<UserNotifications />} />
         <Route path="feedback" element={<UserFeedback />} />
         <Route path="chat" element={<UserChat />} />
+        <Route path="profile" element={<Profile />} /> {/* ✅ Fixed path */}
       </Route>
     </Routes>
   );
 }
 
 export default UserRoutes;
+
 

@@ -128,7 +128,8 @@ export default function UserNavbar() {
               </button>
 
               <Link
-                to="/profile"
+                to="/dashboard/profile"
+                onClick={() => setDropdownOpen(false)}
                 className="block px-2 py-1 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
               >
                 View Profile

@@ -1,5 +1,5 @@
 import { PaperClipIcon, CalendarIcon, BellIcon, PencilSquareIcon } from '@heroicons/react/24/outline';
-
+import { Link } from 'react-router-dom';
 export default function UserHomepage() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -14,10 +14,10 @@ export default function UserHomepage() {
             Date: April 28, 2025 | Time: 10:30 AM
           </p>
         </div>
-        <div className="mt-4 flex items-center">
+        <Link to="/user/dashboard/appointments" className="flex items-center text-blue-500 hover:underline">
           <CalendarIcon className="h-5 w-5 text-blue-500 mr-2" />
           <span className="text-blue-500 cursor-pointer">View Appointment</span>
-        </div>
+          </Link>
       </div>
 
       {/* Notifications Widget */}
@@ -39,18 +39,18 @@ export default function UserHomepage() {
       <div className="bg-white p-6 rounded-lg shadow-lg dark:bg-gray-800">
         <h2 className="text-xl font-semibold text-gray-700 dark:text-white">Quick Actions</h2>
         <div className="mt-4 space-y-3">
-          <div className="flex items-center">
+          <Link to="/user/dashboard/appointments" className="flex items-center text-blue-500 hover:underline">
             <PencilSquareIcon className="h-5 w-5 text-green-500 mr-2" />
             <span className="text-blue-500 cursor-pointer">Book Appointment</span>
-          </div>
-          <div className="flex items-center">
+          </Link>
+          <Link to="/user/dashboard/chat" className="flex items-center text-blue-500 hover:underline">
             <PaperClipIcon className="h-5 w-5 text-purple-500 mr-2" />
-            <span className="text-blue-500 cursor-pointer">View Medical Records</span>
-          </div>
-          <div className="flex items-center">
+            <span className="text-blue-500 cursor-pointer">View Chats</span>
+          </Link>
+           {/* <div className="flex items-center">
             <PencilSquareIcon className="h-5 w-5 text-yellow-500 mr-2" />
-            <span className="text-blue-500 cursor-pointer">Update Profile</span>
-          </div>
+            <span className="text-blue-500 cursor-pointer">Update Profile</span> 
+          </div> */}
         </div>
       </div>
     </div>

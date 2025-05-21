@@ -3,8 +3,8 @@ import mongoose, { Schema } from 'mongoose';
 // Chat Message Schema
 const chatMessageSchema = new Schema(
   {
-    senderId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-    receiverId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    senderId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' , required: true },
+    receiverId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' , required: true },
     message: { type: String },
     timestamp: { type: Date },
     isRead: { type: Boolean }

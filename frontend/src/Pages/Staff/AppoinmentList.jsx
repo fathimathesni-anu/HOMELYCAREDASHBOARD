@@ -90,6 +90,8 @@ const AppointmentList = () => {
       } else {
         // Create a new appointment
         const response = await axiosInstance.post('/appoinment/create', formData);
+        console.log("Data being sent:", yourPayload);
+
         setAppointments((prev) => [response.data, ...prev]);
       }
 

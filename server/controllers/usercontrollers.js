@@ -141,3 +141,43 @@ export const userLogout = async (req, res, next) => {
     });
   }
 };
+
+export const updateUserProfile = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { name, email, mobile } = req.body;
+
+    // Construct update object
+    const updateData = {
+      name,
+      email,
+      mobile,
+    };
+
+    // If a new profile picture was uploaded
+    if (req.file) {
+      updateData.profilepic = `/uploads/profilePics/${req.file.filename}`;
+    }
+
+    // Update user
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      updateData,
+      { new: true, runValidators: true }
+    ).select("-password");
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({
+      message: "Profile updated successfully",
+      data: updatedUser,
+    });
+  } catch (error) {
+    console.error("Update profile error:", error);
+    return res.status(error.statusCode || 500).json({
+      message: error.message || "Internal server error",
+    });
+  }
+};
