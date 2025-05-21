@@ -20,8 +20,8 @@ const corsOptions = {
   ],
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   credentials: true, // Allow credentials (cookies, etc.)
-  allowedHeaders: ["Content-Type", "Authorization"]
-};
+  allowedHeaders: ["Content-Type", "Authorization"] 
+}; 
 
 // Apply CORS globally
 app.use(cors(corsOptions));

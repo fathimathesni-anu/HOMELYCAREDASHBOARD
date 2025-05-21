@@ -45,7 +45,14 @@ const DoctorDashboard = () => {
         </div>
       )}
 
-      {!loading && !error && <DoctorHomepage />}
+      {!loading && !error && (
+        userRole === 'doctor' ? (
+          <DoctorHomepage />
+        ) : (
+          <p className="text-red-500">Error: userole not authorised</p>
+        )
+      )}
+
     </div>
   );
 };

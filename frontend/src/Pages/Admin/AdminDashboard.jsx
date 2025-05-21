@@ -45,7 +45,14 @@ const AdminDashboard = () => {
         </div>
       )}
 
-      {!loading && !error && <AdminHomepage />}
+      {!loading && !error && (
+        userRole === 'admin' ? (
+          <AdminHomepage />
+        ) : (
+          <p className="text-red-500">Error: userole not authorised</p>
+        )
+      )}
+
     </div>
   );
 };

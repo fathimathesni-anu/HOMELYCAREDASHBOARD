@@ -29,7 +29,9 @@ const UserDashboard = () => {
         {loading ? 'Loading...' : error ? 'Error loading user' : `Welcome,  ${userName} `}
       </h1>
 
-      {!loading && !error && <UserHomepage />}
+      {!loading && !error && (
+  <UserHomepage /> // No role check here unless needed
+)}
     </div>
   );
 };

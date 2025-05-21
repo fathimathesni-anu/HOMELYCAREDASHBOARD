@@ -40,14 +40,16 @@ const StaffDashboard = () => {
       {error && <p className="text-red-500 dark:text-red-400">Error: {error}</p>}
 
       {!loading && !error && (
-        <>
-          {userRole === 'staff' && (
+        userRole === 'staff' ? (
+          <>
             <p className="text-blue-500">Staff access granted. You can manage assigned tasks.</p>
-          )}
-          {/* Add other roles if needed */}
-          <StaffHomepage />
-        </>
+            <StaffHomepage />
+          </>
+        ) : (
+          <p className="text-red-500">Error: userole not authorised</p>
+        )
       )}
+
     </div>
   );
 };
