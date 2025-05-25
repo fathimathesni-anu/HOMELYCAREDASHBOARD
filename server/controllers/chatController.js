@@ -1,163 +1,86 @@
-import { Chat } from '../models/chatmodel.js'; // Assuming your schema is in chatModel.js
+import { Chat } from '../models/chatmodel.js';
 
 // Create a chat message
-/* export const createChatMessage = async (req, res) => {
+export const createChat = async (req, res) => {
   try {
-    const chat = new Chat(req.body);
-    await chat.save();
-    res.status(201).json({ message: 'Chat message sent successfully', chat });
-  } catch (error) {
-    res.status(400).json({ message: 'Error sending chat message', error });
-  }
-}; */
-
-export const createChatMessage = async (req, res) => {
-  try {
-    const senderId = req.user._id; // set sender from authenticated user
     const { receiverId, message } = req.body;
-
-    if (!receiverId || !message) {
-      return res.status(400).json({ message: 'receiverId and message are required' });
-    }
+    const senderId = req.user.id; // From JWT
 
     const chat = new Chat({
       senderId,
       receiverId,
       message,
+      timestamp: new Date(),
       isRead: false,
-      timestamp: new Date()
     });
 
     await chat.save();
-    res.status(201).json({ message: 'Chat message sent successfully', chat });
+    res.status(201).json({ success: true, chat });
   } catch (error) {
-    res.status(400).json({ message: 'Error sending chat message', error: error.message });
+    res.status(500).json({ success: false, error: error.message });
   }
 };
 
+// Get all chat messages for current user (sent or received)
 export const getAllChats = async (req, res) => {
   try {
-    const userId = req.user._id;
+    const userId = req.user.id;
 
     const chats = await Chat.find({
-      $or: [{ senderId: userId }, { receiverId: userId }]
-    }).populate('senderId receiverId');
+      $or: [{ senderId: userId }, { receiverId: userId }],
+    }).sort({ createdAt: -1 });
 
-    res.status(200).json(chats);
+    res.status(200).json({ success: true, chats });
   } catch (error) {
-    res.status(400).json({ message: 'Error fetching chats', error });
+    res.status(500).json({ success: false, error: error.message });
   }
 };
 
-
+// Get a single chat message by ID (only if user is part of it)
 export const getChatById = async (req, res) => {
   try {
-    const userId = req.user._id;
-    const chat = await Chat.findById(req.params.id).populate('senderId receiverId');
-
-    if (!chat) return res.status(404).json({ message: 'Chat not found' });
-
-    // Only allow if user is sender or receiver
-    if (chat.senderId._id.toString() !== userId && chat.receiverId._id.toString() !== userId) {
-      return res.status(403).json({ message: 'Not authorized to view this chat' });
+    const chat = await Chat.findById(req.params.id);
+    if (!chat || (chat.senderId.toString() !== req.user.id && chat.receiverId.toString() !== req.user.id)) {
+      return res.status(404).json({ success: false, message: 'Chat not found or unauthorized' });
     }
 
-    res.status(200).json(chat);
+    res.status(200).json({ success: true, chat });
   } catch (error) {
-    res.status(400).json({ message: 'Error fetching chat', error });
+    res.status(500).json({ success: false, error: error.message });
   }
 };
 
-
-/* 
-export const updateChatMessage = async (req, res) => {
+// Update a chat message (only by sender)
+export const updateChat = async (req, res) => {
   try {
-    const userId = req.user._id;
     const chat = await Chat.findById(req.params.id);
-
-    if (!chat) return res.status(404).json({ message: 'Chat not found' });
-
-    // Only sender or receiver can update the chat
-    if (chat.senderId.toString() !== userId && chat.receiverId.toString() !== userId) {
-      return res.status(403).json({ message: 'Not authorized to update this chat' });
+    if (!chat || chat.senderId.toString() !== req.user.id) {
+      return res.status(403).json({ success: false, message: 'Not authorized to update this message' });
     }
 
-    Object.assign(chat, req.body);
+    chat.message = req.body.message || chat.message;
+    chat.isRead = req.body.isRead ?? chat.isRead;
     await chat.save();
 
-    res.status(200).json({ message: 'Chat updated successfully', chat });
+    res.status(200).json({ success: true, chat });
   } catch (error) {
-    res.status(400).json({ message: 'Error updating chat', error });
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+// Delete a chat message (only by sender)
+export const deleteChat = async (req, res) => {
+  try {
+    const chat = await Chat.findById(req.params.id);
+    if (!chat || chat.senderId.toString() !== req.user.id) {
+      return res.status(403).json({ success: false, message: 'Not authorized to delete this message' });
+    }
+
+    await Chat.findByIdAndDelete(req.params.id);
+    res.status(200).json({ success: true, message: 'Chat deleted' });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
   }
 };
 
 
-
-export const deleteChatMessage = async (req, res) => {
-  try {
-    const userId = req.user._id;
-    const chat = await Chat.findById(req.params.id);
-
-    if (!chat) return res.status(404).json({ message: 'Chat not found' });
-
-    // Only sender or receiver can delete the chat
-    if (chat.senderId.toString() !== userId && chat.receiverId.toString() !== userId) {
-      return res.status(403).json({ message: 'Not authorized to delete this chat' });
-    }
-
-    await chat.remove();
-
-    res.status(200).json({ message: 'Chat deleted successfully' });
-  } catch (error) {
-    res.status(400).json({ message: 'Error deleting chat', error });
-  }
-}; */
-
-
-export const updateChatMessage = async (req, res) => {
-  try {
-    const userId = req.user._id;
-    const chat = await Chat.findById(req.params.id);
-
-    if (!chat) return res.status(404).json({ message: 'Chat not found' });
-
-    const senderId = chat.senderId._id?.toString?.() || chat.senderId.toString();
-    const receiverId = chat.receiverId._id?.toString?.() || chat.receiverId.toString();
-
-    if (senderId !== userId && receiverId !== userId) {
-      return res.status(403).json({ message: 'Not authorized to update this chat' });
-    }
-
-    Object.assign(chat, req.body);
-    await chat.save();
-
-    res.status(200).json({ message: 'Chat updated successfully', chat });
-  } catch (error) {
-    console.error('Update chat error:', error);
-    res.status(400).json({ message: 'Error updating chat', error: error.message });
-  }
-};
-
-
-export const deleteChatMessage = async (req, res) => {
-  try {
-    const userId = req.user._id;
-    const chat = await Chat.findById(req.params.id);
-
-    if (!chat) return res.status(404).json({ message: 'Chat not found' });
-
-    const senderId = chat.senderId._id?.toString?.() || chat.senderId.toString();
-    const receiverId = chat.receiverId._id?.toString?.() || chat.receiverId.toString();
-
-    if (senderId !== userId && receiverId !== userId) {
-      return res.status(403).json({ message: 'Not authorized to delete this chat' });
-    }
-
-    await chat.remove();
-
-    res.status(200).json({ message: 'Chat deleted successfully' });
-  } catch (error) {
-    console.error('Delete chat error:', error);
-    res.status(400).json({ message: 'Error deleting chat', error: error.message });
-  }
-};

@@ -13,7 +13,7 @@ import {
 import { useroleAuth, authorizeRoles } from '../middleware/useroleAuth.js';
 
 // Create a new task (admin only)
-router.post('/create', useroleAuth, authorizeRoles('admin'), createTask);
+router.post('/create', useroleAuth, authorizeRoles('admin','staff','doctor'), createTask);
 
 // Get all tasks (any logged-in user)
 router.get('/', useroleAuth, getAllTasks);
@@ -22,10 +22,10 @@ router.get('/', useroleAuth, getAllTasks);
 router.get('/:id', useroleAuth, getTaskById);
 
 // Update a task (admin or staff)
-router.put('/update/:id', useroleAuth, authorizeRoles('admin', 'staff'), updateTask);
+router.put('/update/:id', useroleAuth, authorizeRoles('admin', 'staff','doctor'), updateTask);
 
 // Delete a task (admin only)
-router.delete('/delete/:id', useroleAuth, authorizeRoles('admin'), deleteTask);
+router.delete('/delete/:id', useroleAuth, authorizeRoles('admin','staff','doctor'), deleteTask);
 
 export { router as taskRouter };
 

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import axiosInstance from '../../api/axiosInstance'; // adjust path based on your project structure
+import axiosInstance from '../../api/axiosInstance';
+import DoctorSelector from '../../Components/Admin/DoctorSelector'; // Adjust path if needed
 
 const PatientList = () => {
   const [patients, setPatients] = useState([]);
@@ -16,12 +17,9 @@ const PatientList = () => {
     assignedDoctor: ''
   });
   const [editingId, setEditingId] = useState(null);
-  const [doctors, setDoctors] = useState([]);
 
-  // Fetch patients and doctors
   useEffect(() => {
     fetchPatients();
-    fetchDoctors();
   }, []);
 
   const fetchPatients = async () => {
@@ -30,15 +28,6 @@ const PatientList = () => {
       setPatients(res.data);
     } catch (err) {
       console.error('Error fetching patients', err);
-    }
-  };
-
-  const fetchDoctors = async () => {
-    try {
-      const res = await axiosInstance.get('/doctor');
-      setDoctors(res.data);
-    } catch (err) {
-      console.error('Error fetching doctors', err);
     }
   };
 
@@ -70,26 +59,21 @@ const PatientList = () => {
         await axiosInstance.post('/patient/create', formData);
       }
       fetchPatients();
-      setFormData({
-        name: '',
-        age: '',
-        gender: '',
-        contactInfo: {
-          phone: '',
-          email: '',
-          address: ''
-        },
-        medicalHistory: [],
-        assignedDoctor: ''
-      });
-      setEditingId(null);
+      resetForm();
     } catch (err) {
-      console.error('Error saving patient:', err);
+      console.error('Error saving patient:', err.response?.data || err.message);
     }
   };
 
   const handleEdit = (patient) => {
-    setFormData(patient);
+    setFormData({
+      name: patient.name,
+      age: patient.age,
+      gender: patient.gender,
+      contactInfo: patient.contactInfo,
+      medicalHistory: patient.medicalHistory,
+      assignedDoctor: patient.assignedDoctor
+    });
     setEditingId(patient._id);
   };
 
@@ -100,6 +84,22 @@ const PatientList = () => {
     } catch (err) {
       console.error('Error deleting patient', err);
     }
+  };
+
+  const resetForm = () => {
+    setFormData({
+      name: '',
+      age: '',
+      gender: '',
+      contactInfo: {
+        phone: '',
+        email: '',
+        address: ''
+      },
+      medicalHistory: [],
+      assignedDoctor: ''
+    });
+    setEditingId(null);
   };
 
   return (
@@ -117,14 +117,15 @@ const PatientList = () => {
         <input name="contactInfo.email" value={formData.contactInfo.email} onChange={handleChange} placeholder="Email" className="border p-2 w-full" />
         <input name="contactInfo.address" value={formData.contactInfo.address} onChange={handleChange} placeholder="Address" className="border p-2 w-full" />
 
-        <select name="assignedDoctor" value={formData.assignedDoctor} onChange={handleChange} required className="border p-2 w-full">
-          <option value="">Select Doctor</option>
-          {doctors.map((doc) => (
-            <option key={doc._id} value={doc._id}>{doc.name}</option>
-          ))}
-        </select>
+        <DoctorSelector
+          onDoctorSelect={(doctorId) =>
+            setFormData((prev) => ({ ...prev, assignedDoctor: doctorId }))
+          }
+        />
 
-        <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">{editingId ? 'Update' : 'Create'}</button>
+        <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">
+          {editingId ? 'Update' : 'Create'}
+        </button>
       </form>
 
       <hr className="my-6" />

@@ -47,10 +47,6 @@ export default function UserHomepage() {
             <PaperClipIcon className="h-5 w-5 text-purple-500 mr-2" />
             <span className="text-blue-500 cursor-pointer">View Chats</span>
           </Link>
-           {/* <div className="flex items-center">
-            <PencilSquareIcon className="h-5 w-5 text-yellow-500 mr-2" />
-            <span className="text-blue-500 cursor-pointer">Update Profile</span> 
-          </div> */}
         </div>
       </div>
     </div>

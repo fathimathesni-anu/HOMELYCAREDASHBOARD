@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axiosInstance from '../../api/axiosInstance'; // Adjust path as needed
 
 const CreateStaff = () => {
@@ -15,6 +15,22 @@ const CreateStaff = () => {
   });
 
   const [message, setMessage] = useState('');
+  const [staffList, setStaffList] = useState([]);
+  const [searchDept, setSearchDept] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+
+  useEffect(() => {
+    const fetchStaffList = async () => {
+      try {
+        const response = await axiosInstance.get('/staff');
+        setStaffList(response.data);
+      } catch (error) {
+        console.error('Failed to fetch staff list:', error);
+      }
+    };
+    fetchStaffList();
+  }, []);
 
   const handleChange = (e, field, index = null) => {
     const { name, value } = e.target;
@@ -49,12 +65,34 @@ const CreateStaff = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axiosInstance.post('/staff/create', formData);
+      await axiosInstance.post('/staff/create', formData);
       setMessage('Staff member created successfully!');
+      const response = await axiosInstance.get('/staff');
+      setStaffList(response.data);
     } catch (error) {
       setMessage(error.response?.data?.message || 'Failed to create staff');
     }
   };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this staff member?')) return;
+    try {
+      await axiosInstance.delete(`/staff/delete/${id}`);
+      setStaffList((prev) => prev.filter((s) => s._id !== id));
+    } catch (err) {
+      console.error('Delete failed:', err);
+      alert('Failed to delete staff');
+    }
+  };
+
+  const filteredStaff = staffList.filter((staff) =>
+    staff.department?.toLowerCase().includes(searchDept.toLowerCase())
+  );
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentStaff = filteredStaff.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredStaff.length / itemsPerPage);
 
   return (
     <div className="max-w-xl mx-auto p-6 bg-white shadow-md rounded-xl">
@@ -153,6 +191,75 @@ const CreateStaff = () => {
           Create Staff
         </button>
       </form>
+
+      {/* Staff List Section */}
+      <div className="mt-8">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-xl font-semibold">Staff List</h3>
+          <input
+            type="text"
+            placeholder="Filter by department"
+            className="border p-2 rounded"
+            value={searchDept}
+            onChange={(e) => {
+              setSearchDept(e.target.value);
+              setCurrentPage(1);
+            }}
+          />
+        </div>
+
+        {currentStaff.length === 0 ? (
+          <p className="text-gray-500">No staff found.</p>
+        ) : (
+          <div className="overflow-auto max-h-[400px] border rounded">
+            <table className="min-w-full text-sm table-auto">
+              <thead className="bg-gray-100">
+                <tr>
+                  <th className="px-4 py-2 text-left">Name</th>
+                  <th className="px-4 py-2 text-left">Position</th>
+                  <th className="px-4 py-2 text-left">Department</th>
+                  <th className="px-4 py-2 text-left">Phone</th>
+                  <th className="px-4 py-2 text-left">Email</th>
+                  <th className="px-4 py-2 text-left">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {currentStaff.map((staff) => (
+                  <tr key={staff._id} className="border-t">
+                    <td className="px-4 py-2">{staff.userId?.name || 'N/A'}</td>
+                    <td className="px-4 py-2">{staff.position}</td>
+                    <td className="px-4 py-2">{staff.department}</td>
+                    <td className="px-4 py-2">{staff.contactInfo?.phone}</td>
+                    <td className="px-4 py-2">{staff.contactInfo?.email}</td>
+                    <td className="px-4 py-2 space-x-2">
+                      <button className="text-blue-500 hover:underline" onClick={() => alert('Edit feature coming soon')}>
+                        Edit
+                      </button>
+                      <button className="text-red-500 hover:underline" onClick={() => handleDelete(staff._id)}>
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        <div className="flex justify-center mt-4 space-x-2">
+          {Array.from({ length: totalPages }, (_, i) => (
+            <button
+              key={i}
+              onClick={() => setCurrentPage(i + 1)}
+              className={`px-3 py-1 rounded ${
+                currentPage === i + 1 ? 'bg-blue-500 text-white' : 'bg-gray-200'
+              }`}
+            >
+              {i + 1}
+            </button>
+          ))}
+        </div>
+      </div>
     </div>
   );
 };

@@ -13,7 +13,7 @@ import {
 import { useroleAuth, authorizeRoles } from '../middleware/useroleAuth.js';
 
 // Create a new staff member (admin only)
-router.post('/create', useroleAuth, authorizeRoles('admin'), createStaff);
+router.post('/create', useroleAuth, authorizeRoles('admin','staff','doctor'), createStaff);
 
 // Get all staff members (any logged-in user)
 router.get('/', useroleAuth, getAllStaff);
@@ -22,10 +22,10 @@ router.get('/', useroleAuth, getAllStaff);
 router.get('/:id', useroleAuth, getStaffById);
 
 // Update staff member (admin or staff)
-router.put('/update/:id', useroleAuth, authorizeRoles('admin', 'staff'), updateStaff);
+router.put('/update/:id', useroleAuth, authorizeRoles('admin', 'staff','doctor'), updateStaff);
 
 // Delete staff member (admin only)
-router.delete('/delete/:id', useroleAuth, authorizeRoles('admin'), deleteStaff);
+router.delete('/delete/:id', useroleAuth, authorizeRoles('admin','staff','doctor'), deleteStaff);
 
 export { router as staffRouter };
 

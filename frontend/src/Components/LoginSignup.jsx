@@ -34,7 +34,7 @@ export default function LoginSignup() {
       // Store user data (including role)
       const userData = res.data.data;
       localStorage.setItem("user", JSON.stringify(userData));
-
+      console.log(userData) 
       // Check role and navigate accordingly
       const userRole = userData.role; // Assuming role is included in the response
       if (userRole === "admin" || userRole === "superadmin") {
