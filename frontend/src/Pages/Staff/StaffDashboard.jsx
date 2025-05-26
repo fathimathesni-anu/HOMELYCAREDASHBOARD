@@ -33,7 +33,7 @@ const StaffDashboard = () => {
 
       {!loading && !error && (
         <div className="text-gray-600 dark:text-gray-300 mb-4">
-         {/*  Logged in as: <strong>{userName}</strong> ({userRole}) */}   Logged in as: <strong>{userName}</strong> | Role: <strong>{userRole}</strong>
+       Logged in as: <strong>{userName}</strong> | Role: <strong>{userRole}</strong>
         </div>
       )}
 

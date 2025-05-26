@@ -18,7 +18,6 @@ export default function UserNavbar() {
 
   const navigate = useNavigate();
 
-  // ✅ Fetch user profile
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -32,7 +31,6 @@ export default function UserNavbar() {
     fetchProfile();
   }, []);
 
-  // 🖼 Handle file input
   const handleFileChange = (e) => {
     const selected = e.target.files[0];
     if (!selected) return;
@@ -40,7 +38,6 @@ export default function UserNavbar() {
     setPreview(URL.createObjectURL(selected));
   };
 
-  // ⬆️ Upload new profile picture
   const handleUpload = async () => {
     if (!file) return;
 
@@ -57,6 +54,7 @@ export default function UserNavbar() {
       setProfilePic(res.data.profilePic);
       setFile(null);
       setPreview(null);
+      setDropdownOpen(false); // Optionally close dropdown after upload
     } catch (err) {
       console.error('❌ Upload failed:', err.response?.data || err.message);
     } finally {
@@ -94,7 +92,7 @@ export default function UserNavbar() {
               src={
                 preview ||
                 (profilePic
-                  ? `user/uploads/${profilePic}`
+                  ? `/user/uploads/${profilePic}`
                   : `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'User')}&background=random&size=128`)
               }
               alt="Profile"
@@ -111,7 +109,12 @@ export default function UserNavbar() {
               <div className="flex items-center space-x-2">
                 <div className="w-10 h-10 rounded-full overflow-hidden border">
                   <img
-                    src={preview || (profilePic ? `user/uploads/${profilePic}` : 'https://ui-avatars.com/api/?name=User&background=random&size=128')}
+                    src={
+                      preview ||
+                      (profilePic
+                        ? `/user/uploads/${profilePic}`
+                        : `https://ui-avatars.com/api/?name=${user.name}&background=random&size=128`)
+                    }
                     alt="Preview"
                     className="object-cover w-full h-full"
                   />
@@ -121,15 +124,14 @@ export default function UserNavbar() {
 
               <button
                 onClick={handleUpload}
+                className="block w-full px-2 py-1 text-sm text-white bg-blue-600 hover:bg-blue-700 rounded"
                 disabled={uploading}
-                className="block w-full text-left px-2 py-1 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
               >
                 {uploading ? 'Uploading...' : 'Upload'}
               </button>
 
               <Link
                 to="/dashboard/profile"
-                onClick={() => setDropdownOpen(false)}
                 className="block px-2 py-1 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
               >
                 View Profile
@@ -147,6 +149,7 @@ export default function UserNavbar() {
     </header>
   );
 }
+
 
 
 
