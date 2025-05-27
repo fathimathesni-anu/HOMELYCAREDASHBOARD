@@ -1,7 +1,13 @@
 import React, { useState } from 'react';
 import axiosInstance from '../../api/axiosInstance';
 
-const ScheduleForm = ({ doctorId, scheduleIndex = null, existingSchedule = null, token, onSuccess }) => {
+const ScheduleForm = ({
+  doctorId,
+  scheduleIndex = null,
+  existingSchedule = null,
+  token, // Optional if axiosInstance handles this
+  onSuccess
+}) => {
   const [formData, setFormData] = useState({
     doctorName: existingSchedule?.doctorName || '',
     specialization: existingSchedule?.specialization || '',
@@ -35,35 +41,33 @@ const ScheduleForm = ({ doctorId, scheduleIndex = null, existingSchedule = null,
 
       const method = scheduleIndex !== null ? 'put' : 'post';
 
-      const response = await axiosInstance[method](url, formData, {
+      await axiosInstance[method](url, formData, {
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`, // Optional if globally handled
         },
       });
 
       alert(`Schedule ${scheduleIndex !== null ? 'updated' : 'added'} successfully.`);
-      if (onSuccess) onSuccess(response.data);
+      onSuccess?.();
     } catch (err) {
       console.error('Error submitting schedule:', err);
       alert('Failed to submit schedule');
     }
   };
 
-  // ✅ Delete schedule handler
   const handleDelete = async () => {
-    const confirmDelete = window.confirm('Are you sure you want to delete this schedule?');
-    if (!confirmDelete) return;
+    if (!window.confirm('Are you sure you want to delete this schedule?')) return;
 
     try {
       const url = `/doctorschedule/${doctorId}/schedules/${scheduleIndex}`;
       await axiosInstance.delete(url, {
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`, // Optional
         },
       });
 
       alert('Schedule deleted successfully.');
-      if (onSuccess) onSuccess(); // Let parent refresh data or close modal
+      onSuccess?.();
     } catch (err) {
       console.error('Error deleting schedule:', err);
       alert('Failed to delete schedule');
@@ -71,7 +75,7 @@ const ScheduleForm = ({ doctorId, scheduleIndex = null, existingSchedule = null,
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-4 mt-6 border p-4 rounded shadow-sm bg-white">
       <div>
         <label className="block text-sm font-medium text-gray-700">Doctor Name</label>
         <input
@@ -139,7 +143,7 @@ const ScheduleForm = ({ doctorId, scheduleIndex = null, existingSchedule = null,
         </div>
       </div>
 
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between pt-4">
         <button
           type="submit"
           className="inline-flex justify-center rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
@@ -162,6 +166,7 @@ const ScheduleForm = ({ doctorId, scheduleIndex = null, existingSchedule = null,
 };
 
 export default ScheduleForm;
+
 
 
 

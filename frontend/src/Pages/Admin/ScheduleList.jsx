@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axiosInstance from '../../api/axiosInstance';
-import ScheduleForm from './SheduleForm';
+import ScheduleForm from '../Admin/SheduleForm';
 
 const ScheduleList = ({ doctorId, token, userRole }) => {
   const [schedules, setSchedules] = useState([]);
@@ -8,11 +8,13 @@ const ScheduleList = ({ doctorId, token, userRole }) => {
   const [showForm, setShowForm] = useState(false);
 
   const fetchSchedules = async () => {
+    if (!doctorId) return;
+
     try {
       const response = await axiosInstance.get(`/doctorschedule/${doctorId}`, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${token}` }, // Optional if axiosInstance handles auth globally
       });
-      setSchedules(response.data.schedules || []);
+      setSchedules(response.data?.schedules || []);
     } catch (err) {
       console.error('Error fetching schedules:', err);
     }
@@ -59,8 +61,10 @@ const ScheduleList = ({ doctorId, token, userRole }) => {
               className="p-4 border rounded-md flex justify-between items-center"
             >
               <div>
-                <p className="font-medium">{schedule.doctorName} - {schedule.specialization}</p>
-                <p>{schedule.availableDays.join(', ')}</p>
+                <p className="font-medium">
+                  {schedule.doctorName || 'Doctor'} — {schedule.specialization || 'N/A'}
+                </p>
+                <p>{(schedule.availableDays || []).join(', ')}</p>
                 <p>{schedule.startTime} - {schedule.endTime}</p>
               </div>
               <button
@@ -88,4 +92,5 @@ const ScheduleList = ({ doctorId, token, userRole }) => {
 };
 
 export default ScheduleList;
+
 

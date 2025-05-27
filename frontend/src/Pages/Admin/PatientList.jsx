@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axiosInstance from '../../api/axiosInstance';
-import DoctorSelector from '../../Components/Admin/DoctorSelector';
-import ScheduleList from '../../Pages/Admin/ScheduleList'; // ✅ Make sure this path is correct
+import DoctorSelector from '../../Components/Admin/DoctorSelector'; // Adjust path if needed
 
 const PatientList = () => {
   const [patients, setPatients] = useState([]);
@@ -124,17 +123,6 @@ const PatientList = () => {
           }
         />
 
-        {/* ✅ Show ScheduleList for selected doctor */}
-        {formData.assignedDoctor && (
-          <div className="mt-4">
-            <ScheduleList
-              doctorId={formData.assignedDoctor}
-              token={localStorage.getItem('token')}
-              userRole="admin"
-            />
-          </div>
-        )}
-
         <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">
           {editingId ? 'Update' : 'Create'}
         </button>
@@ -163,6 +151,4 @@ const PatientList = () => {
 };
 
 export default PatientList;
-
-
 

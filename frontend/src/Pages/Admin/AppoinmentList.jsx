@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axiosInstance from '../../api/axiosInstance';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import ScheduleList from './ScheduleList';
+
 
 const Appointment = ({ appointment, onEdit, onDelete, onMarkStatus, doctors }) => {
   const doctor = typeof appointment.doctorId === 'string'
@@ -53,7 +53,7 @@ const AppointmentList = () => {
         const [appointmentsRes, patientsRes, doctorsRes] = await Promise.all([
           axiosInstance.get('/appoinment'),
           axiosInstance.get('/patient'),
-          axiosInstance.get('/doctor'),
+          axiosInstance.get('/doctor')
         ]);
         setAppointments(appointmentsRes.data);
         setPatients(patientsRes.data);
@@ -99,15 +99,10 @@ const AppointmentList = () => {
     e.preventDefault();
     try {
       if (editingAppointment) {
-        const response = await axiosInstance.put(
-          `/appoinment/update/${editingAppointment._id}`,
-          formData
-        );
+        const response = await axiosInstance.put(`/appoinment/update/${editingAppointment._id}`, formData);
         setAppointments((prev) =>
           prev.map((appointment) =>
-            appointment._id === editingAppointment._id
-              ? response.data.appointment
-              : appointment
+            appointment._id === editingAppointment._id ? response.data.appointment : appointment
           )
         );
         setEditingAppointment(null);
@@ -170,6 +165,8 @@ const AppointmentList = () => {
   return (
     <div className="appointment-list p-6 space-y-6">
       <form onSubmit={handleSubmit} className="space-y-4">
+
+        {/* Patient Select */}
         <select
           name="patientId"
           value={formData.patientId}
@@ -185,6 +182,7 @@ const AppointmentList = () => {
           ))}
         </select>
 
+        {/* Doctor Select */}
         <select
           name="doctorId"
           value={formData.doctorId}
@@ -200,17 +198,7 @@ const AppointmentList = () => {
           ))}
         </select>
 
-        {/* ✅ Display doctor schedule when selected */}
-        {formData.doctorId && (
-          <div className="mt-4">
-            <ScheduleList
-              doctorId={formData.doctorId}
-              token={localStorage.getItem('token')}
-              userRole="admin"
-            />
-          </div>
-        )}
-
+        {/* Date Picker */}
         {loadingSchedule ? (
           <p>Loading available schedule...</p>
         ) : (
@@ -237,6 +225,7 @@ const AppointmentList = () => {
           />
         )}
 
+        {/* Reason */}
         <input
           type="text"
           name="reason"
@@ -247,6 +236,7 @@ const AppointmentList = () => {
           required
         />
 
+        {/* Notes */}
         <textarea
           name="notes"
           value={formData.notes}
@@ -295,15 +285,17 @@ const AppointmentList = () => {
             onEdit={handleEdit}
             onDelete={handleDelete}
             onMarkStatus={handleMarkStatus}
-            doctors={doctors}
+            doctors={doctors} // ← add this
           />
         ))
+
       )}
     </div>
   );
 };
 
 export default AppointmentList;
+
 
 
 

@@ -3,26 +3,6 @@ import axiosInstance from '../../api/axiosInstance';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
-/* const Appointment = ({ appointment, onEdit, onDelete, onMarkStatus }) => {
-  return (
-    <div className="appointment p-4 border rounded-md shadow-sm flex justify-between items-center">
-      <div className="appointment-content">
-        <h4 className="text-lg font-semibold">Patient: {appointment.patientId?.name}</h4>
-        <p><strong>Doctor:</strong> {appointment.doctorId?.userId?.name || appointment.doctorId?.name}</p>
-        <p><strong>Appointment Date:</strong> {new Date(appointment.appointmentDate).toLocaleString()}</p>
-        <p><strong>Status:</strong> {appointment.status}</p>
-        <p><strong>Reason:</strong> {appointment.reason}</p>
-        <p><strong>Notes:</strong> {appointment.notes}</p>
-      </div>
-      <div className="flex space-x-2">
-        <button onClick={() => onEdit(appointment)} className="px-3 py-1 bg-yellow-500 text-white text-sm rounded-md hover:bg-yellow-600">Edit</button>
-        <button onClick={() => onDelete(appointment._id)} className="px-3 py-1 bg-red-500 text-white text-sm rounded-md hover:bg-red-600">Delete</button>
-        <button onClick={() => onMarkStatus(appointment._id, 'Completed')} className="px-3 py-1 bg-blue-500 text-white text-sm rounded-md hover:bg-blue-600">Mark as Completed</button>
-        <button onClick={() => onMarkStatus(appointment._id, 'Cancelled')} className="px-3 py-1 bg-gray-500 text-white text-sm rounded-md hover:bg-gray-600">Mark as Cancelled</button>
-      </div>
-    </div>
-  );
-}; */
 
 const Appointment = ({ appointment, onEdit, onDelete, onMarkStatus, doctors }) => {
   const doctor = typeof appointment.doctorId === 'string'
@@ -298,15 +278,6 @@ const AppointmentList = () => {
       {appointments.length === 0 ? (
         <p className="text-center text-gray-500">No appointments</p>
       ) : (
-        /*  appointments.map((appointment) => (
-           <Appointment
-             key={appointment._id}
-             appointment={appointment}
-             onEdit={handleEdit}
-             onDelete={handleDelete}
-             onMarkStatus={handleMarkStatus}
-           />
-         )) */
         appointments.map((appointment) => (
           <Appointment
             key={appointment._id}
