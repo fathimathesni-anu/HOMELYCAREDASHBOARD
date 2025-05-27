@@ -49,6 +49,27 @@ const ScheduleForm = ({ doctorId, scheduleIndex = null, existingSchedule = null,
     }
   };
 
+  // ✅ Delete schedule handler
+  const handleDelete = async () => {
+    const confirmDelete = window.confirm('Are you sure you want to delete this schedule?');
+    if (!confirmDelete) return;
+
+    try {
+      const url = `/doctorschedule/${doctorId}/schedules/${scheduleIndex}`;
+      await axiosInstance.delete(url, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      alert('Schedule deleted successfully.');
+      if (onSuccess) onSuccess(); // Let parent refresh data or close modal
+    } catch (err) {
+      console.error('Error deleting schedule:', err);
+      alert('Failed to delete schedule');
+    }
+  };
+
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
@@ -118,18 +139,30 @@ const ScheduleForm = ({ doctorId, scheduleIndex = null, existingSchedule = null,
         </div>
       </div>
 
-      <div>
+      <div className="flex items-center justify-between">
         <button
           type="submit"
-          className="inline-flex justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 focus:outline-none"
+          className="inline-flex justify-center rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
         >
           {scheduleIndex !== null ? 'Update Schedule' : 'Add Schedule'}
         </button>
+
+        {scheduleIndex !== null && (
+          <button
+            type="button"
+            onClick={handleDelete}
+            className="inline-flex justify-center rounded-md bg-red-600 px-4 py-2 text-white hover:bg-red-700"
+          >
+            Delete
+          </button>
+        )}
       </div>
     </form>
   );
 };
 
 export default ScheduleForm;
+
+
 
 

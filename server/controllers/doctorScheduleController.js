@@ -61,3 +61,21 @@ export const deleteDoctorSchedule = async (req, res) => {
   }
 };
 
+// Get all schedules for a specific doctor
+
+  export const getDoctorSchedule =async (req, res) => {
+    const { doctorId } = req.params;
+
+    try {
+      const doctor = await Doctor.findById(doctorId);
+      if (!doctor) {
+        return res.status(404).json({ message: 'Doctor not found' });
+      }
+
+      res.json({ schedules: doctor.schedule });
+    } catch (error) {
+      console.error('Error fetching doctor schedules:', error);
+      res.status(500).json({ message: 'Failed to fetch schedules', error });
+    }
+  };
+

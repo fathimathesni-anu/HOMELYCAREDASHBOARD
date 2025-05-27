@@ -3,6 +3,7 @@ import {
   addScheduleToDoctor,
   updateDoctorSchedule,
   deleteDoctorSchedule,
+  getDoctorSchedule,
 } from '../controllers/doctorScheduleController.js';
 
 import { useroleAuth, authorizeRoles } from '../middleware/useroleAuth.js';
@@ -33,5 +34,9 @@ router.delete(
   deleteDoctorSchedule
 );
 
+router.get(
+  '/:doctorId',
+  useroleAuth,
+  authorizeRoles('admin', 'staff'),getDoctorSchedule);
 export { router as doctorScheduleRouter };
 

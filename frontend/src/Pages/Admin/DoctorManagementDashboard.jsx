@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import DoctorForm from './DoctorForm';
-import ScheduleForm from './SheduleForm';
+import ScheduleList from './ScheduleList'; // ✅ Use this instead of ScheduleForm
 import axiosInstance from '../../api/axiosInstance';
 
 const DoctorManagementDashboard = () => {
   const [doctors, setDoctors] = useState([]);
   const [selectedDoctor, setSelectedDoctor] = useState(null);
   const [showScheduleModal, setShowScheduleModal] = useState(false);
-  const [token, setToken] = useState(''); // Replace with auth token logic
+  const [token, setToken] = useState(''); // Replace with actual auth logic
 
   useEffect(() => {
     fetchDoctors();
@@ -62,36 +62,25 @@ const DoctorManagementDashboard = () => {
         </ul>
       </div>
 
+      {/* ✅ Schedule Modal */}
       {showScheduleModal && selectedDoctor && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white p-6 rounded shadow-xl w-full max-w-2xl relative">
+          <div className="bg-white p-6 rounded shadow-xl w-full max-w-3xl relative max-h-[90vh] overflow-y-auto">
             <button
               onClick={closeScheduleModal}
-              className="absolute top-2 right-2 text-gray-600 hover:text-black"
+              className="absolute top-2 right-2 text-gray-600 hover:text-black text-2xl"
             >
               &times;
             </button>
-            <h2 className="text-xl font-bold mb-4">Manage Schedule for {selectedDoctor.userId?.name}</h2>
+            <h2 className="text-xl font-bold mb-4">
+              Manage Schedule for {selectedDoctor.userId?.name || 'Doctor'}
+            </h2>
 
-            {selectedDoctor.schedule?.map((sched, index) => (
-              <div key={index} className="mb-6">
-                <ScheduleForm
-                  doctorId={selectedDoctor._id}
-                  scheduleIndex={index}
-                  existingSchedule={sched}
-                  token={token}
-                  onSuccess={fetchDoctors}
-                />
-              </div>
-            ))}
-
-            <div className="mt-6">
-              <ScheduleForm
-                doctorId={selectedDoctor._id}
-                token={token}
-                onSuccess={fetchDoctors}
-              />
-            </div>
+            <ScheduleList
+              doctorId={selectedDoctor._id}
+              token={token}
+              userRole="admin" // Or derive from user context
+            />
           </div>
         </div>
       )}
@@ -100,6 +89,7 @@ const DoctorManagementDashboard = () => {
 };
 
 export default DoctorManagementDashboard;
+
 
 
 
