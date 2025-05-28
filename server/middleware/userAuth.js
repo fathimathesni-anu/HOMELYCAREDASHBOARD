@@ -17,7 +17,7 @@ export const userAuth = (req, res, next) =>{
   } catch (error) {
     return res.status(401).json({message:error.message||"user autherization failed",success:false});
   }
-}; 
+};
 
 /* import jwt from "jsonwebtoken";
 

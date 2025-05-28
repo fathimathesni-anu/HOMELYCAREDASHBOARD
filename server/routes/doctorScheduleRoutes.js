@@ -14,7 +14,7 @@ const router = express.Router();
 router.post(
   '/:doctorId/schedules',
   useroleAuth,
-  authorizeRoles('admin', 'staff'),
+  authorizeRoles('admin', 'staff','doctor'),
   addScheduleToDoctor
 );
 
@@ -22,7 +22,7 @@ router.post(
 router.put(
   '/:doctorId/schedules/:scheduleIndex',
   useroleAuth,
-  authorizeRoles('admin', 'staff'),
+  authorizeRoles('admin', 'staff','doctor'),
   updateDoctorSchedule
 );
 
@@ -37,6 +37,6 @@ router.delete(
 router.get(
   '/:doctorId',
   useroleAuth,
-  authorizeRoles('admin', 'staff'),getDoctorSchedule);
+  authorizeRoles('admin', 'staff','doctor'),getDoctorSchedule);
 export { router as doctorScheduleRouter };
 

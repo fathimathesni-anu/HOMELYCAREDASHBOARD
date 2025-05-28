@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axiosInstance from '../../api/axiosInstance';
-import DoctorSelector from '../../Components/Admin/DoctorSelector'; // Adjust path if needed
+import DoctorSelector from '../../Components/Admin/DoctorSelector';
+import ScheduleViewer from '../../Components/ScheduleViewer'; // ✅ Import ScheduleViewer
 
 const PatientList = () => {
   const [patients, setPatients] = useState([]);
@@ -106,22 +107,72 @@ const PatientList = () => {
     <div className="p-4">
       <h2 className="text-xl font-bold mb-4">{editingId ? 'Edit Patient' : 'Add New Patient'}</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
-        <input name="name" value={formData.name} onChange={handleChange} placeholder="Name" required className="border p-2 w-full" />
-        <input name="age" value={formData.age} onChange={handleChange} placeholder="Age" type="number" required className="border p-2 w-full" />
-        <select name="gender" value={formData.gender} onChange={handleChange} required className="border p-2 w-full">
+        <input
+          name="name"
+          value={formData.name}
+          onChange={handleChange}
+          placeholder="Name"
+          required
+          className="border p-2 w-full"
+        />
+        <input
+          name="age"
+          value={formData.age}
+          onChange={handleChange}
+          placeholder="Age"
+          type="number"
+          required
+          className="border p-2 w-full"
+        />
+        <select
+          name="gender"
+          value={formData.gender}
+          onChange={handleChange}
+          required
+          className="border p-2 w-full"
+        >
           <option value="">Select Gender</option>
           <option value="male">Male</option>
           <option value="female">Female</option>
         </select>
-        <input name="contactInfo.phone" value={formData.contactInfo.phone} onChange={handleChange} placeholder="Phone" className="border p-2 w-full" />
-        <input name="contactInfo.email" value={formData.contactInfo.email} onChange={handleChange} placeholder="Email" className="border p-2 w-full" />
-        <input name="contactInfo.address" value={formData.contactInfo.address} onChange={handleChange} placeholder="Address" className="border p-2 w-full" />
+        <input
+          name="contactInfo.phone"
+          value={formData.contactInfo.phone}
+          onChange={handleChange}
+          placeholder="Phone"
+          className="border p-2 w-full"
+        />
+        <input
+          name="contactInfo.email"
+          value={formData.contactInfo.email}
+          onChange={handleChange}
+          placeholder="Email"
+          className="border p-2 w-full"
+        />
+        <input
+          name="contactInfo.address"
+          value={formData.contactInfo.address}
+          onChange={handleChange}
+          placeholder="Address"
+          className="border p-2 w-full"
+        />
 
         <DoctorSelector
           onDoctorSelect={(doctorId) =>
             setFormData((prev) => ({ ...prev, assignedDoctor: doctorId }))
           }
         />
+
+        {/* ✅ Show doctor schedule if assignedDoctor is selected */}
+        {formData.assignedDoctor && (
+          <div className="border rounded-md p-3 bg-gray-50">
+            <h4 className="font-semibold mb-2">Doctor's Schedule</h4>
+            <ScheduleViewer
+              doctorId={formData.assignedDoctor}
+              token={localStorage.getItem('token')}
+            />
+          </div>
+        )}
 
         <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">
           {editingId ? 'Update' : 'Create'}
@@ -140,8 +191,18 @@ const PatientList = () => {
               📞 {patient.contactInfo.phone} | 📧 {patient.contactInfo.email}
             </div>
             <div className="space-x-2">
-              <button onClick={() => handleEdit(patient)} className="bg-yellow-400 px-2 py-1 rounded">Edit</button>
-              <button onClick={() => handleDelete(patient._id)} className="bg-red-600 text-white px-2 py-1 rounded">Delete</button>
+              <button
+                onClick={() => handleEdit(patient)}
+                className="bg-yellow-400 px-2 py-1 rounded"
+              >
+                Edit
+              </button>
+              <button
+                onClick={() => handleDelete(patient._id)}
+                className="bg-red-600 text-white px-2 py-1 rounded"
+              >
+                Delete
+              </button>
             </div>
           </li>
         ))}

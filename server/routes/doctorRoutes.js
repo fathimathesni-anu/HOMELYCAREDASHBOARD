@@ -11,7 +11,7 @@ import {
 import { useroleAuth, authorizeRoles } from '../middleware/useroleAuth.js';
 
 // Create a new doctor (only admin can create typically)
-router.post('/create', useroleAuth, authorizeRoles('admin','staff'), createDoctor);
+router.post('/create', useroleAuth, authorizeRoles('admin','staff','doctor'), createDoctor);
 
 // Get all doctors (any logged-in user)
 router.get('/', useroleAuth, getAllDoctors);
@@ -20,7 +20,7 @@ router.get('/', useroleAuth, getAllDoctors);
 router.get('/:id', useroleAuth, getDoctorById);
 
 // Update doctor (admin or staff)
-router.put('/update/:id', useroleAuth, authorizeRoles('admin', 'staff'), updateDoctor);
+router.put('/update/:id', useroleAuth, authorizeRoles('admin', 'staff','doctor'), updateDoctor);
 
 // Delete doctor (admin only)
 router.delete('/delete/:id', useroleAuth, authorizeRoles('admin'), deleteDoctor);

@@ -1,14 +1,20 @@
 import React, { useState } from 'react';
 import axiosInstance from '../../api/axiosInstance';
 
-const ScheduleForm = ({ doctorId, scheduleIndex = null, existingSchedule = null, token, onSuccess }) => {
+const ScheduleForm = ({
+  doctorId,
+  scheduleIndex = null,
+  existingSchedule = null,
+  onSuccess
+}) => {
   const [formData, setFormData] = useState({
-    availableDays: existingSchedule?.availableDays || [],
+    doctorName: existingSchedule?.doctorName || '',
+    specialization: existingSchedule?.specialization || '',
+    availableDays: Array.isArray(existingSchedule?.availableDays) ? existingSchedule.availableDays : [],
     startTime: existingSchedule?.startTime || '',
     endTime: existingSchedule?.endTime || '',
   });
 
-  const [loading, setLoading] = useState(false);
   const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
   const handleChange = (e) => {
@@ -27,28 +33,22 @@ const ScheduleForm = ({ doctorId, scheduleIndex = null, existingSchedule = null,
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-
     try {
       const url = scheduleIndex !== null
         ? `/doctorschedule/${doctorId}/schedules/${scheduleIndex}`
         : `/doctorschedule/${doctorId}/schedules`;
 
-      const method = scheduleIndex !== null ? 'put' : 'post';
+      if (scheduleIndex !== null) {
+        await axiosInstance.put(url, formData);
+      } else {
+        await axiosInstance.post(url, formData);
+      }
 
-      const response = await axiosInstance[method](url, formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      alert(`Schedule ${scheduleIndex !== null ? 'updated' : 'added'} successfully`);
+      alert(`Schedule ${scheduleIndex !== null ? 'updated' : 'added'} successfully.`);
       onSuccess?.();
     } catch (err) {
       console.error('Error submitting schedule:', err);
       alert('Failed to submit schedule');
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -57,11 +57,9 @@ const ScheduleForm = ({ doctorId, scheduleIndex = null, existingSchedule = null,
 
     try {
       const url = `/doctorschedule/${doctorId}/schedules/${scheduleIndex}`;
-      await axiosInstance.delete(url, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await axiosInstance.delete(url);
 
-      alert('Schedule deleted successfully');
+      alert('Schedule deleted successfully.');
       onSuccess?.();
     } catch (err) {
       console.error('Error deleting schedule:', err);
@@ -70,16 +68,41 @@ const ScheduleForm = ({ doctorId, scheduleIndex = null, existingSchedule = null,
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white p-4 rounded shadow space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-4 mt-6 border p-4 rounded shadow-sm bg-white">
       <div>
-        <label className="block font-semibold mb-1">Available Days:</label>
-        <div className="flex flex-wrap gap-3">
+        <label className="block text-sm font-medium text-gray-700">Doctor Name</label>
+        <input
+          type="text"
+          name="doctorName"
+          value={formData.doctorName}
+          onChange={handleChange}
+          required
+          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700">Specialization</label>
+        <input
+          type="text"
+          name="specialization"
+          value={formData.specialization}
+          onChange={handleChange}
+          required
+          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Available Days</label>
+        <div className="grid grid-cols-2 gap-2">
           {daysOfWeek.map((day) => (
-            <label key={day} className="flex items-center space-x-1">
+            <label key={day} className="flex items-center space-x-2">
               <input
                 type="checkbox"
                 checked={formData.availableDays.includes(day)}
                 onChange={() => handleCheckboxChange(day)}
+                className="rounded text-blue-600 focus:ring-blue-500"
               />
               <span>{day}</span>
             </label>
@@ -87,47 +110,47 @@ const ScheduleForm = ({ doctorId, scheduleIndex = null, existingSchedule = null,
         </div>
       </div>
 
-      <div>
-        <label className="block font-semibold mb-1">Start Time:</label>
-        <input
-          type="time"
-          name="startTime"
-          value={formData.startTime}
-          onChange={handleChange}
-          className="border p-2 rounded w-full"
-          required
-        />
-      </div>
-
-      <div>
-        <label className="block font-semibold mb-1">End Time:</label>
-        <input
-          type="time"
-          name="endTime"
-          value={formData.endTime}
-          onChange={handleChange}
-          className="border p-2 rounded w-full"
-          required
-        />
-      </div>
-
       <div className="flex space-x-4">
+        <div className="flex-1">
+          <label className="block text-sm font-medium text-gray-700">Start Time</label>
+          <input
+            type="time"
+            name="startTime"
+            value={formData.startTime}
+            onChange={handleChange}
+            required
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
+          />
+        </div>
+
+        <div className="flex-1">
+          <label className="block text-sm font-medium text-gray-700">End Time</label>
+          <input
+            type="time"
+            name="endTime"
+            value={formData.endTime}
+            onChange={handleChange}
+            required
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
+          />
+        </div>
+      </div>
+
+      <div className="flex items-center justify-between pt-4">
         <button
           type="submit"
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-          disabled={loading}
+          className="inline-flex justify-center rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
         >
-          {scheduleIndex !== null ? 'Update' : 'Add'} Schedule
+          {scheduleIndex !== null ? 'Update Schedule' : 'Add Schedule'}
         </button>
 
         {scheduleIndex !== null && (
           <button
             type="button"
             onClick={handleDelete}
-            className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
-            disabled={loading}
+            className="inline-flex justify-center rounded-md bg-red-600 px-4 py-2 text-white hover:bg-red-700"
           >
-            Delete Schedule
+            Delete
           </button>
         )}
       </div>
@@ -136,5 +159,9 @@ const ScheduleForm = ({ doctorId, scheduleIndex = null, existingSchedule = null,
 };
 
 export default ScheduleForm;
+
+
+
+
 
 

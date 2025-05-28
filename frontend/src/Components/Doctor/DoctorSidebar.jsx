@@ -3,6 +3,7 @@ import {
   HomeIcon,
   CalendarIcon,
   UserGroupIcon,
+  UserIcon,
   ChatBubbleLeftEllipsisIcon,
   BellIcon,
   Bars3Icon,
@@ -15,6 +16,7 @@ const menuItems = [
   { name: 'Dashboard', icon: HomeIcon, path: '/dashboard' },
   { name: 'Appointments', icon: CalendarIcon, path: '/dashboard/appointments' },
   { name: 'Patients', icon: UserGroupIcon, path: '/dashboard/patients' },
+  { name: 'Doctors', icon: UserIcon, path: '/dashboard/doctors' },
   { name: 'Chat', icon: ChatBubbleLeftEllipsisIcon, path: '/dashboard/chat' },
   { name: 'Notifications', icon: BellIcon, path: '/dashboard/notifications' },
   { name: 'Feedback', icon: PencilSquareIcon, path: '/dashboard/feedback' },
@@ -43,11 +45,10 @@ export default function DoctorSidebar() {
             <Link
               key={item.name}
               to={item.path}
-              className={`flex items-center p-2 text-sm font-medium rounded-lg transition-colors duration-200 ${
-                isActive
+              className={`flex items-center p-2 text-sm font-medium rounded-lg transition-colors duration-200 ${isActive
                   ? 'bg-blue-100 text-blue-700 dark:bg-blue-700 dark:text-white'
                   : 'text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800'
-              }`}
+                }`}
             >
               <item.icon className="h-5 w-5 mr-3" />
               <span className={`${isOpen ? 'inline' : 'hidden'} transition-opacity duration-300`}>

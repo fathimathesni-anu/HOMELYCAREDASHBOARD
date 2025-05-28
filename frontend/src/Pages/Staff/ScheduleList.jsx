@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axiosInstance from '../../api/axiosInstance';
-import ScheduleForm from '../Admin/SheduleForm'; // Fixed typo
+import ScheduleForm from '../Staff/SheduleForm'; // Fixed typo
 
 const ScheduleList = ({ doctorId, token, userRole }) => {
   const [schedules, setSchedules] = useState([]);

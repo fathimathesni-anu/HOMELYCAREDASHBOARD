@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import DoctorLayout from '../Components/Doctor/DoctorLayout';
 import DoctorDashboard from '../Pages/Doctor/DoctorDashboard';
 import Appointments from '../Pages/Doctor/AppoinmentList';
+import Doctors from '../Pages/Doctor/DoctorManagementDashboard';
 import Patients from '../Pages/Doctor/PatientList';
 import Chat from '../Pages/Doctor/ChatComponent';
 import Notifications from '../Pages/Doctor/NotificationList';
@@ -25,6 +26,7 @@ function DoctorRoutes() {
     <Routes>
       <Route path="/dashboard" element={<PrivateRoute><DoctorLayout /></PrivateRoute>}>
         <Route index element={<DoctorDashboard />} />
+        <Route path="doctors" element={<Doctors />} />
         <Route path="appointments" element={<Appointments />} />
         <Route path="patients" element={<Patients />} />
         <Route path="chat" element={<Chat />} />

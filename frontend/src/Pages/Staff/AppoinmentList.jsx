@@ -2,27 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axiosInstance from '../../api/axiosInstance';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-
-/* const Appointment = ({ appointment, onEdit, onDelete, onMarkStatus }) => {
-  return (
-    <div className="appointment p-4 border rounded-md shadow-sm flex justify-between items-center">
-      <div className="appointment-content">
-        <h4 className="text-lg font-semibold">Patient: {appointment.patientId?.name}</h4>
-        <p><strong>Doctor:</strong> {appointment.doctorId?.userId?.name || appointment.doctorId?.name}</p>
-        <p><strong>Appointment Date:</strong> {new Date(appointment.appointmentDate).toLocaleString()}</p>
-        <p><strong>Status:</strong> {appointment.status}</p>
-        <p><strong>Reason:</strong> {appointment.reason}</p>
-        <p><strong>Notes:</strong> {appointment.notes}</p>
-      </div>
-      <div className="flex space-x-2">
-        <button onClick={() => onEdit(appointment)} className="px-3 py-1 bg-yellow-500 text-white text-sm rounded-md hover:bg-yellow-600">Edit</button>
-        <button onClick={() => onDelete(appointment._id)} className="px-3 py-1 bg-red-500 text-white text-sm rounded-md hover:bg-red-600">Delete</button>
-        <button onClick={() => onMarkStatus(appointment._id, 'Completed')} className="px-3 py-1 bg-blue-500 text-white text-sm rounded-md hover:bg-blue-600">Mark as Completed</button>
-        <button onClick={() => onMarkStatus(appointment._id, 'Cancelled')} className="px-3 py-1 bg-gray-500 text-white text-sm rounded-md hover:bg-gray-600">Mark as Cancelled</button>
-      </div>
-    </div>
-  );
-}; */
+import ScheduleViewer from '../../Components/ScheduleViewer';
 
 const Appointment = ({ appointment, onEdit, onDelete, onMarkStatus, doctors }) => {
   const doctor = typeof appointment.doctorId === 'string'
@@ -55,7 +35,6 @@ const AppointmentList = () => {
   const [appointments, setAppointments] = useState([]);
   const [patients, setPatients] = useState([]);
   const [doctors, setDoctors] = useState([]);
-  const [doctorSchedule, setDoctorSchedule] = useState([]);
   const [formData, setFormData] = useState({
     patientId: '',
     doctorId: '',
@@ -65,7 +44,6 @@ const AppointmentList = () => {
     notes: '',
   });
   const [editingAppointment, setEditingAppointment] = useState(null);
-  const [loadingSchedule, setLoadingSchedule] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -73,7 +51,7 @@ const AppointmentList = () => {
         const [appointmentsRes, patientsRes, doctorsRes] = await Promise.all([
           axiosInstance.get('/appoinment'),
           axiosInstance.get('/patient'),
-          axiosInstance.get('/doctor')
+          axiosInstance.get('/doctor'),
         ]);
         setAppointments(appointmentsRes.data);
         setPatients(patientsRes.data);
@@ -85,44 +63,27 @@ const AppointmentList = () => {
     fetchData();
   }, []);
 
-  const fetchDoctorSchedule = async (doctorId) => {
-    setLoadingSchedule(true);
-    try {
-      const res = await axiosInstance.get(`/doctor/${doctorId}`);
-      setDoctorSchedule(res.data.schedule || []);
-    } catch (error) {
-      console.error('Failed to fetch doctor schedule', error);
-      setDoctorSchedule([]);
-    } finally {
-      setLoadingSchedule(false);
-    }
-  };
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
-
-    if (name === 'doctorId') {
-      setFormData((prev) => ({
-        ...prev,
-        appointmentDate: '',
-        doctorId: value,
-      }));
-      fetchDoctorSchedule(value);
-    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       if (editingAppointment) {
-        const response = await axiosInstance.put(`/appoinment/update/${editingAppointment._id}`, formData);
+        const response = await axiosInstance.put(
+          `/appoinment/update/${editingAppointment._id}`,
+          formData
+        );
         setAppointments((prev) =>
           prev.map((appointment) =>
-            appointment._id === editingAppointment._id ? response.data.appointment : appointment
+            appointment._id === editingAppointment._id
+              ? response.data.appointment
+              : appointment
           )
         );
         setEditingAppointment(null);
@@ -139,7 +100,6 @@ const AppointmentList = () => {
         status: 'Scheduled',
         notes: '',
       });
-      setDoctorSchedule([]);
     } catch (error) {
       console.error('Error saving appointment', error);
     }
@@ -155,9 +115,6 @@ const AppointmentList = () => {
       status: appointment.status,
       notes: appointment.notes,
     });
-    if (appointment.doctorId?._id) {
-      fetchDoctorSchedule(appointment.doctorId._id);
-    }
   };
 
   const handleDelete = async (id) => {
@@ -185,8 +142,6 @@ const AppointmentList = () => {
   return (
     <div className="appointment-list p-6 space-y-6">
       <form onSubmit={handleSubmit} className="space-y-4">
-
-        {/* Patient Select */}
         <select
           name="patientId"
           value={formData.patientId}
@@ -202,7 +157,6 @@ const AppointmentList = () => {
           ))}
         </select>
 
-        {/* Doctor Select */}
         <select
           name="doctorId"
           value={formData.doctorId}
@@ -218,34 +172,30 @@ const AppointmentList = () => {
           ))}
         </select>
 
-        {/* Date Picker */}
-        {loadingSchedule ? (
-          <p>Loading available schedule...</p>
-        ) : (
-          <DatePicker
-            selected={formData.appointmentDate ? new Date(formData.appointmentDate) : null}
-            onChange={(date) =>
-              setFormData((prev) => ({
-                ...prev,
-                appointmentDate: date.toISOString(),
-              }))
-            }
-            includeDates={doctorSchedule
-              .map((slot) => {
-                const date = new Date(slot);
-                return isNaN(date.getTime()) ? null : date;
-              })
-              .filter(Boolean)}
-            showTimeSelect
-            timeIntervals={30}
-            dateFormat="Pp"
-            placeholderText="Select available appointment date and time"
-            className="border p-2 rounded-md w-full"
-            disabled={!formData.doctorId}
+        {/* ✅ Integrated read-only schedule viewer */}
+        {formData.doctorId && (
+          <ScheduleViewer
+            doctorId={formData.doctorId}
+            token={localStorage.getItem('token')}
           />
         )}
 
-        {/* Reason */}
+        <DatePicker
+          selected={formData.appointmentDate ? new Date(formData.appointmentDate) : null}
+          onChange={(date) =>
+            setFormData((prev) => ({
+              ...prev,
+              appointmentDate: date.toISOString(),
+            }))
+          }
+          showTimeSelect
+          timeIntervals={30}
+          dateFormat="Pp"
+          placeholderText="Select appointment date and time"
+          className="border p-2 rounded-md w-full"
+          disabled={!formData.doctorId}
+        />
+
         <input
           type="text"
           name="reason"
@@ -256,7 +206,6 @@ const AppointmentList = () => {
           required
         />
 
-        {/* Notes */}
         <textarea
           name="notes"
           value={formData.notes}
@@ -285,7 +234,6 @@ const AppointmentList = () => {
                   status: 'Scheduled',
                   notes: '',
                 });
-                setDoctorSchedule([]);
               }}
               className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600"
             >
@@ -298,15 +246,6 @@ const AppointmentList = () => {
       {appointments.length === 0 ? (
         <p className="text-center text-gray-500">No appointments</p>
       ) : (
-        /*  appointments.map((appointment) => (
-           <Appointment
-             key={appointment._id}
-             appointment={appointment}
-             onEdit={handleEdit}
-             onDelete={handleDelete}
-             onMarkStatus={handleMarkStatus}
-           />
-         )) */
         appointments.map((appointment) => (
           <Appointment
             key={appointment._id}
@@ -314,10 +253,9 @@ const AppointmentList = () => {
             onEdit={handleEdit}
             onDelete={handleDelete}
             onMarkStatus={handleMarkStatus}
-            doctors={doctors} // ← add this
+            doctors={doctors}
           />
         ))
-
       )}
     </div>
   );
