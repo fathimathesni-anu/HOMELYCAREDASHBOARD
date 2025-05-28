@@ -168,11 +168,12 @@ const PatientList = () => {
           <div className="border rounded-md p-3 bg-gray-50">
             <h4 className="font-semibold mb-2">Doctor's Schedule</h4>
             <ScheduleViewer
-              doctorId={formData.assignedDoctor}
+              doctorId={formData.assignedDoctor._id}
               token={localStorage.getItem('token')}
             />
           </div>
         )}
+
 
         <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">
           {editingId ? 'Update' : 'Create'}

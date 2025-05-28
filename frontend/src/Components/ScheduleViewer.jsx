@@ -1,5 +1,4 @@
-// components/ScheduleViewer.js
-import React, { useEffect, useState } from 'react';
+ import React, { useEffect, useState } from 'react';
 import axiosInstance from '../api/axiosInstance';
 
 const ScheduleViewer = ({ doctorId, token }) => {
@@ -24,7 +23,7 @@ const ScheduleViewer = ({ doctorId, token }) => {
     };
 
     fetchSchedule();
-  }, [doctorId]);
+  }, [doctorId, token]);
 
   if (!doctorId) return null;
 
@@ -50,4 +49,5 @@ const ScheduleViewer = ({ doctorId, token }) => {
 };
 
 export default ScheduleViewer;
+
 

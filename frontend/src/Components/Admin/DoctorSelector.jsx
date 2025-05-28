@@ -1,9 +1,11 @@
+
+  // DoctorSelector.js
 import React, { useEffect, useState } from 'react';
 import axiosInstance from '../../api/axiosInstance';
 
-export default function DoctorSelector({ onDoctorSelect }) {
+export default function DoctorSelector({ onDoctorSelect, selectedDoctor }) {
   const [doctors, setDoctors] = useState([]);
-  const [selectedId, setSelectedId] = useState('');
+  const [selectedId, setSelectedId] = useState(selectedDoctor?._id || '');
 
   useEffect(() => {
     const fetchDoctors = async () => {
@@ -21,7 +23,8 @@ export default function DoctorSelector({ onDoctorSelect }) {
   const handleChange = (e) => {
     const doctorId = e.target.value;
     setSelectedId(doctorId);
-    onDoctorSelect(doctorId); // ✅ only pass the doctorId
+    const selectedDoc = doctors.find((doc) => doc._id === doctorId);
+    onDoctorSelect(selectedDoc);
   };
 
   return (
@@ -42,7 +45,6 @@ export default function DoctorSelector({ onDoctorSelect }) {
     </div>
   );
 }
-
 
 
 

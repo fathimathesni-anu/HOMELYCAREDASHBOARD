@@ -1,3 +1,4 @@
+// AppointmentBooking.js
 import React, { useState, useEffect } from 'react';
 import axiosInstance from '../../api/axiosInstance';
 import DoctorSelector from '../../Components/Admin/DoctorSelector';
@@ -11,8 +12,6 @@ const AppointmentBooking = () => {
   const [loading, setLoading] = useState(false);
   const [appointments, setAppointments] = useState([]);
   const [filterDate, setFilterDate] = useState('');
-
-  // Track editing appointment ID and temp form data for editing
   const [editingId, setEditingId] = useState(null);
   const [editDate, setEditDate] = useState('');
   const [editTime, setEditTime] = useState('');
@@ -27,17 +26,11 @@ const AppointmentBooking = () => {
 
     try {
       const token = localStorage.getItem('token');
-
       const res = await axiosInstance.post(
-        '/appoinmentschedule/book',
+        '/appointmentschedule/book',
         { doctorId, date, time },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
-
       setMessage(res.data.message);
       setDate('');
       setTime('');
@@ -54,53 +47,24 @@ const AppointmentBooking = () => {
   const fetchAppointments = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await axiosInstance.get('/appoinmentschedule/my-appointments', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+      const res = await axiosInstance.get('/appointmentschedule/my-appointments', {
+        headers: { Authorization: `Bearer ${token}` },
       });
-
       setAppointments(res.data.appointments || []);
     } catch (err) {
       console.error('Failed to fetch appointments', err);
     }
   };
 
-  const handleStatusChange = async (appointmentId, newStatus) => {
-    try {
-      const token = localStorage.getItem('token');
-      const res = await axiosInstance.put(
-        `/appoinmentschedule/${appointmentId}/status`,
-        { status: newStatus },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      setAppointments((prev) =>
-        prev.map((a) => (a._id === appointmentId ? res.data.appointment : a))
-      );
-    } catch (err) {
-      console.error('Status update failed', err);
-    }
-  };
-
-  // New: Update full appointment
   const updateAppointment = async (appointmentId) => {
     setLoading(true);
     setMessage('');
     try {
       const token = localStorage.getItem('token');
       const res = await axiosInstance.put(
-        `/appoinmentschedule/${appointmentId}`,
-        {
-          date: editDate,
-          time: editTime,
-          status: editStatus,
-          doctorId: editDoctorId,
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+        `/appointmentschedule/${appointmentId}`,
+        { date: editDate, time: editTime, status: editStatus, doctorId: editDoctorId },
+        { headers: { Authorization: `Bearer ${token}` } }
       );
       setAppointments((prev) =>
         prev.map((a) => (a._id === appointmentId ? res.data.appointment : a))
@@ -119,15 +83,13 @@ const AppointmentBooking = () => {
     }
   };
 
-  // New: Delete appointment
   const deleteAppointment = async (appointmentId) => {
     if (!window.confirm('Are you sure you want to delete this appointment?')) return;
-
     setLoading(true);
     setMessage('');
     try {
       const token = localStorage.getItem('token');
-      await axiosInstance.delete(`/appoinmentschedule/${appointmentId}`, {
+      await axiosInstance.delete(`/appointmentschedule/${appointmentId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setAppointments((prev) => prev.filter((a) => a._id !== appointmentId));
@@ -151,7 +113,6 @@ const AppointmentBooking = () => {
 
   const workingHours = selectedDoctor ? getWorkingHoursForDate(selectedDoctor.schedule, date) : null;
 
-  // Handle edit button click - populate edit fields
   const startEditing = (appt) => {
     setEditingId(appt._id);
     setEditDate(appt.date);
@@ -162,181 +123,105 @@ const AppointmentBooking = () => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto mt-10 p-6 bg-white rounded-lg shadow-lg">
-      <h2 className="text-xl font-bold mb-4">Book an Appointment</h2>
+    <div className="max-w-4xl mx-auto mt-10 p-6 bg-gray-100 rounded-lg shadow-lg">
+      <h2 className="text-2xl font-bold text-gray-800 mb-6">Book an Appointment</h2>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4 bg-white p-6 rounded-lg shadow">
         <DoctorSelector
           onDoctorSelect={(doctor) => {
             setSelectedDoctor(doctor);
-            setDoctorId(doctor._id);
+            setDoctorId(doctor?._id || '');
           }}
+          selectedDoctor={selectedDoctor}
         />
 
         {selectedDoctor && (
-          <div className="text-sm text-gray-600 mb-2">
-            {date ? (
-              workingHours ? (
-                <>
-                  Working Hours on {new Date(date).toLocaleDateString()}: <strong>{workingHours.startTime}</strong> -{' '}
-                  <strong>{workingHours.endTime}</strong>
-                </>
-              ) : (
-                <>Doctor is not available on selected date</>
-              )
-            ) : (
-              <>Select a date to view availability</>
+          <div className="text-sm text-blue-700">
+            {!date && <>Select a date to view availability</>}
+            {date && !workingHours && <>Doctor is not available on this date</>}
+            {date && workingHours && (
+              <>
+                Working Hours on {new Date(date).toLocaleDateString()}: <strong>{workingHours.startTime}</strong> - <strong>{workingHours.endTime}</strong>
+              </>
             )}
           </div>
         )}
 
-        <div>
-          <label className="block font-medium">Date</label>
-          <input
-            type="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-            className="w-full border rounded p-2"
-            required
-          />
-        </div>
-
-        <div>
-          <label className="block font-medium">Time</label>
-          <input
-            type="time"
-            value={time}
-            onChange={(e) => setTime(e.target.value)}
-            className="w-full border rounded p-2"
-            required
-          />
-        </div>
+        <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="w-full border border-gray-300 rounded px-3 py-2" required />
+        <input type="time" value={time} onChange={(e) => setTime(e.target.value)} className="w-full border border-gray-300 rounded px-3 py-2" required />
 
         <button
           type="submit"
-          className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700"
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded font-semibold"
           disabled={loading}
         >
           {loading ? 'Booking...' : 'Book Appointment'}
         </button>
 
-        {message && (
-          <div className="mt-4 text-center text-sm font-medium text-green-600">{message}</div>
-        )}
+        {message && <div className="text-center text-green-600 font-medium">{message}</div>}
       </form>
 
-      <div className="mt-8">
-        <label className="block font-medium mb-1">Filter Appointments by Date</label>
+      <div className="mt-10">
+        <h3 className="text-xl font-semibold text-gray-800 mb-4">Your Appointments</h3>
+
         <input
           type="date"
           value={filterDate}
           onChange={(e) => setFilterDate(e.target.value)}
-          className="w-full border rounded p-2 mb-4"
+          className="mb-6 border border-gray-300 rounded px-3 py-2"
         />
-      </div>
 
-      <div className="mt-4">
-        <h3 className="text-lg font-semibold mb-2">My Appointments</h3>
-        {appointments.length === 0 ? (
-          <p className="text-sm text-gray-500">No appointments yet.</p>
-        ) : (
-          <ul className="divide-y divide-gray-200">
-            {appointments
-              .filter((appt) => !filterDate || appt.date === filterDate)
-              .map((appt) => (
-                <li key={appt._id} className="py-2">
-                  <div className="flex justify-between items-center">
-                    <div>
-                      {editingId === appt._id ? (
-                        <>
-                          <input
-                            type="date"
-                            value={editDate}
-                            onChange={(e) => setEditDate(e.target.value)}
-                            className="border rounded p-1 mb-1"
-                          />
-                          <input
-                            type="time"
-                            value={editTime}
-                            onChange={(e) => setEditTime(e.target.value)}
-                            className="border rounded p-1 mb-1"
-                          />
-                          <DoctorSelector
-                            onDoctorSelect={(doctor) => {
-                              setEditSelectedDoctor(doctor);
-                              setEditDoctorId(doctor._id);
-                            }}
-                            selectedDoctor={editSelectedDoctor}
-                          />
-                          <select
-                            value={editStatus}
-                            onChange={(e) => setEditStatus(e.target.value)}
-                            className="border rounded px-2 py-1 text-sm mb-1"
-                          >
-                            <option value="pending">Pending</option>
-                            <option value="confirmed">Confirmed</option>
-                            <option value="cancelled">Cancelled</option>
-                          </select>
-                        </>
-                      ) : (
-                        <>
-                          <div>
-                            {new Date(appt.date).toLocaleDateString()} at {appt.time}
-                          </div>
-                          <div className="text-sm text-gray-600">
-                            Doctor: {appt.doctorId?.name || 'Unknown'}
-                          </div>
-                          <div className="text-sm text-gray-600">Status: {appt.status}</div>
-                        </>
-                      )}
-                    </div>
-
-                    <div className="flex items-center space-x-2">
-                      {editingId === appt._id ? (
-                        <>
-                          <button
-                            onClick={() => updateAppointment(appt._id)}
-                            className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 text-sm"
-                            disabled={loading}
-                          >
-                            Save
-                          </button>
-                          <button
-                            onClick={() => setEditingId(null)}
-                            className="bg-gray-400 text-white px-3 py-1 rounded hover:bg-gray-500 text-sm"
-                            disabled={loading}
-                          >
-                            Cancel
-                          </button>
-                        </>
-                      ) : (
-                        <>
-                          <button
-                            onClick={() => startEditing(appt)}
-                            className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600 text-sm"
-                          >
-                            Edit
-                          </button>
-                          <button
-                            onClick={() => deleteAppointment(appt._id)}
-                            className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 text-sm"
-                          >
-                            Delete
-                          </button>
-                        </>
-                      )}
+        <div className="space-y-4">
+          {appointments
+            .filter((appt) => !filterDate || appt.date === filterDate)
+            .map((appt) => (
+              <div key={appt._id} className="bg-white p-6 rounded-lg shadow border">
+                {editingId === appt._id ? (
+                  <div className="space-y-3">
+                    <DoctorSelector
+                      onDoctorSelect={(doc) => {
+                        setEditSelectedDoctor(doc);
+                        setEditDoctorId(doc?._id || '');
+                      }}
+                      selectedDoctor={editSelectedDoctor}
+                    />
+                    <input type="date" value={editDate} onChange={(e) => setEditDate(e.target.value)} className="w-full border rounded px-3 py-2" />
+                    <input type="time" value={editTime} onChange={(e) => setEditTime(e.target.value)} className="w-full border rounded px-3 py-2" />
+                    <select value={editStatus} onChange={(e) => setEditStatus(e.target.value)} className="w-full border rounded px-3 py-2">
+                      <option value="booked">Booked</option>
+                      <option value="completed">Completed</option>
+                      <option value="cancelled">Cancelled</option>
+                    </select>
+                    <div className="flex gap-4">
+                      <button onClick={() => updateAppointment(appt._id)} className="bg-green-600 text-white px-4 py-2 rounded">Update</button>
+                      <button onClick={() => setEditingId(null)} className="bg-gray-300 px-4 py-2 rounded">Cancel</button>
                     </div>
                   </div>
-                </li>
-              ))}
-          </ul>
-        )}
+                ) : (
+                  <div>
+                    <p className="text-gray-700"><strong>Doctor:</strong> {appt.doctorId?.userId?.name}</p>
+                    <p className="text-gray-700"><strong>Date:</strong> {appt.date}</p>
+                    <p className="text-gray-700"><strong>Time:</strong> {appt.time}</p>
+                    <p className="text-gray-700"><strong>Status:</strong> {appt.status}</p>
+                    <div className="mt-4 flex gap-4">
+                      <button onClick={() => startEditing(appt)} className="bg-yellow-500 text-white px-4 py-2 rounded">Edit</button>
+                      <button onClick={() => deleteAppointment(appt._id)} className="bg-red-600 text-white px-4 py-2 rounded">Delete</button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
+        </div>
       </div>
     </div>
   );
 };
 
 export default AppointmentBooking;
+
+
+
+
 
 
 
