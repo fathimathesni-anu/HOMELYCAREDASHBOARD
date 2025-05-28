@@ -1,5 +1,5 @@
 import { Doctor } from '../models/doctormodel.js';
-
+import mongoose from 'mongoose';
 
 // Add a new schedule to a doctor
 export const addScheduleToDoctor = async (req, res) => {
@@ -63,19 +63,28 @@ export const deleteDoctorSchedule = async (req, res) => {
 
 // Get all schedules for a specific doctor
 
-  export const getDoctorSchedule =async (req, res) => {
-    const { doctorId } = req.params;
+export const getDoctorSchedule = async (req, res) => {
+  let { doctorId } = req.params;
 
-    try {
-      const doctor = await Doctor.findById(doctorId);
-      if (!doctor) {
-        return res.status(404).json({ message: 'Doctor not found' });
-      }
+  // If doctorId is an object, try to extract _id
+  if (typeof doctorId === 'object' && doctorId !== null) {
+    doctorId = doctorId._id || doctorId.toString();
+  }
 
-      res.json({ schedules: doctor.schedule });
-    } catch (error) {
-      console.error('Error fetching doctor schedules:', error);
-      res.status(500).json({ message: 'Failed to fetch schedules', error });
+  // Validate doctorId as a valid ObjectId string
+  if (!mongoose.Types.ObjectId.isValid(doctorId)) {
+    return res.status(400).json({ message: 'Invalid doctorId format' });
+  }
+
+  try {
+    const doctor = await Doctor.findById(doctorId);
+    if (!doctor) {
+      return res.status(404).json({ message: 'Doctor not found' });
     }
-  };
 
+    res.json({ schedules: doctor.schedule });
+  } catch (error) {
+    console.error('Error fetching doctor schedules:', error);
+    res.status(500).json({ message: 'Failed to fetch schedules', error });
+  }
+};

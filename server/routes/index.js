@@ -22,7 +22,7 @@ router.use("/user", userRouter);
 router.use("/userole", useroleRouter);
 router.use("/patient", patientRouter);
 router.use("/appoinment", appoinmentRouter);
-router.use("/appoinmentschedule", appointmentScheduleRouter);
+router.use("/appointmentschedule", appointmentScheduleRouter);
 router.use("/doctor", doctorRouter);
 router.use("/doctorschedule", doctorScheduleRouter);
 router.use("/bloodbank", bloodBankRouter);
