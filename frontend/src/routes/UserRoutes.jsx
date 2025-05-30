@@ -12,7 +12,7 @@ function UserPrivateRoute({ children }) {
   const user = JSON.parse(localStorage.getItem("user"));
 
   if (!user || user.role !== "user") {
-    return <Navigate to="/" />;
+    return <Navigate to="/" replace />;
   }
 
   return children;

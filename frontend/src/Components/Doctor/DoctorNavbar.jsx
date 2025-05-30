@@ -134,12 +134,12 @@ export default function DoctorNavbar() {
                 {uploading ? "Uploading..." : "Upload"}
               </button>
 
-              <Link
+              {/* <Link
                 to="/doctor/profile"
                 className="block px-2 py-1 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
               >
                 View Profile
-              </Link>
+              </Link> */}
               <button
                 onClick={handleLogout}
                 className="w-full text-left px-2 py-1 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"

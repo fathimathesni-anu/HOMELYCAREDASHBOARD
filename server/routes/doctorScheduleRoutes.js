@@ -6,7 +6,7 @@ import {
   getDoctorSchedule,
 } from '../controllers/doctorScheduleController.js';
 
-import { useroleAuth, authorizeRoles } from '../middleware/useroleAuth.js';
+import { useroleAuth, authorizeRoles} from '../middleware/useroleAuth.js';
 
 const router = express.Router();
 
@@ -38,5 +38,8 @@ router.get(
   '/:doctorId',
   useroleAuth,
   authorizeRoles('admin', 'staff','doctor'),getDoctorSchedule);
+
+
+
 export { router as doctorScheduleRouter };
 
