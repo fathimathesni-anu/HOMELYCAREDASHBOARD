@@ -1,56 +1,32 @@
-import { useState, useEffect } from 'react';
-import { Outlet } from 'react-router-dom';
-import AdminNavbar from './AdminNavbar';
-import AdminSidebar from './AdminSidebar';
-import Footer from '../Footer';
-import { Bars3Icon } from '@heroicons/react/24/outline';
+import AdminNavbar from "@/components/admin/AdminNavbar";
+import AdminSidebar from "@/components/admin/AdminSidebar";
 
-export default function AdminLayout() {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
-  // Auto-close sidebar on resize (desktop)
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth >= 768) {
-        setIsSidebarOpen(false);
-      }
-    };
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  const toggleSidebar = () => setIsSidebarOpen((prev) => !prev);
-
+const AdminLayout = ({ children }) => {
   return (
-    <div className="flex h-screen bg-gray-100 dark:bg-gray-900 overflow-hidden">
+    <div className="flex min-h-screen bg-gray-50">
       {/* Sidebar */}
-      <AdminSidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
+      <div className="hidden md:flex w-64 flex-col border-r border-gray-200 bg-white">
+        <AdminSidebar />
+      </div>
 
-      {/* Mobile Sidebar Toggle Button */}
-      <button
-        className="fixed top-4 left-4 z-50 p-2 rounded-md bg-white dark:bg-gray-800 shadow md:hidden"
-        onClick={toggleSidebar}
-        aria-label="Toggle sidebar"
-      >
-        <Bars3Icon className="h-6 w-6 text-gray-700 dark:text-white" />
-      </button>
-
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col ml-0 md:ml-64 transition-all duration-300">
-        <AdminNavbar />
-        
-        <div className="flex-1 overflow-y-auto p-4 md:p-6">
-          <Outlet />
+      {/* Main content area */}
+      <div className="flex-1 flex flex-col">
+        {/* Navbar */}
+        <div className="sticky top-0 z-40 w-full md:ml-64">
+          <AdminNavbar />
         </div>
 
-        {/* Optional: show footer only on desktop */}
-        <div className="hidden md:block">
-          <Footer />
-        </div>
+        {/* Page content */}
+        <main className="flex-1 p-4 md:p-6 bg-gray-50">
+          <div className="max-w-7xl mx-auto">{children}</div>
+        </main>
       </div>
     </div>
   );
-}
+};
+
+export default AdminLayout;
+
 
 
 
