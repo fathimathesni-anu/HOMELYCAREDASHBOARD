@@ -4,32 +4,34 @@ import axiosInstance from '../../api/axiosInstance';
 const Notification = ({ notification, onMarkRead, onEdit, onDelete }) => {
   return (
     <div
-      className={`notification p-4 border rounded-md shadow-sm flex justify-between items-center ${
-        notification.isRead ? 'bg-gray-200' : 'bg-blue-100'
+      className={`notification p-4 border rounded-md shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-3 sm:space-y-0 sm:space-x-4 ${
+        notification.isRead ? 'bg-gray-100' : 'bg-blue-100'
       }`}
     >
-      <div className="notification-content">
-        <h4 className="text-lg font-semibold">{notification.message}</h4>
-        <small className="text-sm text-gray-500">
+      <div className="notification-content flex-1">
+        <h4 className="text-lg font-semibold text-gray-900">{notification.message}</h4>
+        <small className="text-xs text-gray-600">
           {new Date(notification.createdAt).toLocaleString()}
         </small>
       </div>
-      <div className="flex space-x-2">
-        <button
-          onClick={() => onMarkRead(notification._id)}
-          className="px-3 py-1 bg-blue-500 text-white text-sm rounded-md hover:bg-blue-600"
-        >
-          Mark as Read
-        </button>
+      <div className="flex flex-wrap sm:flex-nowrap space-x-2">
+        {!notification.isRead && (
+          <button
+            onClick={() => onMarkRead(notification._id)}
+            className="px-3 py-1 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition"
+          >
+            Mark as Read
+          </button>
+        )}
         <button
           onClick={() => onEdit(notification)}
-          className="px-3 py-1 bg-yellow-500 text-white text-sm rounded-md hover:bg-yellow-600"
+          className="px-3 py-1 bg-yellow-500 text-white text-sm rounded-md hover:bg-yellow-600 transition"
         >
           Edit
         </button>
         <button
-          onClick={() => onDelete(notification._id)}  // Delete button
-          className="px-3 py-1 bg-red-500 text-white text-sm rounded-md hover:bg-red-600"
+          onClick={() => onDelete(notification._id)}
+          className="px-3 py-1 bg-red-600 text-white text-sm rounded-md hover:bg-red-700 transition"
         >
           Delete
         </button>
@@ -56,7 +58,6 @@ const NotificationList = () => {
     fetchNotifications();
   }, []);
 
-  // Mark as Read handler
   const handleMarkRead = async (id) => {
     try {
       await axiosInstance.put(`/notification/update/${id}`, { isRead: true });
@@ -68,12 +69,10 @@ const NotificationList = () => {
     }
   };
 
-  // Add or Update Notification handler
   const handleAddOrUpdate = async (e) => {
     e.preventDefault();
     try {
       if (editingNotification) {
-        // Update existing notification
         const response = await axiosInstance.put(
           `/notification/update/${editingNotification._id}`,
           { message }
@@ -85,49 +84,46 @@ const NotificationList = () => {
         );
         setEditingNotification(null);
       } else {
-        // Add new notification
-        const response = await axiosInstance.post('/notification/create', {
-          message,
-        });
+        const response = await axiosInstance.post('/notification/create', { message });
         setNotifications((prev) => [response.data, ...prev]);
       }
-
       setMessage('');
     } catch (error) {
       console.error('Error saving notification', error);
     }
   };
 
-  // Edit Notification handler
   const handleEdit = (notification) => {
     setEditingNotification(notification);
     setMessage(notification.message);
   };
 
-  // Delete Notification handler
   const handleDelete = async (id) => {
     try {
       await axiosInstance.delete(`/notification/delete/${id}`);
-      setNotifications((prev) => prev.filter((n) => n._id !== id));  // Remove the deleted notification from the list
+      setNotifications((prev) => prev.filter((n) => n._id !== id));
     } catch (error) {
       console.error('Error deleting notification', error);
     }
   };
 
   return (
-    <div className="notification-list p-6 space-y-6">
-      <form onSubmit={handleAddOrUpdate} className="space-x-2">
+    <div className="max-w-4xl mx-auto p-4 sm:p-6 space-y-8">
+      <form
+        onSubmit={handleAddOrUpdate}
+        className="flex flex-col sm:flex-row sm:items-center sm:space-x-3 space-y-3 sm:space-y-0"
+      >
         <input
           type="text"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           placeholder="Enter notification message"
-          className="border p-2 rounded-md w-2/3"
+          className="flex-grow border border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
           required
         />
         <button
           type="submit"
-          className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+          className="px-5 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 transition"
         >
           {editingNotification ? 'Update' : 'Add'} Notification
         </button>
@@ -138,7 +134,7 @@ const NotificationList = () => {
               setEditingNotification(null);
               setMessage('');
             }}
-            className="px-4 py-2 bg-gray-400 text-white rounded-md hover:bg-gray-500 ml-2"
+            className="px-5 py-3 bg-gray-400 text-white rounded-md hover:bg-gray-500 transition"
           >
             Cancel
           </button>
@@ -146,23 +142,26 @@ const NotificationList = () => {
       </form>
 
       {notifications.length === 0 ? (
-        <p className="text-center text-gray-500">No notifications</p>
+        <p className="text-center text-gray-500">No notifications available.</p>
       ) : (
-        notifications.map((notification) => (
-          <Notification
-            key={notification._id}
-            notification={notification}
-            onMarkRead={handleMarkRead}
-            onEdit={handleEdit}
-            onDelete={handleDelete}  // Pass delete function to each Notification
-          />
-        ))
+        <div className="space-y-4">
+          {notifications.map((notification) => (
+            <Notification
+              key={notification._id}
+              notification={notification}
+              onMarkRead={handleMarkRead}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+            />
+          ))}
+        </div>
       )}
     </div>
   );
 };
 
 export default NotificationList;
+
 
 
 

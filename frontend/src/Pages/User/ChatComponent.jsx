@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import axiosInstance from '../../api/axiosInstance';
 
@@ -59,8 +58,8 @@ const ChatComponent = () => {
   }, []);
 
   return (
-    <div className="p-6 max-w-3xl mx-auto bg-white shadow-md rounded-xl mt-6">
-      <h2 className="text-3xl font-bold text-center mb-6 text-blue-700">💬 Chat Box</h2>
+    <div className="p-4 sm:p-6 max-w-4xl mx-auto bg-white shadow-md rounded-xl mt-6">
+      <h2 className="text-2xl sm:text-3xl font-bold text-center mb-6 text-blue-700">💬 Chat Box</h2>
 
       {/* Message Form */}
       <div className="mb-6 space-y-4">
@@ -70,17 +69,20 @@ const ChatComponent = () => {
           value={receiverId}
           onChange={(e) => setReceiverId(e.target.value)}
           className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+          aria-label="Receiver User ID"
         />
         <textarea
           rows="4"
           placeholder="Type your message..."
           value={message}
           onChange={(e) => setMessage(e.target.value)}
-          className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+          className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"
+          aria-label="Message"
         />
         <button
           onClick={sendMessage}
           className="w-full bg-blue-600 text-white font-semibold py-2 rounded-lg hover:bg-blue-700 transition"
+          aria-label="Send Message"
         >
           ➤ Send
         </button>
@@ -90,63 +92,74 @@ const ChatComponent = () => {
       {loading ? (
         <p className="text-center text-gray-500">Loading messages...</p>
       ) : (
-        <ul className="space-y-4 max-h-[400px] overflow-y-auto pr-1">
+        <ul className="space-y-4 max-h-[400px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-blue-400 scrollbar-track-gray-100">
           {chats.map((chat) => (
             <li
               key={chat._id}
-              className="p-4 rounded-lg border bg-gray-50 shadow-sm relative"
+              className="p-4 rounded-lg border bg-gray-50 shadow-sm relative flex flex-col sm:flex-row sm:justify-between sm:items-start"
             >
-              <div className="flex justify-between text-sm text-gray-600 mb-2">
-                <span><strong>From:</strong> {chat.senderId}</span>
-                <span><strong>To:</strong> {chat.receiverId}</span>
+              <div className="flex flex-col flex-1">
+                <div className="flex justify-between text-sm text-gray-600 mb-2 flex-wrap gap-2">
+                  <span><strong>From:</strong> {chat.senderId}</span>
+                  <span><strong>To:</strong> {chat.receiverId}</span>
+                </div>
+
+                {editId === chat._id ? (
+                  <>
+                    <textarea
+                      className="w-full p-2 border rounded mb-2 resize-none"
+                      value={editMessage}
+                      onChange={(e) => setEditMessage(e.target.value)}
+                      rows={3}
+                      aria-label="Edit Message"
+                    />
+                    <div className="flex gap-2 flex-wrap">
+                      <button
+                        onClick={() => updateMessage(chat._id)}
+                        className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 flex-grow sm:flex-grow-0"
+                        aria-label="Save Edited Message"
+                      >
+                        Save
+                      </button>
+                      <button
+                        onClick={() => setEditId(null)}
+                        className="px-3 py-1 bg-gray-400 text-white rounded hover:bg-gray-500 flex-grow sm:flex-grow-0"
+                        aria-label="Cancel Edit"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-base text-gray-800 break-words">{chat.message}</p>
+                    <p className="text-xs text-gray-500 mt-2 whitespace-nowrap">
+                      {new Date(chat.timestamp || chat.createdAt).toLocaleString()}
+                    </p>
+                  </>
+                )}
               </div>
 
-              {editId === chat._id ? (
-                <>
-                  <textarea
-                    className="w-full p-2 border rounded mb-2"
-                    value={editMessage}
-                    onChange={(e) => setEditMessage(e.target.value)}
-                  />
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => updateMessage(chat._id)}
-                      className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700"
-                    >
-                      Save
-                    </button>
-                    <button
-                      onClick={() => setEditId(null)}
-                      className="px-3 py-1 bg-gray-400 text-white rounded hover:bg-gray-500"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <p className="text-base text-gray-800">{chat.message}</p>
-                  <p className="text-xs text-gray-500 mt-2">
-                    {new Date(chat.timestamp || chat.createdAt).toLocaleString()}
-                  </p>
-                  <div className="mt-3 flex gap-2">
-                    <button
-                      onClick={() => {
-                        setEditId(chat._id);
-                        setEditMessage(chat.message);
-                      }}
-                      className="text-blue-600 hover:underline text-sm"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => deleteMessage(chat._id)}
-                      className="text-red-600 hover:underline text-sm"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </>
+              {editId !== chat._id && (
+                <div className="mt-3 sm:mt-0 flex gap-3 flex-wrap sm:flex-col sm:items-end">
+                  <button
+                    onClick={() => {
+                      setEditId(chat._id);
+                      setEditMessage(chat.message);
+                    }}
+                    className="text-blue-600 hover:underline text-sm"
+                    aria-label="Edit Message"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => deleteMessage(chat._id)}
+                    className="text-red-600 hover:underline text-sm"
+                    aria-label="Delete Message"
+                  >
+                    Delete
+                  </button>
+                </div>
               )}
             </li>
           ))}
@@ -157,6 +170,7 @@ const ChatComponent = () => {
 };
 
 export default ChatComponent;
+
 
 
 

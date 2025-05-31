@@ -1,4 +1,3 @@
-// AppointmentBooking.js
 import React, { useState, useEffect } from 'react';
 import axiosInstance from '../../api/axiosInstance';
 import DoctorSelector from '../../Components/Admin/DoctorSelector';
@@ -123,8 +122,8 @@ const AppointmentBooking = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto mt-10 p-6 bg-gray-100 rounded-lg shadow-lg">
-      <h2 className="text-2xl font-bold text-gray-800 mb-6">Book an Appointment</h2>
+    <div className="max-w-4xl mx-auto px-4 mt-10 p-6 bg-gray-100 rounded-lg shadow-lg">
+      <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-6">Book an Appointment</h2>
 
       <form onSubmit={handleSubmit} className="space-y-4 bg-white p-6 rounded-lg shadow">
         <DoctorSelector
@@ -141,14 +140,27 @@ const AppointmentBooking = () => {
             {date && !workingHours && <>Doctor is not available on this date</>}
             {date && workingHours && (
               <>
-                Working Hours on {new Date(date).toLocaleDateString()}: <strong>{workingHours.startTime}</strong> - <strong>{workingHours.endTime}</strong>
+                Working Hours on {new Date(date).toLocaleDateString()}:{' '}
+                <strong>{workingHours.startTime}</strong> - <strong>{workingHours.endTime}</strong>
               </>
             )}
           </div>
         )}
 
-        <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="w-full border border-gray-300 rounded px-3 py-2" required />
-        <input type="time" value={time} onChange={(e) => setTime(e.target.value)} className="w-full border border-gray-300 rounded px-3 py-2" required />
+        <input
+          type="date"
+          value={date}
+          onChange={(e) => setDate(e.target.value)}
+          className="w-full border border-gray-300 rounded px-3 py-2"
+          required
+        />
+        <input
+          type="time"
+          value={time}
+          onChange={(e) => setTime(e.target.value)}
+          className="w-full border border-gray-300 rounded px-3 py-2"
+          required
+        />
 
         <button
           type="submit"
@@ -162,13 +174,13 @@ const AppointmentBooking = () => {
       </form>
 
       <div className="mt-10">
-        <h3 className="text-xl font-semibold text-gray-800 mb-4">Your Appointments</h3>
+        <h3 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-4">Your Appointments</h3>
 
         <input
           type="date"
           value={filterDate}
           onChange={(e) => setFilterDate(e.target.value)}
-          className="mb-6 border border-gray-300 rounded px-3 py-2"
+          className="mb-6 w-full max-w-xs border border-gray-300 rounded px-3 py-2"
         />
 
         <div className="space-y-4">
@@ -185,27 +197,69 @@ const AppointmentBooking = () => {
                       }}
                       selectedDoctor={editSelectedDoctor}
                     />
-                    <input type="date" value={editDate} onChange={(e) => setEditDate(e.target.value)} className="w-full border rounded px-3 py-2" />
-                    <input type="time" value={editTime} onChange={(e) => setEditTime(e.target.value)} className="w-full border rounded px-3 py-2" />
-                    <select value={editStatus} onChange={(e) => setEditStatus(e.target.value)} className="w-full border rounded px-3 py-2">
+                    <input
+                      type="date"
+                      value={editDate}
+                      onChange={(e) => setEditDate(e.target.value)}
+                      className="w-full border border-gray-300 rounded px-3 py-2"
+                    />
+                    <input
+                      type="time"
+                      value={editTime}
+                      onChange={(e) => setEditTime(e.target.value)}
+                      className="w-full border border-gray-300 rounded px-3 py-2"
+                    />
+                    <select
+                      value={editStatus}
+                      onChange={(e) => setEditStatus(e.target.value)}
+                      className="w-full border border-gray-300 rounded px-3 py-2"
+                    >
                       <option value="booked">Booked</option>
                       <option value="completed">Completed</option>
                       <option value="cancelled">Cancelled</option>
                     </select>
-                    <div className="flex gap-4">
-                      <button onClick={() => updateAppointment(appt._id)} className="bg-green-600 text-white px-4 py-2 rounded">Update</button>
-                      <button onClick={() => setEditingId(null)} className="bg-gray-300 px-4 py-2 rounded">Cancel</button>
+                    <div className="flex flex-wrap gap-4">
+                      <button
+                        onClick={() => updateAppointment(appt._id)}
+                        className="bg-green-600 text-white px-4 py-2 rounded w-full sm:w-auto"
+                      >
+                        Update
+                      </button>
+                      <button
+                        onClick={() => setEditingId(null)}
+                        className="bg-gray-300 px-4 py-2 rounded w-full sm:w-auto"
+                      >
+                        Cancel
+                      </button>
                     </div>
                   </div>
                 ) : (
                   <div>
-                    <p className="text-gray-700"><strong>Doctor:</strong> {appt.doctorId?.userId?.name}</p>
-                    <p className="text-gray-700"><strong>Date:</strong> {appt.date}</p>
-                    <p className="text-gray-700"><strong>Time:</strong> {appt.time}</p>
-                    <p className="text-gray-700"><strong>Status:</strong> {appt.status}</p>
-                    <div className="mt-4 flex gap-4">
-                      <button onClick={() => startEditing(appt)} className="bg-yellow-500 text-white px-4 py-2 rounded">Edit</button>
-                      <button onClick={() => deleteAppointment(appt._id)} className="bg-red-600 text-white px-4 py-2 rounded">Delete</button>
+                    <p className="text-gray-700">
+                      <strong>Doctor:</strong> {appt.doctorId?.userId?.name}
+                    </p>
+                    <p className="text-gray-700">
+                      <strong>Date:</strong> {appt.date}
+                    </p>
+                    <p className="text-gray-700">
+                      <strong>Time:</strong> {appt.time}
+                    </p>
+                    <p className="text-gray-700">
+                      <strong>Status:</strong> {appt.status}
+                    </p>
+                    <div className="mt-4 flex flex-wrap gap-4">
+                      <button
+                        onClick={() => startEditing(appt)}
+                        className="bg-yellow-500 text-white px-4 py-2 rounded w-full sm:w-auto"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => deleteAppointment(appt._id)}
+                        className="bg-red-600 text-white px-4 py-2 rounded w-full sm:w-auto"
+                      >
+                        Delete
+                      </button>
                     </div>
                   </div>
                 )}
@@ -218,6 +272,7 @@ const AppointmentBooking = () => {
 };
 
 export default AppointmentBooking;
+
 
 
 

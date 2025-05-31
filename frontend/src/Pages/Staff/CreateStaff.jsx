@@ -95,17 +95,18 @@ const CreateStaff = () => {
   const totalPages = Math.ceil(filteredStaff.length / itemsPerPage);
 
   return (
-    <div className="max-w-xl mx-auto p-6 bg-white shadow-md rounded-xl">
-      <h2 className="text-2xl font-bold mb-4">Create Staff Member</h2>
-      {message && <div className="mb-4 text-red-500">{message}</div>}
-      <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="max-w-4xl mx-auto p-6 bg-white shadow-md rounded-xl">
+      <h2 className="text-2xl font-bold mb-6 text-center">Create Staff Member</h2>
+      {message && <div className="mb-4 text-red-500 text-center">{message}</div>}
+
+      <form onSubmit={handleSubmit} className="space-y-5">
         <input
           type="text"
           name="userId"
           placeholder="User ID"
           value={formData.userId}
           onChange={handleChange}
-          className="w-full border p-2 rounded"
+          className="w-full border p-3 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           required
         />
         <input
@@ -114,7 +115,7 @@ const CreateStaff = () => {
           placeholder="Position"
           value={formData.position}
           onChange={handleChange}
-          className="w-full border p-2 rounded"
+          className="w-full border p-3 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           required
         />
         <input
@@ -123,17 +124,17 @@ const CreateStaff = () => {
           placeholder="Department"
           value={formData.department}
           onChange={handleChange}
-          className="w-full border p-2 rounded"
+          className="w-full border p-3 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
 
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <input
             type="text"
             name="phone"
             placeholder="Phone"
             value={formData.contactInfo.phone}
             onChange={(e) => handleChange(e, 'contactInfo')}
-            className="border p-2 rounded"
+            className="border p-3 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <input
             type="email"
@@ -141,21 +142,24 @@ const CreateStaff = () => {
             placeholder="Email"
             value={formData.contactInfo.email}
             onChange={(e) => handleChange(e, 'contactInfo')}
-            className="border p-2 rounded"
+            className="border p-3 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
 
         <div>
-          <h3 className="font-semibold mb-2">Schedule</h3>
+          <h3 className="font-semibold mb-3">Schedule</h3>
           {formData.schedule.map((slot, index) => (
-            <div key={index} className="grid grid-cols-3 gap-2 mb-2">
+            <div
+              key={index}
+              className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-3"
+            >
               <input
                 type="text"
                 name="day"
                 placeholder="Day"
                 value={slot.day}
                 onChange={(e) => handleChange(e, 'schedule', index)}
-                className="border p-2 rounded"
+                className="border p-3 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               <input
                 type="text"
@@ -163,7 +167,7 @@ const CreateStaff = () => {
                 placeholder="Start Time"
                 value={slot.startTime}
                 onChange={(e) => handleChange(e, 'schedule', index)}
-                className="border p-2 rounded"
+                className="border p-3 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               <input
                 type="text"
@@ -171,14 +175,14 @@ const CreateStaff = () => {
                 placeholder="End Time"
                 value={slot.endTime}
                 onChange={(e) => handleChange(e, 'schedule', index)}
-                className="border p-2 rounded"
+                className="border p-3 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
           ))}
           <button
             type="button"
             onClick={handleAddSchedule}
-            className="text-blue-500 hover:underline"
+            className="text-blue-600 hover:underline"
           >
             + Add Schedule Slot
           </button>
@@ -186,20 +190,20 @@ const CreateStaff = () => {
 
         <button
           type="submit"
-          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+          className="w-full bg-blue-600 text-white py-3 rounded hover:bg-blue-700 transition"
         >
           Create Staff
         </button>
       </form>
 
       {/* Staff List Section */}
-      <div className="mt-8">
-        <div className="flex justify-between items-center mb-4">
+      <div className="mt-10">
+        <div className="flex flex-col sm:flex-row justify-between items-center mb-4 gap-3">
           <h3 className="text-xl font-semibold">Staff List</h3>
           <input
             type="text"
             placeholder="Filter by department"
-            className="border p-2 rounded"
+            className="border p-3 rounded w-full sm:w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={searchDept}
             onChange={(e) => {
               setSearchDept(e.target.value);
@@ -209,33 +213,39 @@ const CreateStaff = () => {
         </div>
 
         {currentStaff.length === 0 ? (
-          <p className="text-gray-500">No staff found.</p>
+          <p className="text-center text-gray-500 py-6">No staff found.</p>
         ) : (
           <div className="overflow-auto max-h-[400px] border rounded">
             <table className="min-w-full text-sm table-auto">
-              <thead className="bg-gray-100">
+              <thead className="bg-gray-100 sticky top-0 z-10">
                 <tr>
-                  <th className="px-4 py-2 text-left">Name</th>
-                  <th className="px-4 py-2 text-left">Position</th>
-                  <th className="px-4 py-2 text-left">Department</th>
-                  <th className="px-4 py-2 text-left">Phone</th>
-                  <th className="px-4 py-2 text-left">Email</th>
-                  <th className="px-4 py-2 text-left">Actions</th>
+                  <th className="px-4 py-3 text-left">Name</th>
+                  <th className="px-4 py-3 text-left">Position</th>
+                  <th className="px-4 py-3 text-left">Department</th>
+                  <th className="px-4 py-3 text-left">Phone</th>
+                  <th className="px-4 py-3 text-left">Email</th>
+                  <th className="px-4 py-3 text-left">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {currentStaff.map((staff) => (
-                  <tr key={staff._id} className="border-t">
+                  <tr key={staff._id} className="border-t even:bg-gray-50">
                     <td className="px-4 py-2">{staff.userId?.name || 'N/A'}</td>
                     <td className="px-4 py-2">{staff.position}</td>
                     <td className="px-4 py-2">{staff.department}</td>
                     <td className="px-4 py-2">{staff.contactInfo?.phone}</td>
                     <td className="px-4 py-2">{staff.contactInfo?.email}</td>
-                    <td className="px-4 py-2 space-x-2">
-                      <button className="text-blue-500 hover:underline" onClick={() => alert('Edit feature coming soon')}>
+                    <td className="px-4 py-2 space-x-3 whitespace-nowrap">
+                      <button
+                        className="text-blue-600 hover:underline"
+                        onClick={() => alert('Edit feature coming soon')}
+                      >
                         Edit
                       </button>
-                      <button className="text-red-500 hover:underline" onClick={() => handleDelete(staff._id)}>
+                      <button
+                        className="text-red-600 hover:underline"
+                        onClick={() => handleDelete(staff._id)}
+                      >
                         Delete
                       </button>
                     </td>
@@ -246,13 +256,15 @@ const CreateStaff = () => {
           </div>
         )}
 
-        <div className="flex justify-center mt-4 space-x-2">
+        <div className="flex justify-center mt-6 space-x-2 flex-wrap">
           {Array.from({ length: totalPages }, (_, i) => (
             <button
               key={i}
               onClick={() => setCurrentPage(i + 1)}
-              className={`px-3 py-1 rounded ${
-                currentPage === i + 1 ? 'bg-blue-500 text-white' : 'bg-gray-200'
+              className={`px-4 py-2 rounded transition ${
+                currentPage === i + 1
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-gray-200 hover:bg-gray-300'
               }`}
             >
               {i + 1}
@@ -265,6 +277,7 @@ const CreateStaff = () => {
 };
 
 export default CreateStaff;
+
 
 
 

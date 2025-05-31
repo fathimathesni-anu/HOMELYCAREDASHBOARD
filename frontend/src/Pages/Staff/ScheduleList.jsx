@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axiosInstance from '../../api/axiosInstance';
-import ScheduleForm from '../Staff/SheduleForm'; // Fixed typo
+import ScheduleForm from '../Staff/SheduleForm';
 
 const ScheduleList = ({ doctorId, token, userRole }) => {
   const [schedules, setSchedules] = useState([]);
@@ -12,10 +12,9 @@ const ScheduleList = ({ doctorId, token, userRole }) => {
 
     try {
       const response = await axiosInstance.get(`/doctorschedule/${doctorId}`, {
-        headers: { Authorization: `Bearer ${token}` }, // Only needed if not handled globally
+        headers: { Authorization: `Bearer ${token}` },
       });
 
-      // Adjust based on your backend's response shape
       setSchedules(Array.isArray(response.data?.schedules) ? response.data.schedules : []);
     } catch (err) {
       console.error('Error fetching schedules:', err);
@@ -43,35 +42,39 @@ const ScheduleList = ({ doctorId, token, userRole }) => {
   };
 
   return (
-    <div className="space-y-4">
-      <h2 className="text-xl font-semibold">Doctor Schedules</h2>
+    <div className="max-w-3xl mx-auto p-4 sm:p-6 space-y-6">
+      <h2 className="text-2xl font-semibold text-center sm:text-left">Doctor Schedules</h2>
 
-      <button
-        onClick={handleAdd}
-        className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-      >
-        Add New Schedule
-      </button>
+      <div className="flex justify-center sm:justify-start">
+        <button
+          onClick={handleAdd}
+          className="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-md font-semibold transition"
+        >
+          Add New Schedule
+        </button>
+      </div>
 
       {schedules.length === 0 ? (
-        <p className="text-gray-500">No schedules found.</p>
+        <p className="text-center text-gray-500 mt-6">No schedules found.</p>
       ) : (
-        <ul className="space-y-2">
+        <ul className="space-y-4">
           {schedules.map((schedule, index) => (
             <li
               key={schedule._id || index}
-              className="p-4 border rounded-md flex justify-between items-center"
+              className="p-4 border rounded-md flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0"
             >
-              <div>
-                <p className="font-medium">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-6 flex-1 min-w-0">
+                <p className="font-medium truncate">
                   {schedule.doctorName || 'Doctor'} — {schedule.specialization || 'N/A'}
                 </p>
-                <p>{(schedule.availableDays || []).join(', ')}</p>
-                <p>{schedule.startTime} - {schedule.endTime}</p>
+                <p className="text-gray-600 truncate">{(schedule.availableDays || []).join(', ')}</p>
+                <p className="text-gray-600 truncate">
+                  {schedule.startTime} - {schedule.endTime}
+                </p>
               </div>
               <button
                 onClick={() => handleEdit(index)}
-                className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
+                className="mt-3 sm:mt-0 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-semibold transition self-stretch sm:self-auto"
               >
                 Edit
               </button>
@@ -81,19 +84,22 @@ const ScheduleList = ({ doctorId, token, userRole }) => {
       )}
 
       {showForm && (
-        <ScheduleForm
-          doctorId={doctorId}
-          token={token}
-          scheduleIndex={editingIndex}
-          existingSchedule={editingIndex !== null ? schedules[editingIndex] : null}
-          onSuccess={handleSuccess}
-        />
+        <div className="mt-6">
+          <ScheduleForm
+            doctorId={doctorId}
+            token={token}
+            scheduleIndex={editingIndex}
+            existingSchedule={editingIndex !== null ? schedules[editingIndex] : null}
+            onSuccess={handleSuccess}
+          />
+        </div>
       )}
     </div>
   );
 };
 
 export default ScheduleList;
+
 
 
 

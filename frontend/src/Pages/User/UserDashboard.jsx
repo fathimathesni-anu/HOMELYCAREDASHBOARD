@@ -21,22 +21,29 @@ const UserDashboard = () => {
       }
     };
     fetchProfile();
-  }, [navigate]); // Correct dependency
+  }, [navigate]);
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold text-gray-700 dark:text-white">
-        {loading ? 'Loading...' : error ? 'Error loading user' : `Welcome,  ${userName} `}
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col items-center px-4 py-10 sm:py-16">
+      <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-800 dark:text-white mb-8 text-center max-w-xl">
+        {loading
+          ? 'Loading...'
+          : error
+          ? 'Error loading user'
+          : `Welcome, ${userName}`}
       </h1>
 
       {!loading && !error && (
-  <UserHomepage /> // No role check here unless needed
-)}
+        <div className="w-full max-w-5xl bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 sm:p-10">
+          <UserHomepage />
+        </div>
+      )}
     </div>
   );
 };
 
 export default UserDashboard;
+
 
 
 

@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import axiosInstance from '../../api/axiosInstance';
 
@@ -59,7 +58,7 @@ const ChatComponent = () => {
   }, []);
 
   return (
-    <div className="p-6 max-w-3xl mx-auto bg-white shadow-md rounded-xl mt-6">
+    <div className="p-6 max-w-3xl mx-auto bg-white shadow-md rounded-xl mt-6 flex flex-col min-h-[600px]">
       <h2 className="text-3xl font-bold text-center mb-6 text-blue-700">💬 Chat Box</h2>
 
       {/* Message Form */}
@@ -90,13 +89,16 @@ const ChatComponent = () => {
       {loading ? (
         <p className="text-center text-gray-500">Loading messages...</p>
       ) : (
-        <ul className="space-y-4 max-h-[400px] overflow-y-auto pr-1">
+        <ul className="space-y-4 overflow-y-auto flex-1 pr-1 scrollbar-thin scrollbar-thumb-blue-400 scrollbar-track-gray-100 max-h-[400px] sm:max-h-[500px]">
+          {chats.length === 0 && (
+            <p className="text-center text-gray-500 mt-6">No messages found.</p>
+          )}
           {chats.map((chat) => (
             <li
               key={chat._id}
-              className="p-4 rounded-lg border bg-gray-50 shadow-sm relative"
+              className="p-4 rounded-lg border bg-gray-50 shadow-sm relative break-words"
             >
-              <div className="flex justify-between text-sm text-gray-600 mb-2">
+              <div className="flex flex-col sm:flex-row justify-between text-sm text-gray-600 mb-2 gap-2 sm:gap-0">
                 <span><strong>From:</strong> {chat.senderId}</span>
                 <span><strong>To:</strong> {chat.receiverId}</span>
               </div>
@@ -104,20 +106,20 @@ const ChatComponent = () => {
               {editId === chat._id ? (
                 <>
                   <textarea
-                    className="w-full p-2 border rounded mb-2"
+                    className="w-full p-2 border rounded mb-2 resize-y"
                     value={editMessage}
                     onChange={(e) => setEditMessage(e.target.value)}
                   />
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 justify-end">
                     <button
                       onClick={() => updateMessage(chat._id)}
-                      className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700"
+                      className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 transition"
                     >
                       Save
                     </button>
                     <button
                       onClick={() => setEditId(null)}
-                      className="px-3 py-1 bg-gray-400 text-white rounded hover:bg-gray-500"
+                      className="px-3 py-1 bg-gray-400 text-white rounded hover:bg-gray-500 transition"
                     >
                       Cancel
                     </button>
@@ -125,11 +127,11 @@ const ChatComponent = () => {
                 </>
               ) : (
                 <>
-                  <p className="text-base text-gray-800">{chat.message}</p>
+                  <p className="text-base text-gray-800 whitespace-pre-wrap">{chat.message}</p>
                   <p className="text-xs text-gray-500 mt-2">
                     {new Date(chat.timestamp || chat.createdAt).toLocaleString()}
                   </p>
-                  <div className="mt-3 flex gap-2">
+                  <div className="mt-3 flex gap-4 justify-end flex-wrap">
                     <button
                       onClick={() => {
                         setEditId(chat._id);
@@ -157,3 +159,4 @@ const ChatComponent = () => {
 };
 
 export default ChatComponent;
+

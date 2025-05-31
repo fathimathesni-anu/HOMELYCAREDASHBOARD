@@ -16,7 +16,6 @@ const CreateTask = () => {
   const [staffList, setStaffList] = useState([]);
   const [taskList, setTaskList] = useState([]);
   const [message, setMessage] = useState('');
-
   const token = localStorage.getItem('token');
 
   useEffect(() => {
@@ -126,18 +125,21 @@ const CreateTask = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-white shadow-md rounded-xl space-y-8">
-      <div>
-        <h2 className="text-2xl font-bold mb-4">{editTaskId ? 'Update Task' : 'Create Task'}</h2>
-        {message && <div className="mb-4 text-green-600">{message}</div>}
-        <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div className="bg-white p-6 rounded-xl shadow-md space-y-6">
+        <h2 className="text-2xl font-bold text-blue-700">
+          {editTaskId ? 'Update Task' : 'Create Task'}
+        </h2>
+        {message && <p className="text-green-600 font-medium">{message}</p>}
+
+        <form onSubmit={handleSubmit} className="grid gap-4 md:grid-cols-2">
           <input
             type="text"
             name="title"
             placeholder="Title"
             value={formData.title}
             onChange={handleChange}
-            className="w-full border p-2 rounded"
+            className="col-span-2 border p-3 rounded w-full"
             required
           />
 
@@ -146,14 +148,14 @@ const CreateTask = () => {
             placeholder="Description"
             value={formData.description}
             onChange={handleChange}
-            className="w-full border p-2 rounded"
+            className="col-span-2 border p-3 rounded w-full h-24 resize-none"
           />
 
           <select
             name="assignedTo"
             value={formData.assignedTo}
             onChange={handleChange}
-            className="w-full border p-2 rounded"
+            className="border p-3 rounded"
             required
           >
             <option value="">Assign to Staff</option>
@@ -168,7 +170,7 @@ const CreateTask = () => {
             name="priority"
             value={formData.priority}
             onChange={handleChange}
-            className="w-full border p-2 rounded"
+            className="border p-3 rounded"
           >
             <option value="low">Low</option>
             <option value="medium">Medium</option>
@@ -180,7 +182,7 @@ const CreateTask = () => {
             name="status"
             value={formData.status}
             onChange={handleChange}
-            className="w-full border p-2 rounded"
+            className="border p-3 rounded"
           >
             <option value="pending">Pending</option>
             <option value="in-progress">In Progress</option>
@@ -192,20 +194,20 @@ const CreateTask = () => {
             name="dueDate"
             value={formData.dueDate}
             onChange={handleChange}
-            className="w-full border p-2 rounded"
+            className="border p-3 rounded"
           />
 
           <textarea
             name="note"
             placeholder="Optional Note"
             onChange={handleNoteChange}
-            className="w-full border p-2 rounded"
+            className="col-span-2 border p-3 rounded resize-none"
           />
 
-          <div className="flex gap-3">
+          <div className="col-span-2 flex flex-col sm:flex-row gap-4 mt-2">
             <button
               type="submit"
-              className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+              className="w-full sm:w-auto px-6 py-3 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
             >
               {editTaskId ? 'Update Task' : 'Create Task'}
             </button>
@@ -213,7 +215,7 @@ const CreateTask = () => {
               <button
                 type="button"
                 onClick={resetForm}
-                className="w-full bg-gray-400 text-white py-2 rounded hover:bg-gray-500"
+                className="w-full sm:w-auto px-6 py-3 bg-gray-400 text-white rounded hover:bg-gray-500 transition"
               >
                 Cancel
               </button>
@@ -222,43 +224,46 @@ const CreateTask = () => {
         </form>
       </div>
 
-      <div>
-        <h3 className="text-xl font-semibold mb-3">Existing Tasks</h3>
+      {/* Task List */}
+      <div className="mt-10 bg-white p-6 rounded-xl shadow-md">
+        <h3 className="text-xl font-semibold mb-4 text-gray-800">Existing Tasks</h3>
         {taskList.length === 0 ? (
           <p className="text-gray-500">No tasks found.</p>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-full table-auto border-collapse border">
-              <thead>
-                <tr className="bg-gray-100 text-left">
-                  <th className="border px-4 py-2">Title</th>
-                  <th className="border px-4 py-2">Assigned To</th>
-                  <th className="border px-4 py-2">Priority</th>
-                  <th className="border px-4 py-2">Status</th>
-                  <th className="border px-4 py-2">Due Date</th>
-                  <th className="border px-4 py-2">Actions</th>
+          <div className="overflow-auto">
+            <table className="min-w-full text-sm border border-gray-200">
+              <thead className="bg-gray-100">
+                <tr>
+                  <th className="px-4 py-2 text-left">Title</th>
+                  <th className="px-4 py-2 text-left">Assigned To</th>
+                  <th className="px-4 py-2 text-left">Priority</th>
+                  <th className="px-4 py-2 text-left">Status</th>
+                  <th className="px-4 py-2 text-left">Due Date</th>
+                  <th className="px-4 py-2 text-left">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {taskList.map((task) => (
-                  <tr key={task._id}>
-                    <td className="border px-4 py-2">{task.title}</td>
-                    <td className="border px-4 py-2">
-                      {task.assignedTo?.userId?.name || task.assignedTo?.position || 'N/A'}
+                  <tr key={task._id} className="border-t">
+                    <td className="px-4 py-2">{task.title}</td>
+                    <td className="px-4 py-2">
+                      {task.assignedTo?.userId?.name ||
+                        task.assignedTo?.position ||
+                        'N/A'}
                     </td>
-                    <td className="border px-4 py-2">{task.priority}</td>
-                    <td className="border px-4 py-2">{task.status}</td>
-                    <td className="border px-4 py-2">{task.dueDate?.slice(0, 10)}</td>
-                    <td className="border px-4 py-2 space-x-2">
+                    <td className="px-4 py-2">{task.priority}</td>
+                    <td className="px-4 py-2">{task.status}</td>
+                    <td className="px-4 py-2">{task.dueDate?.slice(0, 10)}</td>
+                    <td className="px-4 py-2 space-x-2">
                       <button
                         onClick={() => handleEdit(task)}
-                        className="text-blue-600 hover:underline text-sm"
+                        className="text-blue-600 hover:underline"
                       >
                         Edit
                       </button>
                       <button
                         onClick={() => handleDelete(task._id)}
-                        className="text-red-600 hover:underline text-sm"
+                        className="text-red-600 hover:underline"
                       >
                         Delete
                       </button>
@@ -275,6 +280,7 @@ const CreateTask = () => {
 };
 
 export default CreateTask;
+
 
 
 

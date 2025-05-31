@@ -77,22 +77,31 @@ export default function AdminNavbar() {
   };
 
   return (
-    <header className="bg-white dark:bg-gray-900 shadow-md p-4 flex justify-between items-center">
-      <div className="text-xl font-semibold text-blue-600 dark:text-white">
+    <header className="bg-white dark:bg-gray-900 shadow-md px-4 md:px-6 py-3 flex justify-between items-center sticky top-0 z-50">
+      {/* Branding */}
+      <div className="text-lg md:text-xl font-semibold text-blue-600 dark:text-white truncate">
         HomelyCare
       </div>
 
-      <div className="flex items-center gap-4 relative">
-        {/* Theme toggle */}
-        <button onClick={toggleTheme} className="p-2 rounded-full bg-gray-200 dark:bg-gray-700">
-          {isDarkMode ? <SunIcon className="h-6 w-6" /> : <MoonIcon className="h-6 w-6" />}
+      {/* Right Side Controls */}
+      <div className="flex items-center gap-3 md:gap-4 relative">
+        {/* Theme Toggle */}
+        <button
+          onClick={toggleTheme}
+          className="p-2 rounded-full bg-gray-100 dark:bg-gray-700 hover:scale-105 transition-transform"
+        >
+          {isDarkMode ? (
+            <SunIcon className="h-5 w-5 text-yellow-500" />
+          ) : (
+            <MoonIcon className="h-5 w-5 text-gray-800" />
+          )}
         </button>
 
         {/* Profile Dropdown */}
         <div className="relative">
           <button
             onClick={() => setDropdownOpen(!dropdownOpen)}
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 focus:outline-none"
           >
             <img
               src={
@@ -104,13 +113,17 @@ export default function AdminNavbar() {
               alt="Profile"
               className="h-8 w-8 rounded-full object-cover border"
             />
-            <span className="text-gray-700 dark:text-white">{admin.name || 'Admin'}</span>
-            <ChevronDownIcon className="h-4 w-4 text-gray-600 dark:text-white" />
+            <span className="text-sm font-medium text-gray-700 dark:text-white hidden sm:inline">
+              {admin.name || 'Admin'}
+            </span>
+            <ChevronDownIcon className="h-4 w-4 text-gray-600 dark:text-white hidden sm:inline" />
           </button>
 
           {dropdownOpen && (
-            <div className="absolute top-12 right-0 w-64 bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-md shadow-lg z-50 p-4 space-y-2">
-              <div className="text-sm text-gray-700 dark:text-white mb-2">Update Profile Picture</div>
+            <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-lg shadow-lg z-50 p-4 space-y-2">
+              <div className="text-sm font-semibold text-gray-700 dark:text-white mb-2">
+                Update Profile Picture
+              </div>
 
               <div className="flex items-center space-x-2">
                 <div className="w-10 h-10 rounded-full overflow-hidden border">
@@ -125,28 +138,25 @@ export default function AdminNavbar() {
                     className="object-cover w-full h-full"
                   />
                 </div>
-                <input type="file" onChange={handleFileChange} accept="image/*" className="text-sm" />
+                <input
+                  type="file"
+                  onChange={handleFileChange}
+                  accept="image/*"
+                  className="text-xs"
+                />
               </div>
 
               <button
                 onClick={handleUpload}
-                className="block w-full px-2 py-1 text-sm text-white bg-blue-600 hover:bg-blue-700 rounded"
+                className="w-full px-3 py-1.5 text-sm text-white bg-blue-600 hover:bg-blue-700 rounded disabled:opacity-50"
                 disabled={uploading}
               >
                 {uploading ? 'Uploading...' : 'Upload'}
               </button>
 
-              {/* Optional profile link */}
-              {/* <Link
-                to="/admin/profile"
-                className="block px-2 py-1 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
-              >
-                View Profile
-              </Link> */}
-
               <button
                 onClick={handleLogout}
-                className="w-full text-left px-2 py-1 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+                className="w-full text-left px-3 py-1.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
               >
                 Logout
               </button>
@@ -157,6 +167,7 @@ export default function AdminNavbar() {
     </header>
   );
 }
+
 
 
 

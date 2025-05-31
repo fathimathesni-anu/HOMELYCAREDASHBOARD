@@ -40,7 +40,10 @@ const DoctorForm = () => {
   const addScheduleField = () => {
     setFormData({
       ...formData,
-      schedule: [...formData.schedule, { doctorName: '', specialization: '', availableDays: [], startTime: '', endTime: '' }],
+      schedule: [
+        ...formData.schedule,
+        { doctorName: '', specialization: '', availableDays: [], startTime: '', endTime: '' },
+      ],
     });
   };
 
@@ -89,17 +92,23 @@ const DoctorForm = () => {
     }
   };
 
-  const filteredDoctors = doctors.filter(doc =>
+  const filteredDoctors = doctors.filter((doc) =>
     doc.specialization?.toLowerCase().includes(filter.toLowerCase())
   );
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
-      <h2 className="text-2xl font-bold mb-4">{editMode ? 'Edit Doctor' : 'Add Doctor'}</h2>
+    <div className="max-w-5xl mx-auto p-4 sm:p-6 lg:p-8">
+      <h2 className="text-2xl sm:text-3xl font-bold mb-6 text-center sm:text-left">
+        {editMode ? 'Edit Doctor' : 'Add Doctor'}
+      </h2>
 
-      {error && <div className="bg-red-100 text-red-700 p-2 rounded mb-4">{error}</div>}
+      {error && (
+        <div className="bg-red-100 text-red-700 p-3 rounded mb-6 max-w-full text-center sm:text-left">
+          {error}
+        </div>
+      )}
 
-      <form onSubmit={handleSubmit} className="space-y-4 bg-white p-4 rounded shadow">
+      <form onSubmit={handleSubmit} className="space-y-6 bg-white p-6 rounded shadow-md">
         <input
           type="text"
           name="userId"
@@ -107,7 +116,7 @@ const DoctorForm = () => {
           value={formData.userId}
           onChange={handleChange}
           required
-          className="w-full border rounded p-2"
+          className="w-full border border-gray-300 rounded p-3 focus:outline-none focus:ring-2 focus:ring-blue-400"
         />
 
         <input
@@ -117,90 +126,103 @@ const DoctorForm = () => {
           value={formData.specialization}
           onChange={handleChange}
           required
-          className="w-full border rounded p-2"
+          className="w-full border border-gray-300 rounded p-3 focus:outline-none focus:ring-2 focus:ring-blue-400"
         />
 
         <button
           type="button"
           onClick={addScheduleField}
-          className="bg-blue-500 text-white px-3 py-1 rounded"
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
         >
-          Add Schedule
+          + Add Schedule
         </button>
 
         {formData.schedule.map((sched, index) => (
-          <div key={index} className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50 p-4 rounded">
+          <div
+            key={index}
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 bg-gray-50 p-4 rounded"
+          >
             <input
               type="text"
               placeholder="Doctor Name"
               value={sched.doctorName}
               onChange={(e) => handleScheduleChange(index, 'doctorName', e.target.value)}
-              className="border rounded p-2"
+              className="border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
             <input
               type="text"
               placeholder="Schedule Specialization"
               value={sched.specialization}
               onChange={(e) => handleScheduleChange(index, 'specialization', e.target.value)}
-              className="border rounded p-2"
+              className="border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
             <input
               type="text"
               placeholder="Available Days (comma separated)"
               value={sched.availableDays.join(', ')}
               onChange={(e) =>
-                handleScheduleChange(index, 'availableDays', e.target.value.split(',').map(day => day.trim()))
+                handleScheduleChange(
+                  index,
+                  'availableDays',
+                  e.target.value.split(',').map((day) => day.trim())
+                )
               }
-              className="border rounded p-2"
+              className="border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
             <div className="flex gap-2">
               <input
                 type="time"
                 value={sched.startTime}
                 onChange={(e) => handleScheduleChange(index, 'startTime', e.target.value)}
-                className="border rounded p-2 w-full"
+                className="border border-gray-300 rounded p-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
               />
               <input
                 type="time"
                 value={sched.endTime}
                 onChange={(e) => handleScheduleChange(index, 'endTime', e.target.value)}
-                className="border rounded p-2 w-full"
+                className="border border-gray-300 rounded p-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
               />
             </div>
           </div>
         ))}
 
-        <button type="submit" className="bg-green-600 text-white px-4 py-2 rounded">
+        <button
+          type="submit"
+          className="bg-green-600 text-white px-6 py-3 rounded text-lg font-semibold hover:bg-green-700 transition"
+        >
           {editMode ? 'Update' : 'Create'}
         </button>
       </form>
 
-      <div className="mt-8">
-        <h3 className="text-xl font-semibold mb-2">All Doctors</h3>
+      <div className="mt-10">
+        <h3 className="text-xl sm:text-2xl font-semibold mb-4 text-center sm:text-left">All Doctors</h3>
         <input
           type="text"
           placeholder="Filter by specialization..."
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
-          className="border rounded p-2 w-full mb-4"
+          className="border border-gray-300 rounded p-3 w-full mb-6 focus:outline-none focus:ring-2 focus:ring-blue-400"
         />
-        <ul className="space-y-2">
+        <ul className="space-y-4">
           {filteredDoctors.map((doc) => (
-            <li key={doc._id} className="bg-white p-4 rounded shadow flex justify-between items-center">
+            <li
+              key={doc._id}
+              className="bg-white p-4 rounded shadow flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
+            >
               <div>
-                <p className="font-medium">{doc.specialization}</p>
-                <p className="text-sm text-gray-600">{doc.userId?.name || 'No user name'}</p>
+                <p className="font-medium text-lg">{doc.specialization}</p>
+                <p className="text-gray-600">{doc.userId?.name || 'No user name'}</p>
               </div>
-              <div className="space-x-2">
+              <div className="flex gap-3">
                 <button
                   onClick={() => handleEdit(doc)}
-                  className="bg-yellow-500 text-white px-3 py-1 rounded"
+                  className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded transition"
                 >
                   Edit
                 </button>
                 <button
                   onClick={() => handleDelete(doc._id)}
-                  className="bg-red-600 text-white px-3 py-1 rounded"
+                  className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded transition"
                 >
                   Delete
                 </button>
@@ -214,5 +236,6 @@ const DoctorForm = () => {
 };
 
 export default DoctorForm;
+
 
 

@@ -1,5 +1,3 @@
-
-  // DoctorSelector.js
 import React, { useEffect, useState } from 'react';
 import axiosInstance from '../../api/axiosInstance';
 
@@ -28,12 +26,19 @@ export default function DoctorSelector({ onDoctorSelect, selectedDoctor }) {
   };
 
   return (
-    <div className="mb-4">
-      <label className="block mb-2 font-medium">Select Doctor</label>
+    <div className="mb-6 w-full max-w-md mx-auto px-4">
+      <label
+        htmlFor="doctor-select"
+        className="block mb-2 text-gray-700 dark:text-gray-300 font-semibold text-lg"
+      >
+        Select Doctor
+      </label>
       <select
+        id="doctor-select"
         value={selectedId}
         onChange={handleChange}
-        className="w-full px-4 py-2 border rounded"
+        className="block w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white transition"
+        aria-label="Select a doctor"
       >
         <option value="">-- Choose a doctor --</option>
         {doctors.map((doc) => (
@@ -45,6 +50,7 @@ export default function DoctorSelector({ onDoctorSelect, selectedDoctor }) {
     </div>
   );
 }
+
 
 
 

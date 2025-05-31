@@ -12,8 +12,8 @@ const Appointment = ({ appointment, onEdit, onDelete, onMarkStatus, doctors }) =
   const doctorName = doctor?.userId?.name || doctor?.name || 'Unknown Doctor';
 
   return (
-    <div className="appointment p-4 border rounded-md shadow-sm flex justify-between items-center">
-      <div className="appointment-content">
+    <div className="appointment p-4 border rounded-md shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-0">
+      <div className="appointment-content flex-1 space-y-1">
         <h4 className="text-lg font-semibold">Patient: {appointment.patientId?.name}</h4>
         <p><strong>Doctor:</strong> {doctorName}</p>
         <p><strong>Appointment Date:</strong> {new Date(appointment.appointmentDate).toLocaleString()}</p>
@@ -21,11 +21,31 @@ const Appointment = ({ appointment, onEdit, onDelete, onMarkStatus, doctors }) =
         <p><strong>Reason:</strong> {appointment.reason}</p>
         <p><strong>Notes:</strong> {appointment.notes}</p>
       </div>
-      <div className="flex space-x-2">
-        <button onClick={() => onEdit(appointment)} className="px-3 py-1 bg-yellow-500 text-white text-sm rounded-md hover:bg-yellow-600">Edit</button>
-        <button onClick={() => onDelete(appointment._id)} className="px-3 py-1 bg-red-500 text-white text-sm rounded-md hover:bg-red-600">Delete</button>
-        <button onClick={() => onMarkStatus(appointment._id, 'Completed')} className="px-3 py-1 bg-blue-500 text-white text-sm rounded-md hover:bg-blue-600">Mark as Completed</button>
-        <button onClick={() => onMarkStatus(appointment._id, 'Cancelled')} className="px-3 py-1 bg-gray-500 text-white text-sm rounded-md hover:bg-gray-600">Mark as Cancelled</button>
+      <div className="flex flex-wrap sm:flex-nowrap gap-2 sm:gap-1">
+        <button
+          onClick={() => onEdit(appointment)}
+          className="px-3 py-1 bg-yellow-500 text-white text-sm rounded-md hover:bg-yellow-600 transition"
+        >
+          Edit
+        </button>
+        <button
+          onClick={() => onDelete(appointment._id)}
+          className="px-3 py-1 bg-red-500 text-white text-sm rounded-md hover:bg-red-600 transition"
+        >
+          Delete
+        </button>
+        <button
+          onClick={() => onMarkStatus(appointment._id, 'Completed')}
+          className="px-3 py-1 bg-blue-500 text-white text-sm rounded-md hover:bg-blue-600 transition"
+        >
+          Mark as Completed
+        </button>
+        <button
+          onClick={() => onMarkStatus(appointment._id, 'Cancelled')}
+          className="px-3 py-1 bg-gray-500 text-white text-sm rounded-md hover:bg-gray-600 transition"
+        >
+          Mark as Cancelled
+        </button>
       </div>
     </div>
   );
@@ -140,13 +160,13 @@ const AppointmentList = () => {
   };
 
   return (
-    <div className="appointment-list p-6 space-y-6">
-      <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="appointment-list max-w-4xl mx-auto p-6 space-y-8">
+      <form onSubmit={handleSubmit} className="space-y-6 bg-white p-6 rounded-lg shadow-md">
         <select
           name="patientId"
           value={formData.patientId}
           onChange={handleChange}
-          className="border p-2 rounded-md w-full"
+          className="border p-3 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
           required
         >
           <option value="">Select patient</option>
@@ -161,7 +181,7 @@ const AppointmentList = () => {
           name="doctorId"
           value={formData.doctorId}
           onChange={handleChange}
-          className="border p-2 rounded-md w-full"
+          className="border p-3 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
           required
         >
           <option value="">Select doctor</option>
@@ -172,12 +192,11 @@ const AppointmentList = () => {
           ))}
         </select>
 
-        {/* ✅ Integrated read-only schedule viewer */}
+        {/* ScheduleViewer, only if doctor selected */}
         {formData.doctorId && (
-          <ScheduleViewer
-            doctorId={formData.doctorId}
-            token={localStorage.getItem('token')}
-          />
+          <div className="my-4">
+            <ScheduleViewer doctorId={formData.doctorId} token={localStorage.getItem('token')} />
+          </div>
         )}
 
         <DatePicker
@@ -192,7 +211,7 @@ const AppointmentList = () => {
           timeIntervals={30}
           dateFormat="Pp"
           placeholderText="Select appointment date and time"
-          className="border p-2 rounded-md w-full"
+          className="border p-3 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
           disabled={!formData.doctorId}
         />
 
@@ -202,7 +221,7 @@ const AppointmentList = () => {
           value={formData.reason}
           onChange={handleChange}
           placeholder="Reason for appointment"
-          className="border p-2 rounded-md w-full"
+          className="border p-3 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
           required
         />
 
@@ -211,13 +230,14 @@ const AppointmentList = () => {
           value={formData.notes}
           onChange={handleChange}
           placeholder="Notes"
-          className="border p-2 rounded-md w-full"
+          rows={3}
+          className="border p-3 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
 
-        <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row gap-3 justify-end">
           <button
             type="submit"
-            className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+            className="w-full sm:w-auto px-6 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 transition"
           >
             {editingAppointment ? 'Update' : 'Create'} Appointment
           </button>
@@ -235,7 +255,7 @@ const AppointmentList = () => {
                   notes: '',
                 });
               }}
-              className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600"
+              className="w-full sm:w-auto px-6 py-3 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition"
             >
               Cancel
             </button>
@@ -243,24 +263,27 @@ const AppointmentList = () => {
         </div>
       </form>
 
-      {appointments.length === 0 ? (
-        <p className="text-center text-gray-500">No appointments</p>
-      ) : (
-        appointments.map((appointment) => (
-          <Appointment
-            key={appointment._id}
-            appointment={appointment}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-            onMarkStatus={handleMarkStatus}
-            doctors={doctors}
-          />
-        ))
-      )}
+      <div className="space-y-4">
+        {appointments.length === 0 ? (
+          <p className="text-center text-gray-500">No appointments</p>
+        ) : (
+          appointments.map((appointment) => (
+            <Appointment
+              key={appointment._id}
+              appointment={appointment}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+              onMarkStatus={handleMarkStatus}
+              doctors={doctors}
+            />
+          ))
+        )}
+      </div>
     </div>
   );
 };
 
 export default AppointmentList;
+
 
 

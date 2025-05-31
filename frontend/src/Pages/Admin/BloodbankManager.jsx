@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axiosInstance from '../../api/axiosInstance'; // ✅ use custom instance
+import axiosInstance from '../../api/axiosInstance';
 
 const BloodBankManager = () => {
   const [formData, setFormData] = useState({
@@ -16,7 +16,6 @@ const BloodBankManager = () => {
   const fetchBloodBankEntries = async () => {
     try {
       const res = await axiosInstance.get('/bloodbank');
-      console.log('API response:', res.data);
       if (Array.isArray(res.data)) {
         setBloodBankEntries(res.data);
       } else {
@@ -62,87 +61,95 @@ const BloodBankManager = () => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-4">
-      <h2 className="text-2xl font-bold mb-4">Blood Bank Management</h2>
+    <div className="max-w-4xl mx-auto px-4 py-6">
+      <h2 className="text-2xl font-bold mb-4 text-center">Blood Bank Management</h2>
 
-      {message && <div className="text-green-600 mb-2">{message}</div>}
-      {error && <div className="text-red-600 mb-2">{error}</div>}
+      {message && <div className="text-green-600 mb-2 text-sm">{message}</div>}
+      {error && <div className="text-red-600 mb-2 text-sm">{error}</div>}
 
-      <form onSubmit={handleSubmit} className="mb-6 space-y-4">
-        <div>
-          <label className="block">Blood Group</label>
-          <select
-            name="bloodGroup"
-            value={formData.bloodGroup}
-            onChange={handleChange}
-            required
-            className="w-full border p-2 rounded"
+      <form onSubmit={handleSubmit} className="mb-6 space-y-4 bg-white p-4 rounded shadow-sm">
+        <div className="flex flex-col sm:flex-row sm:space-x-4">
+          <div className="flex-1">
+            <label className="block text-sm mb-1 font-medium">Blood Group</label>
+            <select
+              name="bloodGroup"
+              value={formData.bloodGroup}
+              onChange={handleChange}
+              required
+              className="w-full border p-2 rounded text-sm"
+            >
+              <option value="">Select Blood Group</option>
+              {bloodGroups.map(bg => (
+                <option key={bg} value={bg}>{bg}</option>
+              ))}
+            </select>
+          </div>
+          <div className="flex-1 mt-4 sm:mt-0">
+            <label className="block text-sm mb-1 font-medium">Available Units</label>
+            <input
+              type="number"
+              name="availableUnits"
+              value={formData.availableUnits}
+              onChange={handleChange}
+              required
+              min="0"
+              className="w-full border p-2 rounded text-sm"
+            />
+          </div>
+        </div>
+        <div className="text-center">
+          <button
+            type="submit"
+            className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition"
           >
-            <option value="">Select Blood Group</option>
-            {bloodGroups.map(bg => (
-              <option key={bg} value={bg}>{bg}</option>
-            ))}
-          </select>
+            Add Entry
+          </button>
         </div>
-        <div>
-          <label className="block">Available Units</label>
-          <input
-            type="number"
-            name="availableUnits"
-            value={formData.availableUnits}
-            onChange={handleChange}
-            required
-            min="0"
-            className="w-full border p-2 rounded"
-          />
-        </div>
-        <button
-          type="submit"
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-        >
-          Add Entry
-        </button>
       </form>
 
-      <h3 className="text-xl font-semibold mb-2">Current Inventory</h3>
-      <table className="w-full border table-auto">
-        <thead>
-          <tr className="bg-gray-200">
-            <th className="p-2 border">Blood Group</th>
-            <th className="p-2 border">Units</th>
-            <th className="p-2 border">Last Updated</th>
-            <th className="p-2 border">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {Array.isArray(bloodBankEntries) && bloodBankEntries.length > 0 ? (
-            bloodBankEntries.map(entry => (
-              <tr key={entry._id} className="text-center">
-                <td className="border p-2">{entry.bloodGroup}</td>
-                <td className="border p-2">{entry.availableUnits}</td>
-                <td className="border p-2">{new Date(entry.lastUpdated).toLocaleString()}</td>
-                <td className="border p-2">
-                  <button
-                    onClick={() => handleDelete(entry._id)}
-                    className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))
-          ) : (
+      <h3 className="text-xl font-semibold mb-3">Current Inventory</h3>
+
+      <div className="overflow-x-auto bg-white rounded shadow-sm">
+        <table className="w-full table-auto text-sm text-left">
+          <thead className="bg-gray-100 text-gray-700">
             <tr>
-              <td colSpan="4" className="p-4 text-gray-500">No entries found.</td>
+              <th className="p-3 border">Blood Group</th>
+              <th className="p-3 border">Units</th>
+              <th className="p-3 border">Last Updated</th>
+              <th className="p-3 border text-center">Actions</th>
             </tr>
-          )}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {bloodBankEntries.length > 0 ? (
+              bloodBankEntries.map(entry => (
+                <tr key={entry._id} className="hover:bg-gray-50">
+                  <td className="p-3 border">{entry.bloodGroup}</td>
+                  <td className="p-3 border">{entry.availableUnits}</td>
+                  <td className="p-3 border">{new Date(entry.lastUpdated).toLocaleString()}</td>
+                  <td className="p-3 border text-center">
+                    <button
+                      onClick={() => handleDelete(entry._id)}
+                      className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 text-xs"
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="4" className="p-4 text-center text-gray-500">No entries found.</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };
 
 export default BloodBankManager;
+
 
 
 

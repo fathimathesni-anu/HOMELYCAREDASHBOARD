@@ -1,23 +1,29 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import StaffSidebar from './StaffSidebar';
 import StaffNavbar from './StaffNavbar';
 import Footer from '../Footer';
 
 export default function StaffLayout() {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
   return (
-    <div className="flex h-screen bg-gray-100">
-      <StaffSidebar />
-      <div className="flex-1 flex flex-col">
-        <StaffNavbar />
-        <div className="flex-1 flex flex-col justify-between overflow-auto">
-          <main className="p-6 flex-1">
-            <Outlet /> {/* Render nested routes here */}
-          </main>
-          <Footer />
-        </div>
+    <div className="flex h-screen bg-gray-100 dark:bg-gray-900 overflow-hidden">
+      {/* Sidebar */}
+      <StaffSidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />
+
+      {/* Main content */}
+      <div className="flex flex-col flex-1 overflow-hidden">
+        <StaffNavbar toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
+        
+        <main className="flex-1 overflow-y-auto p-4 md:p-6 bg-gray-50 dark:bg-gray-800">
+          <Outlet />
+        </main>
+
+        <Footer />
       </div>
     </div>
   );
 }
+
 

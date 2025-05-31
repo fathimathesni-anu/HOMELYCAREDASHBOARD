@@ -30,17 +30,21 @@ const DoctorDashboard = () => {
   }, []);
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold text-gray-700 dark:text-white mb-4">
+    <div className="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8">
+      <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-700 dark:text-white mb-6 text-center sm:text-left">
         {loading ? 'Welcome...' : `Welcome, Dr. ${userName}`}
       </h1>
 
       {loading ? (
-        <p className="text-gray-500 dark:text-gray-400">Loading your information...</p>
+        <p className="text-center sm:text-left text-gray-500 dark:text-gray-400 text-sm sm:text-base mb-6">
+          Loading your information...
+        </p>
       ) : error ? (
-        <p className="text-red-500 dark:text-red-400">Error: {error}</p>
+        <p className="text-center sm:text-left text-red-500 dark:text-red-400 text-sm sm:text-base mb-6">
+          Error: {error}
+        </p>
       ) : (
-        <div className="text-gray-600 dark:text-gray-300 mb-4">
+        <div className="text-center sm:text-left text-gray-600 dark:text-gray-300 mb-6 text-sm sm:text-base">
           Logged in as: <strong>{userName}</strong> | Role: <strong>{userRole}</strong>
         </div>
       )}
@@ -49,15 +53,17 @@ const DoctorDashboard = () => {
         userRole === 'doctor' ? (
           <DoctorHomepage />
         ) : (
-          <p className="text-red-500">Error: userole not authorised</p>
+          <p className="text-center sm:text-left text-red-500 text-sm sm:text-base">
+            Error: user role not authorised
+          </p>
         )
       )}
-
     </div>
   );
 };
 
 export default DoctorDashboard;
+
 
 
 

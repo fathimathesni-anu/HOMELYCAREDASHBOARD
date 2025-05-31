@@ -33,54 +33,65 @@ const DoctorManagementDashboard = () => {
   };
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
-      <h1 className="text-3xl font-bold mb-6">Doctor Management Dashboard</h1>
+    <div className="p-4 md:p-8 max-w-7xl mx-auto">
+      <h1 className="text-3xl md:text-4xl font-bold mb-8 text-center md:text-left">
+        Doctor Management Dashboard
+      </h1>
 
-      <div className="mb-10">
+      <div className="mb-12">
         <DoctorForm />
       </div>
 
-      <div className="bg-white p-4 rounded shadow">
-        <h2 className="text-xl font-semibold mb-4">Doctors List</h2>
-        <ul className="divide-y divide-gray-200">
-          {doctors.map((doc) => (
-            <li key={doc._id} className="py-4 flex justify-between items-center">
-              <div>
-                <p className="font-semibold">{doc.userId?.name || 'Unnamed Doctor'}</p>
-                <p className="text-sm text-gray-500">{doc.specialization}</p>
-              </div>
-              <div className="space-x-2">
-                <button
-                  onClick={() => handleScheduleClick(doc)}
-                  className="bg-blue-500 text-white px-3 py-1 rounded"
-                >
-                  Manage Schedule
-                </button>
-              </div>
-            </li>
-          ))}
-        </ul>
+      <div className="bg-white p-6 rounded-lg shadow-lg">
+        <h2 className="text-2xl font-semibold mb-6">Doctors List</h2>
+        {doctors.length === 0 ? (
+          <p className="text-center text-gray-500 py-6">No doctors found.</p>
+        ) : (
+          <ul className="divide-y divide-gray-200">
+            {doctors.map((doc) => (
+              <li
+                key={doc._id}
+                className="py-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-0"
+              >
+                <div>
+                  <p className="font-semibold text-lg">{doc.userId?.name || 'Unnamed Doctor'}</p>
+                  <p className="text-sm text-gray-600">{doc.specialization}</p>
+                </div>
+                <div>
+                  <button
+                    onClick={() => handleScheduleClick(doc)}
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition"
+                  >
+                    Manage Schedule
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
 
-      {/* ✅ Schedule Modal */}
+      {/* Schedule Modal */}
       {showScheduleModal && selectedDoctor && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white p-6 rounded shadow-xl w-full max-w-3xl relative max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto relative">
             <button
               onClick={closeScheduleModal}
-              className="absolute top-2 right-2 text-gray-600 hover:text-black text-2xl"
+              aria-label="Close modal"
+              className="absolute top-3 right-3 text-gray-600 hover:text-gray-900 text-3xl leading-none"
             >
               &times;
             </button>
-            <h2 className="text-xl font-bold mb-4">
-              Manage Schedule for {selectedDoctor.userId?.name || 'Doctor'}
-            </h2>
-
-            <ScheduleList
-              doctorId={selectedDoctor._id}
-              token={token}
-              userRole="admin" // Or derive from user context
-            />
+            <div className="p-6">
+              <h2 className="text-2xl font-bold mb-6">
+                Manage Schedule for {selectedDoctor.userId?.name || 'Doctor'}
+              </h2>
+              <ScheduleList
+                doctorId={selectedDoctor._id}
+                token={token}
+                userRole="admin" // Or derive from user context
+              />
+            </div>
           </div>
         </div>
       )}
@@ -89,6 +100,7 @@ const DoctorManagementDashboard = () => {
 };
 
 export default DoctorManagementDashboard;
+
 
 
 

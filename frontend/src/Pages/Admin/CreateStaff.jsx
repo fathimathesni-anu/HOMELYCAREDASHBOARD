@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axiosInstance from '../../api/axiosInstance'; // Adjust path as needed
+import axiosInstance from '../../api/axiosInstance'; // Adjust path if necessary
 
 const CreateStaff = () => {
   const [formData, setFormData] = useState({
@@ -95,45 +95,50 @@ const CreateStaff = () => {
   const totalPages = Math.ceil(filteredStaff.length / itemsPerPage);
 
   return (
-    <div className="max-w-xl mx-auto p-6 bg-white shadow-md rounded-xl">
-      <h2 className="text-2xl font-bold mb-4">Create Staff Member</h2>
-      {message && <div className="mb-4 text-red-500">{message}</div>}
+    <div className="max-w-7xl mx-auto p-4 sm:p-6 bg-white shadow-lg rounded-xl mt-6">
+      <h2 className="text-2xl sm:text-3xl font-bold mb-6 text-blue-700">Create Staff Member</h2>
+
+      {message && <div className="mb-4 text-red-600">{message}</div>}
+
       <form onSubmit={handleSubmit} className="space-y-4">
-        <input
-          type="text"
-          name="userId"
-          placeholder="User ID"
-          value={formData.userId}
-          onChange={handleChange}
-          className="w-full border p-2 rounded"
-          required
-        />
-        <input
-          type="text"
-          name="position"
-          placeholder="Position"
-          value={formData.position}
-          onChange={handleChange}
-          className="w-full border p-2 rounded"
-          required
-        />
+        <div className="grid sm:grid-cols-2 gap-4">
+          <input
+            type="text"
+            name="userId"
+            placeholder="User ID"
+            value={formData.userId}
+            onChange={handleChange}
+            className="border p-3 rounded w-full"
+            required
+          />
+          <input
+            type="text"
+            name="position"
+            placeholder="Position"
+            value={formData.position}
+            onChange={handleChange}
+            className="border p-3 rounded w-full"
+            required
+          />
+        </div>
+
         <input
           type="text"
           name="department"
           placeholder="Department"
           value={formData.department}
           onChange={handleChange}
-          className="w-full border p-2 rounded"
+          className="w-full border p-3 rounded"
         />
 
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid sm:grid-cols-2 gap-4">
           <input
             type="text"
             name="phone"
             placeholder="Phone"
             value={formData.contactInfo.phone}
             onChange={(e) => handleChange(e, 'contactInfo')}
-            className="border p-2 rounded"
+            className="border p-3 rounded"
           />
           <input
             type="email"
@@ -141,14 +146,14 @@ const CreateStaff = () => {
             placeholder="Email"
             value={formData.contactInfo.email}
             onChange={(e) => handleChange(e, 'contactInfo')}
-            className="border p-2 rounded"
+            className="border p-3 rounded"
           />
         </div>
 
         <div>
           <h3 className="font-semibold mb-2">Schedule</h3>
           {formData.schedule.map((slot, index) => (
-            <div key={index} className="grid grid-cols-3 gap-2 mb-2">
+            <div key={index} className="grid sm:grid-cols-3 gap-2 mb-2">
               <input
                 type="text"
                 name="day"
@@ -178,7 +183,7 @@ const CreateStaff = () => {
           <button
             type="button"
             onClick={handleAddSchedule}
-            className="text-blue-500 hover:underline"
+            className="text-blue-600 font-medium hover:underline mt-2"
           >
             + Add Schedule Slot
           </button>
@@ -186,20 +191,20 @@ const CreateStaff = () => {
 
         <button
           type="submit"
-          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+          className="w-full bg-blue-600 text-white font-semibold py-3 rounded hover:bg-blue-700 transition"
         >
           Create Staff
         </button>
       </form>
 
       {/* Staff List Section */}
-      <div className="mt-8">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-xl font-semibold">Staff List</h3>
+      <div className="mt-10">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+          <h3 className="text-xl font-semibold text-gray-800">Staff List</h3>
           <input
             type="text"
             placeholder="Filter by department"
-            className="border p-2 rounded"
+            className="border p-2 rounded w-full sm:w-64"
             value={searchDept}
             onChange={(e) => {
               setSearchDept(e.target.value);
@@ -211,16 +216,16 @@ const CreateStaff = () => {
         {currentStaff.length === 0 ? (
           <p className="text-gray-500">No staff found.</p>
         ) : (
-          <div className="overflow-auto max-h-[400px] border rounded">
+          <div className="overflow-x-auto border rounded">
             <table className="min-w-full text-sm table-auto">
-              <thead className="bg-gray-100">
+              <thead className="bg-gray-100 text-left">
                 <tr>
-                  <th className="px-4 py-2 text-left">Name</th>
-                  <th className="px-4 py-2 text-left">Position</th>
-                  <th className="px-4 py-2 text-left">Department</th>
-                  <th className="px-4 py-2 text-left">Phone</th>
-                  <th className="px-4 py-2 text-left">Email</th>
-                  <th className="px-4 py-2 text-left">Actions</th>
+                  <th className="px-4 py-2">Name</th>
+                  <th className="px-4 py-2">Position</th>
+                  <th className="px-4 py-2">Department</th>
+                  <th className="px-4 py-2">Phone</th>
+                  <th className="px-4 py-2">Email</th>
+                  <th className="px-4 py-2">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -231,13 +236,21 @@ const CreateStaff = () => {
                     <td className="px-4 py-2">{staff.department}</td>
                     <td className="px-4 py-2">{staff.contactInfo?.phone}</td>
                     <td className="px-4 py-2">{staff.contactInfo?.email}</td>
-                    <td className="px-4 py-2 space-x-2">
-                      <button className="text-blue-500 hover:underline" onClick={() => alert('Edit feature coming soon')}>
-                        Edit
-                      </button>
-                      <button className="text-red-500 hover:underline" onClick={() => handleDelete(staff._id)}>
-                        Delete
-                      </button>
+                    <td className="px-4 py-2">
+                      <div className="space-x-2">
+                        <button
+                          className="text-blue-600 hover:underline"
+                          onClick={() => alert('Edit feature coming soon')}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          className="text-red-600 hover:underline"
+                          onClick={() => handleDelete(staff._id)}
+                        >
+                          Delete
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -246,13 +259,15 @@ const CreateStaff = () => {
           </div>
         )}
 
-        <div className="flex justify-center mt-4 space-x-2">
+        <div className="flex flex-wrap justify-center mt-6 gap-2">
           {Array.from({ length: totalPages }, (_, i) => (
             <button
               key={i}
               onClick={() => setCurrentPage(i + 1)}
-              className={`px-3 py-1 rounded ${
-                currentPage === i + 1 ? 'bg-blue-500 text-white' : 'bg-gray-200'
+              className={`px-4 py-1 rounded-full border transition ${
+                currentPage === i + 1
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-gray-200 hover:bg-gray-300'
               }`}
             >
               {i + 1}
@@ -265,6 +280,7 @@ const CreateStaff = () => {
 };
 
 export default CreateStaff;
+
 
 
 

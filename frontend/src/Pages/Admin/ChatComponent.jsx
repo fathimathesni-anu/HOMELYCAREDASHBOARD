@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import axiosInstance from '../../api/axiosInstance';
 
@@ -59,8 +58,8 @@ const ChatComponent = () => {
   }, []);
 
   return (
-    <div className="p-6 max-w-3xl mx-auto bg-white shadow-md rounded-xl mt-6">
-      <h2 className="text-3xl font-bold text-center mb-6 text-blue-700">💬 Chat Box</h2>
+    <div className="p-4 sm:p-6 max-w-3xl mx-auto bg-white shadow-lg rounded-lg mt-6">
+      <h2 className="text-2xl sm:text-3xl font-bold text-center mb-6 text-blue-700">💬 Chat Box</h2>
 
       {/* Message Form */}
       <div className="mb-6 space-y-4">
@@ -69,18 +68,18 @@ const ChatComponent = () => {
           placeholder="Receiver User ID"
           value={receiverId}
           onChange={(e) => setReceiverId(e.target.value)}
-          className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+          className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm"
         />
         <textarea
           rows="4"
           placeholder="Type your message..."
           value={message}
           onChange={(e) => setMessage(e.target.value)}
-          className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+          className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm"
         />
         <button
           onClick={sendMessage}
-          className="w-full bg-blue-600 text-white font-semibold py-2 rounded-lg hover:bg-blue-700 transition"
+          className="w-full bg-blue-600 text-white font-medium py-2 rounded-md hover:bg-blue-700 transition text-sm"
         >
           ➤ Send
         </button>
@@ -91,65 +90,69 @@ const ChatComponent = () => {
         <p className="text-center text-gray-500">Loading messages...</p>
       ) : (
         <ul className="space-y-4 max-h-[400px] overflow-y-auto pr-1">
-          {chats.map((chat) => (
-            <li
-              key={chat._id}
-              className="p-4 rounded-lg border bg-gray-50 shadow-sm relative"
-            >
-              <div className="flex justify-between text-sm text-gray-600 mb-2">
-                <span><strong>From:</strong> {chat.senderId}</span>
-                <span><strong>To:</strong> {chat.receiverId}</span>
-              </div>
+          {chats.length === 0 ? (
+            <p className="text-center text-gray-400 text-sm">No messages yet.</p>
+          ) : (
+            chats.map((chat) => (
+              <li
+                key={chat._id}
+                className="p-4 rounded-md border bg-gray-50 shadow-sm text-sm"
+              >
+                <div className="flex justify-between text-gray-600 mb-2 flex-wrap gap-y-1">
+                  <span><strong>From:</strong> {chat.senderId}</span>
+                  <span><strong>To:</strong> {chat.receiverId}</span>
+                </div>
 
-              {editId === chat._id ? (
-                <>
-                  <textarea
-                    className="w-full p-2 border rounded mb-2"
-                    value={editMessage}
-                    onChange={(e) => setEditMessage(e.target.value)}
-                  />
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => updateMessage(chat._id)}
-                      className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700"
-                    >
-                      Save
-                    </button>
-                    <button
-                      onClick={() => setEditId(null)}
-                      className="px-3 py-1 bg-gray-400 text-white rounded hover:bg-gray-500"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <p className="text-base text-gray-800">{chat.message}</p>
-                  <p className="text-xs text-gray-500 mt-2">
-                    {new Date(chat.timestamp || chat.createdAt).toLocaleString()}
-                  </p>
-                  <div className="mt-3 flex gap-2">
-                    <button
-                      onClick={() => {
-                        setEditId(chat._id);
-                        setEditMessage(chat.message);
-                      }}
-                      className="text-blue-600 hover:underline text-sm"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => deleteMessage(chat._id)}
-                      className="text-red-600 hover:underline text-sm"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </>
-              )}
-            </li>
-          ))}
+                {editId === chat._id ? (
+                  <>
+                    <textarea
+                      className="w-full p-2 border rounded-md mb-2 text-sm"
+                      value={editMessage}
+                      onChange={(e) => setEditMessage(e.target.value)}
+                    />
+                    <div className="flex gap-2 flex-wrap">
+                      <button
+                        onClick={() => updateMessage(chat._id)}
+                        className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 text-xs"
+                      >
+                        Save
+                      </button>
+                      <button
+                        onClick={() => setEditId(null)}
+                        className="px-3 py-1 bg-gray-400 text-white rounded hover:bg-gray-500 text-xs"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-gray-800 mb-2">{chat.message}</p>
+                    <p className="text-xs text-gray-500">
+                      {new Date(chat.timestamp || chat.createdAt).toLocaleString()}
+                    </p>
+                    <div className="mt-3 flex gap-4 text-xs">
+                      <button
+                        onClick={() => {
+                          setEditId(chat._id);
+                          setEditMessage(chat.message);
+                        }}
+                        className="text-blue-600 hover:underline"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => deleteMessage(chat._id)}
+                        className="text-red-600 hover:underline"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </>
+                )}
+              </li>
+            ))
+          )}
         </ul>
       )}
     </div>
@@ -157,6 +160,8 @@ const ChatComponent = () => {
 };
 
 export default ChatComponent;
+
+
 
 
 

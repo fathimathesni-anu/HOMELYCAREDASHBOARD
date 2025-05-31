@@ -68,7 +68,10 @@ const ScheduleForm = ({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 mt-6 border p-4 rounded shadow-sm bg-white">
+    <form
+      onSubmit={handleSubmit}
+      className="space-y-6 mt-6 border rounded-lg p-6 shadow-sm bg-white max-w-xl mx-auto"
+    >
       <div>
         <label className="block text-sm font-medium text-gray-700">Doctor Name</label>
         <input
@@ -77,7 +80,8 @@ const ScheduleForm = ({
           value={formData.doctorName}
           onChange={handleChange}
           required
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
+          className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          placeholder="Dr. John Doe"
         />
       </div>
 
@@ -89,28 +93,32 @@ const ScheduleForm = ({
           value={formData.specialization}
           onChange={handleChange}
           required
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
+          className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          placeholder="Cardiology"
         />
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Available Days</label>
-        <div className="grid grid-cols-2 gap-2">
+        <label className="block text-sm font-medium text-gray-700 mb-2">Available Days</label>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
           {daysOfWeek.map((day) => (
-            <label key={day} className="flex items-center space-x-2">
+            <label
+              key={day}
+              className="flex items-center space-x-2 cursor-pointer select-none"
+            >
               <input
                 type="checkbox"
                 checked={formData.availableDays.includes(day)}
                 onChange={() => handleCheckboxChange(day)}
-                className="rounded text-blue-600 focus:ring-blue-500"
+                className="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
               />
-              <span>{day}</span>
+              <span className="text-gray-700">{day}</span>
             </label>
           ))}
         </div>
       </div>
 
-      <div className="flex space-x-4">
+      <div className="flex flex-col sm:flex-row sm:space-x-6 space-y-4 sm:space-y-0">
         <div className="flex-1">
           <label className="block text-sm font-medium text-gray-700">Start Time</label>
           <input
@@ -119,7 +127,7 @@ const ScheduleForm = ({
             value={formData.startTime}
             onChange={handleChange}
             required
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
+            className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           />
         </div>
 
@@ -131,15 +139,15 @@ const ScheduleForm = ({
             value={formData.endTime}
             onChange={handleChange}
             required
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
+            className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           />
         </div>
       </div>
 
-      <div className="flex items-center justify-between pt-4">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-4 sm:space-y-0">
         <button
           type="submit"
-          className="inline-flex justify-center rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+          className="w-full sm:w-auto inline-flex justify-center rounded-md bg-blue-600 px-6 py-2 text-white hover:bg-blue-700 transition"
         >
           {scheduleIndex !== null ? 'Update Schedule' : 'Add Schedule'}
         </button>
@@ -148,7 +156,7 @@ const ScheduleForm = ({
           <button
             type="button"
             onClick={handleDelete}
-            className="inline-flex justify-center rounded-md bg-red-600 px-4 py-2 text-white hover:bg-red-700"
+            className="w-full sm:w-auto inline-flex justify-center rounded-md bg-red-600 px-6 py-2 text-white hover:bg-red-700 transition"
           >
             Delete
           </button>
@@ -159,6 +167,7 @@ const ScheduleForm = ({
 };
 
 export default ScheduleForm;
+
 
 
 

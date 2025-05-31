@@ -26,35 +26,45 @@ const StaffDashboard = () => {
   }, []);
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold text-gray-700 dark:text-white mb-4">
+    <div className="max-w-4xl mx-auto p-4 sm:p-6 md:p-8">
+      <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-800 dark:text-white mb-6 text-center sm:text-left">
         {loading ? 'Loading...' : error ? 'Error loading profile' : `Welcome, ${userName}`}
       </h1>
 
       {!loading && !error && (
-        <div className="text-gray-600 dark:text-gray-300 mb-4">
-       Logged in as: <strong>{userName}</strong> | Role: <strong>{userRole}</strong>
+        <div className="text-center sm:text-left text-gray-600 dark:text-gray-300 mb-6 text-sm sm:text-base">
+          Logged in as: <strong>{userName}</strong> | Role: <strong>{userRole}</strong>
         </div>
       )}
 
-      {error && <p className="text-red-500 dark:text-red-400">Error: {error}</p>}
+      {error && (
+        <p className="text-center sm:text-left text-red-600 dark:text-red-400 mb-6 font-medium">
+          Error: {error}
+        </p>
+      )}
 
       {!loading && !error && (
         userRole === 'staff' ? (
           <>
-            <p className="text-blue-500">Staff access granted. You can manage assigned tasks.</p>
-            <StaffHomepage />
+            <p className="text-center sm:text-left text-blue-600 dark:text-blue-400 mb-6 font-semibold">
+              Staff access granted. You can manage assigned tasks.
+            </p>
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 sm:p-6">
+              <StaffHomepage />
+            </div>
           </>
         ) : (
-          <p className="text-red-500">Error: userole not authorised</p>
+          <p className="text-center sm:text-left text-red-600 dark:text-red-400 font-semibold">
+            Error: user role not authorised
+          </p>
         )
       )}
-
     </div>
   );
 };
 
 export default StaffDashboard;
+
 
 
 

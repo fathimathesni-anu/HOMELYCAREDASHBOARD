@@ -128,8 +128,18 @@ const CreateTask = () => {
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white shadow-md rounded-xl space-y-8">
       <div>
-        <h2 className="text-2xl font-bold mb-4">{editTaskId ? 'Update Task' : 'Create Task'}</h2>
-        {message && <div className="mb-4 text-green-600">{message}</div>}
+        <h2 className="text-2xl font-bold mb-4 text-center sm:text-left">
+          {editTaskId ? 'Update Task' : 'Create Task'}
+        </h2>
+        {message && (
+          <div
+            className={`mb-4 text-center ${
+              message.includes('failed') ? 'text-red-600' : 'text-green-600'
+            }`}
+          >
+            {message}
+          </div>
+        )}
         <form onSubmit={handleSubmit} className="space-y-4">
           <input
             type="text"
@@ -137,7 +147,7 @@ const CreateTask = () => {
             placeholder="Title"
             value={formData.title}
             onChange={handleChange}
-            className="w-full border p-2 rounded"
+            className="w-full border p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             required
           />
 
@@ -146,14 +156,15 @@ const CreateTask = () => {
             placeholder="Description"
             value={formData.description}
             onChange={handleChange}
-            className="w-full border p-2 rounded"
+            className="w-full border p-2 rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+            rows={3}
           />
 
           <select
             name="assignedTo"
             value={formData.assignedTo}
             onChange={handleChange}
-            className="w-full border p-2 rounded"
+            className="w-full border p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             required
           >
             <option value="">Assign to Staff</option>
@@ -164,48 +175,51 @@ const CreateTask = () => {
             ))}
           </select>
 
-          <select
-            name="priority"
-            value={formData.priority}
-            onChange={handleChange}
-            className="w-full border p-2 rounded"
-          >
-            <option value="low">Low</option>
-            <option value="medium">Medium</option>
-            <option value="high">High</option>
-            <option value="urgent">Urgent</option>
-          </select>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <select
+              name="priority"
+              value={formData.priority}
+              onChange={handleChange}
+              className="border p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="low">Low</option>
+              <option value="medium">Medium</option>
+              <option value="high">High</option>
+              <option value="urgent">Urgent</option>
+            </select>
 
-          <select
-            name="status"
-            value={formData.status}
-            onChange={handleChange}
-            className="w-full border p-2 rounded"
-          >
-            <option value="pending">Pending</option>
-            <option value="in-progress">In Progress</option>
-            <option value="completed">Completed</option>
-          </select>
+            <select
+              name="status"
+              value={formData.status}
+              onChange={handleChange}
+              className="border p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="pending">Pending</option>
+              <option value="in-progress">In Progress</option>
+              <option value="completed">Completed</option>
+            </select>
 
-          <input
-            type="date"
-            name="dueDate"
-            value={formData.dueDate}
-            onChange={handleChange}
-            className="w-full border p-2 rounded"
-          />
+            <input
+              type="date"
+              name="dueDate"
+              value={formData.dueDate}
+              onChange={handleChange}
+              className="border p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
 
           <textarea
             name="note"
             placeholder="Optional Note"
             onChange={handleNoteChange}
-            className="w-full border p-2 rounded"
+            className="w-full border p-2 rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+            rows={2}
           />
 
-          <div className="flex gap-3">
+          <div className="flex flex-col sm:flex-row gap-3">
             <button
               type="submit"
-              className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+              className="flex-1 bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
             >
               {editTaskId ? 'Update Task' : 'Create Task'}
             </button>
@@ -213,7 +227,7 @@ const CreateTask = () => {
               <button
                 type="button"
                 onClick={resetForm}
-                className="w-full bg-gray-400 text-white py-2 rounded hover:bg-gray-500"
+                className="flex-1 bg-gray-400 text-white py-2 rounded hover:bg-gray-500 transition"
               >
                 Cancel
               </button>
@@ -223,14 +237,14 @@ const CreateTask = () => {
       </div>
 
       <div>
-        <h3 className="text-xl font-semibold mb-3">Existing Tasks</h3>
+        <h3 className="text-xl font-semibold mb-3 text-center sm:text-left">Existing Tasks</h3>
         {taskList.length === 0 ? (
-          <p className="text-gray-500">No tasks found.</p>
+          <p className="text-gray-500 text-center">No tasks found.</p>
         ) : (
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto rounded border">
             <table className="min-w-full table-auto border-collapse border">
               <thead>
-                <tr className="bg-gray-100 text-left">
+                <tr className="bg-gray-100 text-left sticky top-0 z-10">
                   <th className="border px-4 py-2">Title</th>
                   <th className="border px-4 py-2">Assigned To</th>
                   <th className="border px-4 py-2">Priority</th>
@@ -241,15 +255,15 @@ const CreateTask = () => {
               </thead>
               <tbody>
                 {taskList.map((task) => (
-                  <tr key={task._id}>
-                    <td className="border px-4 py-2">{task.title}</td>
-                    <td className="border px-4 py-2">
+                  <tr key={task._id} className="even:bg-gray-50">
+                    <td className="border px-4 py-2 break-words max-w-xs">{task.title}</td>
+                    <td className="border px-4 py-2 max-w-xs truncate">
                       {task.assignedTo?.userId?.name || task.assignedTo?.position || 'N/A'}
                     </td>
-                    <td className="border px-4 py-2">{task.priority}</td>
-                    <td className="border px-4 py-2">{task.status}</td>
+                    <td className="border px-4 py-2 capitalize">{task.priority}</td>
+                    <td className="border px-4 py-2 capitalize">{task.status}</td>
                     <td className="border px-4 py-2">{task.dueDate?.slice(0, 10)}</td>
-                    <td className="border px-4 py-2 space-x-2">
+                    <td className="border px-4 py-2 whitespace-nowrap space-x-2">
                       <button
                         onClick={() => handleEdit(task)}
                         className="text-blue-600 hover:underline text-sm"
@@ -275,6 +289,7 @@ const CreateTask = () => {
 };
 
 export default CreateTask;
+
 
 
 
