@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react';
 import {
   HomeIcon,
   CalendarIcon,
@@ -10,7 +9,6 @@ import {
   BellIcon,
   HeartIcon,
   PencilSquareIcon,
-  Bars3Icon,
   XMarkIcon,
 } from '@heroicons/react/24/outline';
 import { Link, useLocation } from 'react-router-dom';
@@ -28,31 +26,12 @@ const menuItems = [
   { name: 'Feedback', icon: PencilSquareIcon, path: '/admin/dashboard/feedback' },
 ];
 
-export default function AdminSidebar() {
-  const [isOpen, setIsOpen] = useState(false);
+export default function AdminSidebar({ isOpen, toggleSidebar }) {
   const location = useLocation();
-
-  const toggleSidebar = () => setIsOpen(!isOpen);
-
-  useEffect(() => {
-    setIsOpen(false); // Auto-close on route change (mobile)
-  }, [location.pathname]);
 
   return (
     <>
-      {/* Toggle Button (Mobile) */}
-      <button
-        className="fixed top-4 left-4 z-50 p-2 rounded-md bg-white dark:bg-gray-800 shadow-md md:hidden"
-        onClick={toggleSidebar}
-      >
-        {isOpen ? (
-          <XMarkIcon className="h-6 w-6 text-gray-700 dark:text-white" />
-        ) : (
-          <Bars3Icon className="h-6 w-6 text-gray-700 dark:text-white" />
-        )}
-      </button>
-
-      {/* Overlay (Mobile) */}
+      {/* Mobile Overlay */}
       {isOpen && (
         <div
           className="fixed inset-0 bg-black bg-opacity-30 z-40 md:hidden"
@@ -61,48 +40,47 @@ export default function AdminSidebar() {
       )}
 
       {/* Sidebar */}
-      <div
-        className={`fixed z-50 md:static top-0 left-0 h-full transform transition-transform duration-300 ease-in-out
-        bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700
-        ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0
-        w-64 md:w-64`}
+      <aside
+        className={`fixed top-0 left-0 z-50 md:static h-full w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 transform transition-transform duration-300 ease-in-out
+        ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0`}
       >
-        <div className="h-full flex flex-col">
-          {/* Logo */}
-          <div className="flex items-center justify-between p-4 md:justify-center">
-            <span className="text-xl font-semibold text-blue-600 dark:text-white hidden md:block">
-              HomelyCare
-            </span>
-            <button onClick={toggleSidebar} className="md:hidden text-gray-500 dark:text-gray-400">
-              <XMarkIcon className="h-6 w-6" />
-            </button>
-          </div>
-
-          {/* Navigation */}
-          <nav className="flex-1 px-2 space-y-2 overflow-y-auto">
-            {menuItems.map((item) => {
-              const isActive = location.pathname === item.path;
-              return (
-                <Link
-                  key={item.name}
-                  to={item.path}
-                  className={`flex items-center p-2 text-sm font-medium rounded-lg transition-colors duration-200 ${
-                    isActive
-                      ? 'bg-blue-100 text-blue-700 dark:bg-blue-700 dark:text-white'
-                      : 'text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800'
-                  }`}
-                >
-                  <item.icon className="h-5 w-5 mr-3" />
-                  <span>{item.name}</span>
-                </Link>
-              );
-            })}
-          </nav>
+        {/* Header */}
+        <div className="flex items-center justify-between p-4 md:justify-center">
+          <span className="text-xl font-semibold text-blue-600 dark:text-white">HomelyCare</span>
+          <button
+            onClick={toggleSidebar}
+            className="md:hidden text-gray-500 dark:text-gray-400"
+            aria-label="Close sidebar"
+          >
+            <XMarkIcon className="h-6 w-6" />
+          </button>
         </div>
-      </div>
+
+        {/* Navigation */}
+        <nav className="flex-1 px-2 pb-4 space-y-2 overflow-y-auto">
+          {menuItems.map(({ name, icon: Icon, path }) => {
+            const isActive = location.pathname === path;
+            return (
+              <Link
+                key={name}
+                to={path}
+                className={`flex items-center p-2 text-sm font-medium rounded-lg transition-colors duration-200 ${
+                  isActive
+                    ? 'bg-blue-100 text-blue-700 dark:bg-blue-700 dark:text-white'
+                    : 'text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800'
+                }`}
+              >
+                <Icon className="h-5 w-5 mr-3" />
+                <span>{name}</span>
+              </Link>
+            );
+          })}
+        </nav>
+      </aside>
     </>
   );
 }
+
 
 
 
