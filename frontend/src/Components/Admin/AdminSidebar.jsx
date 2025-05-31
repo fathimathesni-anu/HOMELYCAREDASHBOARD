@@ -95,6 +95,7 @@ export default function AdminSidebar() {
               <Link
                 key={item.name}
                 to={item.path}
+                onClick={() => isMobileMenuOpen && setIsMobileMenuOpen(false)} // close on mobile
                 className={`flex items-center p-2 rounded-lg transition-colors duration-200
                   ${isActive
                     ? 'bg-blue-100 text-blue-700 dark:bg-blue-700 dark:text-white'
@@ -125,5 +126,6 @@ export default function AdminSidebar() {
     </>
   );
 }
+
 
 
