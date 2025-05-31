@@ -77,7 +77,7 @@ export default function AdminNavbar() {
   };
 
   return (
-    <header className="bg-white dark:bg-gray-900 shadow-md px-4 md:px-6 py-3 flex justify-between items-center sticky top-0 z-40">
+    <header className="bg-white dark:bg-gray-900 shadow-md px-6 md:px-8 py-3 flex justify-between items-center sticky top-0 z-40">
       {/* Logo */}
       <div className="text-lg md:text-xl font-semibold text-blue-600 dark:text-white truncate">
         HomelyCare
