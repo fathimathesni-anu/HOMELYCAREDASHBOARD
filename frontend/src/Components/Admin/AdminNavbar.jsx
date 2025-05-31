@@ -113,9 +113,13 @@ export default function AdminNavbar() {
               alt="Profile"
               className="h-8 w-8 rounded-full object-cover border"
             />
+            {/* <span className="text-sm font-medium text-gray-700 dark:text-white hidden sm:inline">
+              {admin.name || 'Admin'}
+            </span> */}
             <span className="text-sm font-medium text-gray-700 dark:text-white hidden sm:inline">
               {admin.name || 'Admin'}
             </span>
+
             <ChevronDownIcon className="h-4 w-4 text-gray-600 dark:text-white hidden sm:inline" />
           </button>
 
