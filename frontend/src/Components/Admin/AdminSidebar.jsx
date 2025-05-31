@@ -29,103 +29,90 @@ const menuItems = [
 ];
 
 export default function AdminSidebar() {
-  const [isOpen, setIsOpen] = useState(true);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
 
-  // Close mobile menu on route change
-  useEffect(() => {
-    setIsMobileMenuOpen(false);
-  }, [location.pathname]);
-
   const toggleSidebar = () => setIsOpen(!isOpen);
-  const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
+
+  // Close sidebar on route change (mobile)
+  useEffect(() => {
+    setIsOpen(false);
+  }, [location.pathname]);
 
   return (
     <>
-      {/* Mobile Hamburger Button */}
+      {/* Sidebar toggle button (visible on small screens) */}
       <button
-        onClick={toggleMobileMenu}
-        className="fixed top-4 left-4 z-50 p-2 rounded-md bg-white dark:bg-gray-900 shadow-md text-gray-700 dark:text-gray-300 md:hidden"
-        aria-label="Toggle menu"
+        className="fixed top-4 left-4 z-50 p-2 rounded-md bg-white dark:bg-gray-800 shadow-md md:hidden"
+        onClick={toggleSidebar}
+        aria-label="Toggle sidebar"
       >
-        {isMobileMenuOpen ? (
-          <XMarkIcon className="h-6 w-6" />
+        {isOpen ? (
+          <XMarkIcon className="h-6 w-6 text-gray-700 dark:text-white" />
         ) : (
-          <Bars3Icon className="h-6 w-6" />
+          <Bars3Icon className="h-6 w-6 text-gray-700 dark:text-white" />
         )}
       </button>
 
       {/* Overlay for mobile */}
-      {isMobileMenuOpen && (
+      {isOpen && (
         <div
-          onClick={() => setIsMobileMenuOpen(false)}
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+          className="fixed inset-0 bg-black bg-opacity-30 z-40 md:hidden"
+          onClick={toggleSidebar}
+          aria-hidden="true"
         />
       )}
 
       {/* Sidebar */}
       <div
-        className={`
-          fixed top-0 left-0 h-full bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700
-          flex flex-col transition-all duration-300 z-50
-          ${isOpen ? 'w-64' : 'w-20'}
-          md:static md:translate-x-0 md:flex md:w-auto
-          ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0
-        `}
-        style={{ transitionProperty: 'width, transform' }}
+        className={`fixed z-50 md:static top-0 left-0 h-full transform transition-transform duration-300 ease-in-out
+          bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700
+          ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0
+          w-64 md:w-64`}
       >
-        {/* Logo and Toggle (hidden on mobile) */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 md:hidden">
-          <div className="text-lg font-bold text-blue-600 dark:text-white">Admin Panel</div>
-          <button
-            onClick={toggleSidebar}
-            className="text-gray-500 dark:text-gray-400 focus:outline-none"
-            aria-label="Toggle sidebar"
-          >
-            {isOpen ? <XMarkIcon className="h-6 w-6" /> : <Bars3Icon className="h-6 w-6" />}
-          </button>
-        </div>
-
         {/* Sidebar content */}
-        <nav className="flex-1 px-2 py-4 space-y-1 overflow-y-auto">
-          {menuItems.map((item) => {
-            const isActive = location.pathname === item.path;
-            return (
-              <Link
-                key={item.name}
-                to={item.path}
-                onClick={() => isMobileMenuOpen && setIsMobileMenuOpen(false)} // close on mobile
-                className={`flex items-center p-2 rounded-lg transition-colors duration-200
-                  ${isActive
-                    ? 'bg-blue-100 text-blue-700 dark:bg-blue-700 dark:text-white'
-                    : 'text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800'
-                  }
-                `}
-              >
-                <item.icon className="h-5 w-5 mr-3" />
-                <span className={`${isOpen ? 'inline' : 'hidden'} transition-opacity duration-300 truncate`}>
-                  {item.name}
-                </span>
-              </Link>
-            );
-          })}
-        </nav>
+        <div className="h-full flex flex-col">
+          {/* Logo/Header */}
+          <div className="flex items-center justify-between p-4 md:justify-center border-b border-gray-200 dark:border-gray-700">
+            <span className="text-xl font-semibold text-blue-600 dark:text-white hidden md:block">
+              Admin Panel
+            </span>
+            <button
+              onClick={toggleSidebar}
+              className="md:hidden text-gray-500 dark:text-gray-400"
+              aria-label="Close sidebar"
+            >
+              <XMarkIcon className="h-6 w-6" />
+            </button>
+          </div>
 
-        {/* Toggle button for desktop */}
-        <div className="hidden md:flex items-center justify-center p-4 border-t border-gray-200 dark:border-gray-700">
-          <button
-            onClick={toggleSidebar}
-            className="text-gray-500 dark:text-gray-400 focus:outline-none"
-            aria-label="Toggle sidebar"
-          >
-            {isOpen ? <XMarkIcon className="h-6 w-6" /> : <Bars3Icon className="h-6 w-6" />}
-          </button>
+          {/* Navigation */}
+          <nav className="flex-1 px-2 space-y-2 overflow-y-auto">
+            {menuItems.map((item) => {
+              const isActive = location.pathname === item.path;
+              return (
+                <Link
+                  key={item.name}
+                  to={item.path}
+                  onClick={() => setIsOpen(false)} // close on mobile nav click
+                  className={`flex items-center p-2 text-sm font-medium rounded-lg transition-colors duration-200
+                    ${isActive
+                      ? 'bg-blue-100 text-blue-700 dark:bg-blue-700 dark:text-white'
+                      : 'text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800'
+                    }`}
+                >
+                  <item.icon className="h-5 w-5 mr-3" />
+                  <span>{item.name}</span>
+                </Link>
+              );
+            })}
+          </nav>
         </div>
       </div>
     </>
   );
 }
+
 
 
 
