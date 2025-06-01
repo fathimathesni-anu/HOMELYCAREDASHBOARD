@@ -31,11 +31,12 @@ export default function AdminSidebar({ isOpen, toggleSidebar }) {
 
   return (
     <>
-      {/* Mobile Overlay */}
+      {/* Mobile overlay */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-30 z-40 md:hidden"
+          className="fixed inset-0 z-40 bg-black bg-opacity-30 md:hidden"
           onClick={toggleSidebar}
+          aria-label="Close sidebar overlay"
         />
       )}
 
@@ -43,9 +44,10 @@ export default function AdminSidebar({ isOpen, toggleSidebar }) {
       <aside
         className={`fixed top-0 left-0 z-50 md:static h-full w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 transform transition-transform duration-300 ease-in-out
         ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0`}
+        role="navigation"
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-4 md:justify-center">
+        <div className="flex items-center justify-between p-4 md:justify-center border-b border-gray-200 dark:border-gray-700">
           <span className="text-xl font-semibold text-blue-600 dark:text-white">HomelyCare</span>
           <button
             onClick={toggleSidebar}
@@ -57,9 +59,10 @@ export default function AdminSidebar({ isOpen, toggleSidebar }) {
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 px-2 pb-4 space-y-2 overflow-y-auto">
+        <nav className="flex-1 px-2 py-4 space-y-2 overflow-y-auto">
           {menuItems.map(({ name, icon: Icon, path }) => {
-            const isActive = location.pathname === path;
+            const isActive = location.pathname.startsWith(path);
+
             return (
               <Link
                 key={name}
@@ -80,6 +83,7 @@ export default function AdminSidebar({ isOpen, toggleSidebar }) {
     </>
   );
 }
+
 
 
 

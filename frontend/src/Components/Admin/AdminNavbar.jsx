@@ -21,9 +21,10 @@ export default function AdminNavbar() {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
+        const token = localStorage.getItem("token");
         const res = await axiosinstance.get("/userole/profile", {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            Authorization: `Bearer ${token}`,
           },
         });
         setAdmin(res.data.data);
@@ -42,7 +43,7 @@ export default function AdminNavbar() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("user");
+    localStorage.removeItem("token");
     navigate("/");
   };
 
@@ -55,6 +56,7 @@ export default function AdminNavbar() {
 
   const handleUpload = async () => {
     if (!file) return;
+
     const formData = new FormData();
     formData.append("profilePic", file);
 
@@ -101,10 +103,10 @@ export default function AdminNavbar() {
           )}
         </button>
 
-        {/* Profile & Dropdown */}
+        {/* Profile Dropdown */}
         <div className="relative">
           <button
-            onClick={() => setDropdownOpen(!dropdownOpen)}
+            onClick={() => setDropdownOpen((prev) => !prev)}
             className="flex items-center gap-2 focus:outline-none"
           >
             <img
@@ -139,7 +141,9 @@ export default function AdminNavbar() {
                       preview ||
                       (profilePic
                         ? `/admin/uploads/${profilePic}`
-                        : `https://ui-avatars.com/api/?name=${admin.name}&background=random&size=128`)
+                        : `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                            admin.name || "Admin"
+                          )}&background=random&size=128`)
                     }
                     alt="Preview"
                     className="object-cover w-full h-full"
@@ -174,6 +178,7 @@ export default function AdminNavbar() {
     </header>
   );
 }
+
 
 
 

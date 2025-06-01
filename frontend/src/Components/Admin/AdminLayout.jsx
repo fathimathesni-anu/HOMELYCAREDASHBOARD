@@ -1,11 +1,12 @@
+import React from "react";
 import AdminNavbar from "../../Components/Admin/AdminNavbar";
 import AdminSidebar from "../../Components/Admin/AdminSidebar";
 
 const AdminLayout = ({ children }) => {
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Sidebar */}
-      <div className="hidden md:flex w-64 flex-col border-r border-gray-200 bg-white">
+      <div className="hidden md:flex w-64 flex-col border-r border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
         <AdminSidebar />
       </div>
 
@@ -17,7 +18,7 @@ const AdminLayout = ({ children }) => {
         </div>
 
         {/* Page content */}
-        <main className="flex-1 p-4 md:p-6 bg-gray-50">
+        <main className="flex-1 p-4 md:p-6 bg-gray-50 dark:bg-gray-900">
           <div className="max-w-7xl mx-auto">{children}</div>
         </main>
       </div>
@@ -26,6 +27,7 @@ const AdminLayout = ({ children }) => {
 };
 
 export default AdminLayout;
+
 
 
 
