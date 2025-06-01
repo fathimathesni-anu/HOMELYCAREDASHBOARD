@@ -3,11 +3,12 @@ import {
   MoonIcon,
   SunIcon,
   ChevronDownIcon,
+  Bars3Icon,
 } from "@heroicons/react/24/outline";
 import { useNavigate } from "react-router-dom";
 import axiosinstance from "../../api/axiosInstance";
 
-export default function AdminNavbar() {
+export default function AdminNavbar({ toggleSidebar }) {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [admin, setAdmin] = useState({});
@@ -75,6 +76,7 @@ export default function AdminNavbar() {
       setProfilePic(res.data.profilePic);
       setFile(null);
       setPreview(null);
+      setDropdownOpen(false);
     } catch (err) {
       console.error("Upload failed:", err);
     } finally {
@@ -83,31 +85,41 @@ export default function AdminNavbar() {
   };
 
   return (
-    <header className="bg-white dark:bg-gray-900 shadow-sm px-4 md:px-6 py-3 flex justify-between items-center sticky top-0 z-50 border-b dark:border-gray-700">
-      {/* Logo */}
-      <div className="text-xl font-bold text-blue-600 dark:text-white">
+    <header className="sticky top-0 z-40 w-full bg-white dark:bg-gray-900 shadow px-4 py-3 flex items-center justify-between md:px-6">
+      {/* Mobile sidebar toggle */}
+      <button
+        onClick={toggleSidebar}
+        className="md:hidden text-gray-600 dark:text-white"
+        aria-label="Toggle sidebar"
+      >
+        <Bars3Icon className="w-6 h-6" />
+      </button>
+
+      <div className="text-xl font-semibold text-blue-600 dark:text-white">
         HomelyCare
       </div>
 
-      {/* Controls */}
-      <div className="flex items-center gap-4 relative">
-        {/* Theme toggle */}
+      <div className="flex items-center gap-3 relative">
+        {/* Dark mode toggle */}
         <button
           onClick={toggleTheme}
-          className="p-2 rounded-full bg-gray-100 dark:bg-gray-800 hover:scale-105 transition-transform"
+          className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-white"
+          aria-label="Toggle dark mode"
         >
           {isDarkMode ? (
-            <SunIcon className="w-5 h-5 text-yellow-500" />
+            <SunIcon className="h-5 w-5" />
           ) : (
-            <MoonIcon className="w-5 h-5 text-gray-700" />
+            <MoonIcon className="h-5 w-5" />
           )}
         </button>
 
         {/* Profile Dropdown */}
         <div className="relative">
           <button
-            onClick={() => setDropdownOpen((prev) => !prev)}
+            onClick={() => setDropdownOpen(!dropdownOpen)}
             className="flex items-center gap-2 focus:outline-none"
+            aria-haspopup="true"
+            aria-expanded={dropdownOpen}
           >
             <img
               src={
@@ -119,22 +131,21 @@ export default function AdminNavbar() {
                     )}&background=random&size=128`)
               }
               alt="Profile"
-              className="w-8 h-8 rounded-full object-cover border"
+              className="h-8 w-8 rounded-full object-cover border"
             />
-            <span className="text-sm text-gray-700 dark:text-white font-medium hidden sm:inline">
+            <span className="hidden sm:block text-sm font-medium text-gray-700 dark:text-white">
               {admin.name || "Admin"}
             </span>
-            <ChevronDownIcon className="w-4 h-4 text-gray-600 dark:text-white hidden sm:inline" />
+            <ChevronDownIcon className="h-4 w-4 text-gray-600 dark:text-white" />
           </button>
 
-          {/* Dropdown Menu */}
           {dropdownOpen && (
-            <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-lg shadow-lg border dark:border-gray-700 z-50 p-4 space-y-3">
-              <div className="text-sm font-semibold text-gray-800 dark:text-white">
+            <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg z-50 p-4 space-y-2">
+              <div className="text-sm text-gray-700 dark:text-white mb-2">
                 Update Profile Picture
               </div>
 
-              <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-2">
                 <div className="w-10 h-10 rounded-full overflow-hidden border">
                   <img
                     src={
@@ -153,21 +164,21 @@ export default function AdminNavbar() {
                   type="file"
                   onChange={handleFileChange}
                   accept="image/*"
-                  className="text-xs w-full"
+                  className="text-xs"
                 />
               </div>
 
               <button
                 onClick={handleUpload}
+                className="w-full px-3 py-1.5 text-sm text-white bg-blue-600 hover:bg-blue-700 rounded"
                 disabled={uploading}
-                className="w-full px-4 py-1.5 text-sm text-white bg-blue-600 hover:bg-blue-700 rounded-md disabled:opacity-50"
               >
                 {uploading ? "Uploading..." : "Upload"}
               </button>
 
               <button
                 onClick={handleLogout}
-                className="w-full text-left px-3 py-1.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md"
+                className="w-full text-left px-3 py-1.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
               >
                 Logout
               </button>
@@ -178,6 +189,7 @@ export default function AdminNavbar() {
     </header>
   );
 }
+
 
 
 

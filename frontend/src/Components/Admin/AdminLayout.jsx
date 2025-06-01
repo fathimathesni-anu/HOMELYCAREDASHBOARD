@@ -1,25 +1,25 @@
-import React from "react";
+import React, { useState } from "react";
 import AdminNavbar from "../../Components/Admin/AdminNavbar";
 import AdminSidebar from "../../Components/Admin/AdminSidebar";
 
 const AdminLayout = ({ children }) => {
-  return (
-    <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Sidebar */}
-      <div className="hidden md:flex w-64 flex-col border-r border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
-        <AdminSidebar />
-      </div>
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
-      {/* Main content area */}
-      <div className="flex-1 flex flex-col">
+  return (
+    <div className="flex h-screen bg-gray-50 dark:bg-gray-900 overflow-hidden">
+      {/* Sidebar */}
+      <AdminSidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />
+
+      {/* Main content */}
+      <div className="flex flex-col flex-1 overflow-hidden">
         {/* Navbar */}
-        <div className="sticky top-0 z-40 w-full md:ml-64">
-          <AdminNavbar />
+        <div className="sticky top-0 z-40 w-full">
+          <AdminNavbar toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
         </div>
 
         {/* Page content */}
-        <main className="flex-1 p-4 md:p-6 bg-gray-50 dark:bg-gray-900">
-          <div className="max-w-7xl mx-auto">{children}</div>
+        <main className="flex-1 overflow-y-auto p-4 md:p-6 bg-gray-50 dark:bg-gray-900">
+          {children}
         </main>
       </div>
     </div>
@@ -27,6 +27,7 @@ const AdminLayout = ({ children }) => {
 };
 
 export default AdminLayout;
+
 
 
 
