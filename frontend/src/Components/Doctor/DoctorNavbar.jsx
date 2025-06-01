@@ -6,9 +6,9 @@ import {
   Bars3Icon,
 } from '@heroicons/react/24/outline';
 import { useNavigate } from 'react-router-dom';
-import axiosinstance from '../../api/axiosInstance';
+import axiosInstance from '../../api/axiosInstance';
 
-export default function DoctorNavbar({ onToggleSidebar }) {
+export default function DoctorNavbar({ toggleSidebar }) {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [doctor, setDoctor] = useState({});
@@ -22,7 +22,7 @@ export default function DoctorNavbar({ onToggleSidebar }) {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const res = await axiosinstance.get('/userole/profile', {
+        const res = await axiosInstance.get('/userole/profile', {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
@@ -30,11 +30,22 @@ export default function DoctorNavbar({ onToggleSidebar }) {
         setDoctor(res.data.data);
         setProfilePic(res.data.data.profilePic);
       } catch (err) {
-        console.error('Failed to fetch profile', err);
+        console.error('Failed to fetch profile:', err);
       }
     };
     fetchProfile();
   }, []);
+
+  const toggleTheme = () => {
+    const newMode = !isDarkMode;
+    setIsDarkMode(newMode);
+    document.documentElement.classList.toggle('dark', newMode);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    navigate('/');
+  };
 
   const handleFileChange = (e) => {
     const selected = e.target.files[0];
@@ -50,7 +61,7 @@ export default function DoctorNavbar({ onToggleSidebar }) {
 
     try {
       setUploading(true);
-      const res = await axiosinstance.post('/doctor/upload-profile-pic', formData, {
+      const res = await axiosInstance.post('/doctor/upload-profile-pic', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -59,55 +70,46 @@ export default function DoctorNavbar({ onToggleSidebar }) {
       setProfilePic(res.data.profilePic);
       setFile(null);
       setPreview(null);
+      setDropdownOpen(false);
     } catch (err) {
-      console.error('Upload failed', err);
+      console.error('Upload failed:', err);
     } finally {
       setUploading(false);
     }
   };
 
-  const toggleTheme = () => {
-    setIsDarkMode(!isDarkMode);
-    document.documentElement.classList.toggle('dark', !isDarkMode);
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem('user');
-    navigate('/');
-  };
-
   return (
-    <header className="bg-white dark:bg-gray-900 shadow-md px-4 py-3 flex justify-between items-center md:px-6">
-      {/* Left: Logo and Sidebar Toggle */}
-      <div className="flex items-center gap-3">
-        <button
-          className="md:hidden text-gray-600 dark:text-gray-300"
-          onClick={onToggleSidebar}
-        >
-          <Bars3Icon className="h-6 w-6" />
-        </button>
-        <span className="text-xl font-semibold text-blue-600 dark:text-white">HomelyCare</span>
+    <header className="sticky top-0 z-40 w-full bg-white dark:bg-gray-900 shadow px-4 py-3 flex items-center justify-between md:px-6">
+      {/* Mobile sidebar toggle */}
+      <button
+        onClick={toggleSidebar}
+        className="md:hidden text-gray-600 dark:text-white"
+        aria-label="Toggle sidebar"
+      >
+        <Bars3Icon className="w-6 h-6" />
+      </button>
+
+      <div className="text-xl font-semibold text-blue-600 dark:text-white">
+        HomelyCare
       </div>
 
-      {/* Right: Profile and Controls */}
-      <div className="flex items-center gap-4 relative">
-        {/* Theme Toggle */}
+      <div className="flex items-center gap-3 relative">
+        {/* Dark mode toggle */}
         <button
           onClick={toggleTheme}
-          className="p-2 rounded-full bg-gray-200 dark:bg-gray-700"
+          className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-white"
+          aria-label="Toggle dark mode"
         >
-          {isDarkMode ? (
-            <SunIcon className="h-6 w-6" />
-          ) : (
-            <MoonIcon className="h-6 w-6" />
-          )}
+          {isDarkMode ? <SunIcon className="h-5 w-5" /> : <MoonIcon className="h-5 w-5" />}
         </button>
 
         {/* Profile Dropdown */}
         <div className="relative">
           <button
             onClick={() => setDropdownOpen(!dropdownOpen)}
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 focus:outline-none"
+            aria-haspopup="true"
+            aria-expanded={dropdownOpen}
           >
             <img
               src={
@@ -121,15 +123,14 @@ export default function DoctorNavbar({ onToggleSidebar }) {
               alt="Profile"
               className="h-8 w-8 rounded-full object-cover border"
             />
-            <span className="text-gray-700 dark:text-white hidden sm:inline">
+            <span className="hidden sm:block text-sm font-medium text-gray-700 dark:text-white">
               {doctor.name || 'Doctor'}
             </span>
             <ChevronDownIcon className="h-4 w-4 text-gray-600 dark:text-white" />
           </button>
 
-          {/* Dropdown Menu */}
           {dropdownOpen && (
-            <div className="absolute top-12 right-0 w-64 bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-md shadow-lg z-50 p-4 space-y-2">
+            <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg z-50 p-4 space-y-2">
               <div className="text-sm text-gray-700 dark:text-white mb-2">
                 Update Profile Picture
               </div>
@@ -141,7 +142,9 @@ export default function DoctorNavbar({ onToggleSidebar }) {
                       preview ||
                       (profilePic
                         ? `/doctor/uploads/${profilePic}`
-                        : `https://ui-avatars.com/api/?name=${doctor.name}&background=random&size=128`)
+                        : `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                            doctor.name || 'Doctor'
+                          )}&background=random&size=128`)
                     }
                     alt="Preview"
                     className="object-cover w-full h-full"
@@ -151,13 +154,13 @@ export default function DoctorNavbar({ onToggleSidebar }) {
                   type="file"
                   onChange={handleFileChange}
                   accept="image/*"
-                  className="text-sm"
+                  className="text-xs"
                 />
               </div>
 
               <button
                 onClick={handleUpload}
-                className="block w-full px-2 py-1 text-sm text-white bg-blue-600 hover:bg-blue-700 rounded"
+                className="w-full px-3 py-1.5 text-sm text-white bg-blue-600 hover:bg-blue-700 rounded"
                 disabled={uploading}
               >
                 {uploading ? 'Uploading...' : 'Upload'}
@@ -165,7 +168,7 @@ export default function DoctorNavbar({ onToggleSidebar }) {
 
               <button
                 onClick={handleLogout}
-                className="w-full text-left px-2 py-1 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+                className="w-full text-left px-3 py-1.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
               >
                 Logout
               </button>
@@ -176,6 +179,8 @@ export default function DoctorNavbar({ onToggleSidebar }) {
     </header>
   );
 }
+
+
 
 
 
