@@ -1,18 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from "react-router-dom";
-import axiosInstance from '../../api/axiosInstance'; // adjust path as needed
+import { useNavigate } from 'react-router-dom';
+import axiosInstance from '../../api/axiosInstance';
 import UserHomepage from './UserHomepage';
 
 const UserDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [userName, setUserName] = useState('');
   const navigate = useNavigate();
-  const [userName, setUserName] = useState("");
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const res = await axiosInstance.get("user/profile", { withCredentials: true });
+        const res = await axiosInstance.get('user/profile', {
+          withCredentials: true,
+        });
         setUserName(res.data.data.name);
       } catch (err) {
         setError(err.response?.data?.message || err.message);
@@ -20,6 +22,7 @@ const UserDashboard = () => {
         setLoading(false);
       }
     };
+
     fetchProfile();
   }, [navigate]);
 
@@ -43,6 +46,8 @@ const UserDashboard = () => {
 };
 
 export default UserDashboard;
+
+
 
 
 
