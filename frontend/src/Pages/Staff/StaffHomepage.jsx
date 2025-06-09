@@ -26,7 +26,7 @@ const StaffHomepage = () => {
     <div className="p-6 bg-white dark:bg-gray-900 min-h-screen text-gray-800 dark:text-gray-100 max-w-6xl mx-auto">
       <h1 className="text-3xl sm:text-4xl font-bold mb-6">Staff Dashboard</h1>
       <p className="mb-8 text-gray-600 dark:text-gray-300 text-base sm:text-lg max-w-3xl">
-        Welcome to the staff management area. Here you can manage staff records, view schedules, assign tasks, and more.
+        Welcome to the staff management area. Here you can manage staff records, view assign tasks,BloodBank Inventory , and more.
       </p>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
