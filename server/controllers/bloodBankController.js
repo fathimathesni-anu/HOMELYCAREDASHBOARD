@@ -54,3 +54,14 @@ export const deleteBloodBankEntry = async (req, res) => {
   }
 };
 
+
+// Get all blood bank entries with count
+export const getcountBloodBankEntries = async (req, res) => {
+  try {
+    const bloodBanks = await BloodBank.find();
+    const count = await BloodBank.countDocuments();
+    res.status(200).json({ count, bloodBanks });
+  } catch (error) {
+    res.status(400).json({ message: 'Error fetching blood bank entries', error });
+  }
+};

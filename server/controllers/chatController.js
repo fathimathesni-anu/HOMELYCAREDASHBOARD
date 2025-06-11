@@ -84,3 +84,12 @@ export const deleteChat = async (req, res) => {
 };
 
 
+// Get total count of chat documents
+export const getChatCount = async (req, res) => {
+  try {
+    const count = await Chat.countDocuments();
+    res.status(200).json({ totalChats: count });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to count chats', error });
+  }
+};

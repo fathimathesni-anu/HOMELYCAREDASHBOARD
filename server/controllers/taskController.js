@@ -11,17 +11,31 @@ export const createTask = async (req, res) => {
   }
 };
 
-// Get all tasks
 export const getAllTasks = async (req, res) => {
   try {
     const tasks = await Task.find()
       .populate('assignedTo')
       .populate('createdBy');
-    res.status(200).json(tasks);
+    
+    const totalTasks = await Task.countDocuments();
+
+    res.status(200).json({ totalTasks, tasks });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
+
+// Get total count of tasks
+export const countTasks = async (req, res) => {
+  try {
+    const totalCount = await Task.countDocuments();
+    const pendingCount = await Task.countDocuments({ status: 'pending' }); // example filter
+    res.status(200).json({ count: totalCount, pendingCount });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 
 // Get task by ID
 export const getTaskById = async (req, res) => {

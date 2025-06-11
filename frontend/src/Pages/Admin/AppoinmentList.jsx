@@ -50,7 +50,7 @@ const AppointmentList = () => {
     const fetchData = async () => {
       try {
         const [appointmentsRes, patientsRes, doctorsRes] = await Promise.all([
-          axiosInstance.get('/appoinment'),
+          axiosInstance.get('/appointment'),
           axiosInstance.get('/patient'),
           axiosInstance.get('/doctor'),
         ]);
@@ -74,7 +74,7 @@ const AppointmentList = () => {
     try {
       if (editingAppointment) {
         const response = await axiosInstance.put(
-          `/appoinment/update/${editingAppointment._id}`,
+          `/appointment/update/${editingAppointment._id}`,
           formData
         );
         setAppointments((prev) =>
@@ -82,7 +82,7 @@ const AppointmentList = () => {
         );
         setEditingAppointment(null);
       } else {
-        const response = await axiosInstance.post('/appoinment/create', formData);
+        const response = await axiosInstance.post('/appointment/create', formData);
         setAppointments((prev) => [response.data.appointment, ...prev]);
       }
 
@@ -113,7 +113,7 @@ const AppointmentList = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axiosInstance.delete(`/appoinment/delete/${id}`);
+      await axiosInstance.delete(`/appointment/delete/${id}`);
       setAppointments((prev) => prev.filter((a) => a._id !== id));
     } catch (error) {
       console.error('Error deleting appointment', error);
@@ -122,7 +122,7 @@ const AppointmentList = () => {
 
   const handleMarkStatus = async (id, status) => {
     try {
-      await axiosInstance.put(`/appoinment/update/${id}`, { status });
+      await axiosInstance.put(`/appointment/update/${id}`, { status });
       setAppointments((prev) =>
         prev.map((a) => (a._id === id ? { ...a, status } : a))
       );

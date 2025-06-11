@@ -2,9 +2,13 @@
  import express from 'express';
 const router = express.Router();
 import { useroleAuth,authorizeRoles } from '../middleware/useroleAuth.js'; 
-import { createAppointment,getAllAppointments,getAppointmentById,updateAppointment,deleteAppointment} from '../controllers/appoinmentController.js'
+import { createAppointment,getAppointmentCount,getAllAppointments, getAppointmentById,updateAppointment,deleteAppointment} from '../controllers/appoinmentController.js'
 // Create a new patient ( admin and staff users can create)
 router.post('/create', useroleAuth,authorizeRoles('admin','staff','doctor'),createAppointment);
+
+
+// Get total number of appointments
+router.get('/count', useroleAuth, getAppointmentCount);
 
 // // Get all patients (Accessible by all users)
 router.get('/', useroleAuth, getAllAppointments);

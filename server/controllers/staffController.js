@@ -57,3 +57,14 @@ export const deleteStaff = async (req, res) => {
   }
 };
 
+
+// Count total staff members
+export const countStaff = async (req, res) => {
+  try {
+    const count = await Staff.countDocuments();
+    res.status(200).json({ count });   // <-- change here from totalStaff to count
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+

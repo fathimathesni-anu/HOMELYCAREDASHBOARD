@@ -55,3 +55,11 @@ export const deleteFeedback = async (req, res) => {
 };
 
 
+export const getFeedbackCount = async (req, res) => {
+  try {
+    const count = await Feedback.countDocuments();
+    res.status(200).json({ totalFeedback: count });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to count feedback', error });
+  }
+};

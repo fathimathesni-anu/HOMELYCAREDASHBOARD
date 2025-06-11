@@ -1,21 +1,40 @@
 import axiosInstance from './axiosInstance';
 
 export const fetchDoctorDashboardStats = async () => {
-  const [appointmentsRes, patientsRes, messagesRes, feedbackRes] = await Promise.all([
-    axiosInstance.get('/appointments'),
+  const [
+    appointmentsRes,
+    appointmentCountRes,
+    patientsRes,
+    chatCountRes,
+    feedbackCountRes // ✅ fetch feedback count only
+  ] = await Promise.all([
+    axiosInstance.get('/appointment'),           // Full appointment list
+    axiosInstance.get('/appointment/count'),     // Total appointment count
     axiosInstance.get('/patient'),
-    axiosInstance.get('/chat'),
-    axiosInstance.get('/feedback'),
+    axiosInstance.get('/chat/count'),            // Chat count only
+    axiosInstance.get('/feedback/count'),        // ✅ Feedback count only
   ]);
 
-  const today = new Date().toISOString().split('T')[0];
-  const todaysAppointments = appointmentsRes.data.filter(app => new Date(app.appointmentDate).toISOString().split('T')[0] === today);
+  const appointments = appointmentsRes.data.appointments || appointmentsRes.data;
+  const todayStr = new Date().toISOString().split('T')[0];
+
+  const todayAppointments = appointments.filter(app => {
+    const appDate = new Date(app.appointmentDate).toISOString().split('T')[0];
+    return appDate === todayStr;
+  });
 
   return {
-    totalAppointmentsToday: todaysAppointments.length,
+    totalAppointmentsToday: todayAppointments.length,
+    totalAppointments: appointmentCountRes.data.totalAppointments,
     totalPatients: patientsRes.data.length,
-    totalUnreadMessages: messagesRes.data.filter(msg => !msg.read).length,
-    totalPendingFeedback: feedbackRes.data.filter(fb => fb.status === 'pending').length,
+    totalChats: chatCountRes.data.totalChats,
+    totalPendingFeedback: feedbackCountRes.data.totalFeedback, // ✅ total feedback count
   };
 };
+
+
+
+
+
+
 

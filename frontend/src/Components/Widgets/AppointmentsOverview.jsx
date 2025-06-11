@@ -1,4 +1,3 @@
-// src/Components/Widgets/AppointmentsOverview.jsx
 import React, { useEffect, useState } from 'react';
 import axiosInstance from '../../api/axiosInstance';
 import { CalendarIcon } from '@heroicons/react/24/outline';
@@ -10,8 +9,9 @@ const AppointmentsOverview = () => {
   useEffect(() => {
     const fetchTodayAppointments = async () => {
       try {
-        const response = await axiosInstance.get('/appoinment');
-        const allAppointments = response.data;
+        // Fetch all appointments for today count
+        const response = await axiosInstance.get('/appointment');
+        const allAppointments = response.data.appointments || response.data;
 
         const today = new Date().toISOString().split('T')[0];
 
@@ -30,14 +30,16 @@ const AppointmentsOverview = () => {
   }, []);
 
   return (
-    <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md">
+    <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md space-y-4">
       <h2 className="text-lg font-semibold text-gray-700 dark:text-white">
         Appointments Overview
       </h2>
-      <p className="mt-4 text-sm text-gray-600 dark:text-gray-300">
-        {todayCount} Appointments scheduled today
+
+      <p className="text-sm text-gray-600 dark:text-gray-300">
+        {todayCount} Appointment{todayCount !== 1 ? 's' : ''} scheduled today
       </p>
-      <Link to="/admin/dashboard/appointments" className="mt-3 flex items-center text-blue-500 hover:underline">
+
+      <Link to="/admin/dashboard/appointments" className="flex items-center text-blue-500 hover:underline">
         <CalendarIcon className="h-5 w-5 text-blue-500 mr-2" />
         <span>View All Appointments</span>
       </Link>
@@ -46,5 +48,7 @@ const AppointmentsOverview = () => {
 };
 
 export default AppointmentsOverview;
+
+
 
 

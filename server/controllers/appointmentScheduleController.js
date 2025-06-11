@@ -114,3 +114,28 @@ export const deleteAppointment = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+
+export const getUpcomingAppointmentCount = async (req, res) => {
+  try {
+    const patientId = req.user.id;
+    const now = new Date();
+
+    // Count appointments for this patient with date/time in the future (>= now)
+    const count = await AppointmentSchedule.countDocuments({
+      patientId,
+      // Assuming 'date' is a Date or string and 'time' is time string or comparable
+      $or: [
+        { date: { $gt: now } }, // Appointments with date after today
+        {
+          date: { $eq: now.toISOString().split('T')[0] }, // same day
+          time: { $gte: now.toTimeString().split(' ')[0] } // time after now
+        }
+      ]
+    });
+
+    res.status(200).json({ upcomingAppointments: count });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};

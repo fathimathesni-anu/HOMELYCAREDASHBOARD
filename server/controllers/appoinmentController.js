@@ -51,6 +51,8 @@ export const getAllAppointments = async (req, res, next) => {
   }
 };
 
+
+
 // Get appointment by ID
 export const getAppointmentById = async (req, res, next) => {
   try {
@@ -107,5 +109,17 @@ export const deleteAppointment = async (req, res, next) => {
   } catch (error) {
     console.error('Error deleting appointment:', error);
     res.status(500).json({ message: 'Error deleting appointment', error });
+  }
+};
+
+
+
+// Get total count of appointments
+export const getAppointmentCount = async (req, res) => {
+  try {
+    const count = await Appointment.countDocuments();
+    res.status(200).json({ totalAppointments: count });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to count appointments', error });
   }
 };
