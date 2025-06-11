@@ -1,13 +1,13 @@
 import { PaperClipIcon, PencilSquareIcon } from '@heroicons/react/24/outline';
 import { Link } from 'react-router-dom';
 import DashboardNotificationWidget from '../../Components/Widgets/DashboardNotificationWidget';
-import NextAppointmentWidget from '../../Components/Widgets/NextAppointmentWidget'; // <- import here
+import TodaysAppointmentsWidget from '../../Components/Widgets/TodaysAppointmentsWidget'; // <- import here
 
 export default function UserHomepage() {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       {/* Dynamic Next Appointment Widget */}
-      <NextAppointmentWidget />
+      <TodaysAppointmentsWidget/>
 
       {/* Notifications Widget (Dynamic) */}
       <DashboardNotificationWidget />

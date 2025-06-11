@@ -115,27 +115,28 @@ export const deleteAppointment = async (req, res) => {
   }
 };
 
-
-export const getUpcomingAppointmentCount = async (req, res) => {
+export const getTodaysAppointments = async (req, res) => {
   try {
     const patientId = req.user.id;
-    const now = new Date();
+    const today = new Date();
+    const todayISO = today.toISOString().split('T')[0]; // YYYY-MM-DD
 
-    // Count appointments for this patient with date/time in the future (>= now)
-    const count = await AppointmentSchedule.countDocuments({
+    const todaysAppointments = await AppointmentSchedule.find({
       patientId,
-      // Assuming 'date' is a Date or string and 'time' is time string or comparable
-      $or: [
-        { date: { $gt: now } }, // Appointments with date after today
-        {
-          date: { $eq: now.toISOString().split('T')[0] }, // same day
-          time: { $gte: now.toTimeString().split(' ')[0] } // time after now
-        }
-      ]
-    });
+      date: todayISO,
+      status: { $in: ['pending', 'confirmed'] }
+    })
+      .populate({
+        path: 'doctorId',
+        populate: { path: 'userId', select: 'name' }
+      })
+      .sort({ time: 1 }); // Sort by time
 
-    res.status(200).json({ upcomingAppointments: count });
+    res.status(200).json({ appointments: todaysAppointments });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ message: 'Failed to get today\'s appointments', error: err.message });
   }
 };
+
+
+
