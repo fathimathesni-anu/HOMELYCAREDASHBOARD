@@ -4,7 +4,7 @@ import mongoose, { Schema } from 'mongoose';
 const appointmentSchema = new Schema(
   {
     patientId: { type: mongoose.Schema.Types.ObjectId, ref: 'Patient' },
-    doctorId: { type: mongoose.Schema.Types.ObjectId, ref: 'Userole' },
+    doctorId: { type: mongoose.Schema.Types.ObjectId, ref: 'Doctor' },
     appointmentDate: { type: Date },
     reason: { type: String },
     status: { type: String, enum: ['Scheduled', 'Completed', 'Cancelled'] },

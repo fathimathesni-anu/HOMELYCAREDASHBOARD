@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import axiosInstance from '../../api/axiosInstance';
 import DatePicker from 'react-datepicker';
@@ -6,21 +5,41 @@ import 'react-datepicker/dist/react-datepicker.css';
 import ScheduleViewer from '../../Components/ScheduleViewer';
 
 const Appointment = ({ appointment, onEdit, onDelete, onMarkStatus, doctors }) => {
-  const doctor = typeof appointment.doctorId === 'string'
-    ? doctors.find((doc) => doc._id === appointment.doctorId)
-    : appointment.doctorId;
+  const doctor = doctors.find((doc) => {
+    if (typeof appointment.doctorId === 'string') {
+      return doc._id === appointment.doctorId;
+    } else {
+      return doc._id === appointment.doctorId?._id;
+    }
+  });
 
-  const doctorName = doctor?.userId?.name || doctor?.name || 'Unknown Doctor';
+  const doctorName =
+    doctor?.userId?.name ||
+    doctor?.name ||
+    `${doctor?.firstName || ''} ${doctor?.lastName || ''}`.trim() ||
+    'Unknown Doctor';
+
+  const doctorSpecialization = doctor?.specialization || 'General';
 
   return (
     <div className="p-4 border rounded-lg shadow-sm bg-white dark:bg-gray-800 space-y-2 md:space-y-0 md:flex md:justify-between md:items-center">
-      <div className="space-y-1 text-sm md:text-base">
-        <h4 className="font-semibold">Patient: {appointment.patientId?.name}</h4>
-        <p><strong>Doctor:</strong> {doctorName}</p>
-        <p><strong>Date:</strong> {new Date(appointment.appointmentDate).toLocaleString()}</p>
-        <p><strong>Status:</strong> {appointment.status}</p>
-        <p><strong>Reason:</strong> {appointment.reason}</p>
-        <p><strong>Notes:</strong> {appointment.notes}</p>
+      <div className="flex items-center space-x-4">
+        {doctor?.profilePicUrl && (
+          <img
+            src={doctor.profilePicUrl}
+            alt={`${doctorName} profile`}
+            className="w-16 h-16 rounded-full object-cover"
+          />
+        )}
+        <div className="space-y-1 text-sm md:text-base">
+          <h4 className="font-semibold">Patient: {appointment.patientId?.name}</h4>
+          <p><strong>Doctor:</strong> {doctorName}</p>
+          <p><strong>Specialization:</strong> {doctorSpecialization}</p>
+          <p><strong>Date:</strong> {new Date(appointment.appointmentDate).toLocaleString()}</p>
+          <p><strong>Status:</strong> {appointment.status}</p>
+          <p><strong>Reason:</strong> {appointment.reason}</p>
+          <p><strong>Notes:</strong> {appointment.notes}</p>
+        </div>
       </div>
       <div className="flex flex-wrap gap-2 mt-4 md:mt-0 md:ml-4">
         <button onClick={() => onEdit(appointment)} className="px-3 py-1 bg-yellow-500 text-white text-sm rounded-md hover:bg-yellow-600">Edit</button>
@@ -250,6 +269,7 @@ const AppointmentList = () => {
 };
 
 export default AppointmentList;
+
 
 
 

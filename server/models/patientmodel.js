@@ -35,7 +35,7 @@ const patientSchema = new Schema(
     }],
     assignedDoctor: { 
       type: mongoose.Schema.Types.ObjectId, 
-      ref: 'Userole', 
+      ref: 'Doctor', 
       required: true 
     },
     appointments: [{ 
