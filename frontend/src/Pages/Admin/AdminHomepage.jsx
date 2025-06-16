@@ -9,13 +9,17 @@ import {
 } from '@heroicons/react/24/outline';
 import { Link } from 'react-router-dom';
 import DashboardNotificationWidget from '../../Components/Widgets/DashboardNotificationWidget';
-import AppointmentsOverview from '../../Components/Widgets/AppointmentsOverview'; // <-- Add this import
-
+import AppointmentsOverview from '../../Components/Widgets/AppointmentsOverview';
+import BloodBankInventoryWidget from '../../Components/Widgets/BloodBankInventoryWidget';
+import DoctorListWidget from '../../Components/Widgets/DoctorListWidget'; // ✅ Import the doctor widget
+import StaffListWidget from '../../Components/Widgets/StaffListWidget';
+import PatientsOverview from '../../Components/Widgets/PatientsOverview'
 export default function AdminHomepage() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
       {/* Staff Management Widget */}
-      <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md">
+     {/*  <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md">
         <h2 className="text-lg font-semibold text-gray-700 dark:text-white">
           Staff Management
         </h2>
@@ -29,15 +33,25 @@ export default function AdminHomepage() {
             <span>Add New Staff</span>
           </Link>
         </div>
-      </div>
-
-      {/* Appointments Overview (Dynamic Widget) */}
-      <AppointmentsOverview /> {/* <-- Replaces hardcoded widget */}
+      </div>  */}
+      <StaffListWidget />
+      {/* Appointments Overview Widget */}
+      <AppointmentsOverview />
 
       {/* System Notifications Widget */}
       <DashboardNotificationWidget />
+
+      {/* Blood Bank Inventory Widget */}
+      <BloodBankInventoryWidget />
+
+      {/* ✅ Doctor List Widget */}
+      <DoctorListWidget />
+
+      <PatientsOverview/>
     </div>
   );
 }
+
+
 
 

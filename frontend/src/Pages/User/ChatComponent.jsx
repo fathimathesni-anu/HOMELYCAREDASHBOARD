@@ -4,6 +4,7 @@ import axiosInstance from '../../api/axiosInstance';
 const ChatComponent = () => {
   const [chats, setChats] = useState([]);
   const [receiverId, setReceiverId] = useState('');
+  const [receiverModel, setReceiverModel] = useState('User'); // New field
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const [editId, setEditId] = useState(null);
@@ -22,11 +23,17 @@ const ChatComponent = () => {
   };
 
   const sendMessage = async () => {
-    if (!receiverId || !message) return alert('Receiver ID and message required');
+    if (!receiverId || !message || !receiverModel) return alert('All fields are required');
+
     try {
-      const res = await axiosInstance.post('/chat', { receiverId, message });
+      const res = await axiosInstance.post('/chat', {
+        receiverId,
+        receiverModel,
+        message,
+      });
       setChats(prev => [res.data.chat, ...prev]);
       setMessage('');
+      setReceiverId('');
     } catch (error) {
       console.error('Error sending message:', error.response?.data || error.message);
     }
@@ -69,20 +76,25 @@ const ChatComponent = () => {
           value={receiverId}
           onChange={(e) => setReceiverId(e.target.value)}
           className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-          aria-label="Receiver User ID"
         />
+        <select
+          value={receiverModel}
+          onChange={(e) => setReceiverModel(e.target.value)}
+          className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+        >
+          <option value="User">User</option>
+          <option value="Userole">Doctor/Admin/Staff</option>
+        </select>
         <textarea
           rows="4"
           placeholder="Type your message..."
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"
-          aria-label="Message"
         />
         <button
           onClick={sendMessage}
           className="w-full bg-blue-600 text-white font-semibold py-2 rounded-lg hover:bg-blue-700 transition"
-          aria-label="Send Message"
         >
           ➤ Send
         </button>
@@ -91,6 +103,8 @@ const ChatComponent = () => {
       {/* Chat Messages */}
       {loading ? (
         <p className="text-center text-gray-500">Loading messages...</p>
+      ) : chats.length === 0 ? (
+        <p className="text-center text-gray-400">No messages yet.</p>
       ) : (
         <ul className="space-y-4 max-h-[400px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-blue-400 scrollbar-track-gray-100">
           {chats.map((chat) => (
@@ -99,9 +113,26 @@ const ChatComponent = () => {
               className="p-4 rounded-lg border bg-gray-50 shadow-sm relative flex flex-col sm:flex-row sm:justify-between sm:items-start"
             >
               <div className="flex flex-col flex-1">
-                <div className="flex justify-between text-sm text-gray-600 mb-2 flex-wrap gap-2">
-                  <span><strong>From:</strong> {chat.senderId}</span>
-                  <span><strong>To:</strong> {chat.receiverId}</span>
+                <div className="flex items-center gap-2 mb-2">
+                  <img
+                    src={chat.senderId?.profilepic || "https://cdn-icons-png.flaticon.com/512/149/149071.png"}
+                    alt="Sender"
+                    className="w-8 h-8 rounded-full"
+                  />
+                  <span className="text-sm text-gray-600">
+                    <strong>From:</strong> {chat.senderId?.name || "Unknown"}
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-2 mb-2">
+                  <img
+                    src={chat.receiverId?.profilepic || "https://cdn-icons-png.flaticon.com/512/149/149071.png"}
+                    alt="Receiver"
+                    className="w-8 h-8 rounded-full"
+                  />
+                  <span className="text-sm text-gray-600">
+                    <strong>To:</strong> {chat.receiverId?.name || "Unknown"}
+                  </span>
                 </div>
 
                 {editId === chat._id ? (
@@ -111,20 +142,17 @@ const ChatComponent = () => {
                       value={editMessage}
                       onChange={(e) => setEditMessage(e.target.value)}
                       rows={3}
-                      aria-label="Edit Message"
                     />
                     <div className="flex gap-2 flex-wrap">
                       <button
                         onClick={() => updateMessage(chat._id)}
                         className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 flex-grow sm:flex-grow-0"
-                        aria-label="Save Edited Message"
                       >
                         Save
                       </button>
                       <button
                         onClick={() => setEditId(null)}
                         className="px-3 py-1 bg-gray-400 text-white rounded hover:bg-gray-500 flex-grow sm:flex-grow-0"
-                        aria-label="Cancel Edit"
                       >
                         Cancel
                       </button>
@@ -133,8 +161,8 @@ const ChatComponent = () => {
                 ) : (
                   <>
                     <p className="text-base text-gray-800 break-words">{chat.message}</p>
-                    <p className="text-xs text-gray-500 mt-2 whitespace-nowrap">
-                      {new Date(chat.timestamp || chat.createdAt).toLocaleString()}
+                    <p className="text-xs text-gray-500 mt-2">
+                      {new Date(chat.createdAt).toLocaleString()}
                     </p>
                   </>
                 )}
@@ -148,14 +176,12 @@ const ChatComponent = () => {
                       setEditMessage(chat.message);
                     }}
                     className="text-blue-600 hover:underline text-sm"
-                    aria-label="Edit Message"
                   >
                     Edit
                   </button>
                   <button
                     onClick={() => deleteMessage(chat._id)}
                     className="text-red-600 hover:underline text-sm"
-                    aria-label="Delete Message"
                   >
                     Delete
                   </button>
@@ -170,6 +196,8 @@ const ChatComponent = () => {
 };
 
 export default ChatComponent;
+
+
 
 
 

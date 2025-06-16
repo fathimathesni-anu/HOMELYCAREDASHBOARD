@@ -107,7 +107,7 @@ const FeedbackComponent = () => {
               <p className="mb-2 text-gray-800 whitespace-pre-wrap">{fb.feedbackText}</p>
               <p className="text-sm text-gray-600 font-medium">Rating: {fb.rating} ⭐</p>
               <p className="text-xs text-gray-400 mt-1">
-                By: {fb.patientId?.name || 'Unknown'} on {new Date(fb.createdAt).toLocaleDateString()}
+                By: {fb.userId?.name || 'Unknown'} on {new Date(fb.createdAt).toLocaleDateString()}
               </p>
             </div>
             <div className="flex space-x-4 sm:flex-col sm:space-x-0 sm:space-y-2">
@@ -134,6 +134,10 @@ const FeedbackComponent = () => {
 };
 
 export default FeedbackComponent;
+
+
+
+
 
 
 

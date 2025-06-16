@@ -1,17 +1,21 @@
-import axios from './axiosInstance'; // or 'axios'
+// src/api/staffDashboard.js
+import axios from './axiosInstance';
 
 export const fetchStaffDashboardStats = async () => {
-  const [staff, tasks, blood] = await Promise.all([
-    axios.get('/staff/count'),       // { count: number }
-    axios.get('/task/count'),        // { count: number, pendingCount: number } — see note below
-    axios.get('/bloodbank/count'),   // { count: number }
+  const [staff, tasks, blood, doctor] = await Promise.all([
+    axios.get('/staff/count'),
+    axios.get('/task/count'),
+    axios.get('/bloodbank/count'),
+    axios.get('/doctor/count')
   ]);
 
   return {
     totalStaff: staff.data.count,
-    pendingTasks: tasks.data.pendingCount,  // updated to use pendingCount directly from API
+    pendingTasks: tasks.data.pendingCount,
     bloodInventory: blood.data.count,
+    totalDoctor: doctor.data.count
   };
 };
+
 
 

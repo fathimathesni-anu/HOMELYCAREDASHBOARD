@@ -3,6 +3,7 @@ const router = express.Router();
 import {
   createDoctor,
   getAllDoctors,
+  getDoctorCount,
   getDoctorById,
   updateDoctor,
   deleteDoctor
@@ -16,6 +17,7 @@ router.post('/create', useroleAuth, authorizeRoles('admin','staff','doctor'), cr
 // Get all doctors (any logged-in user)
 router.get('/', useroleAuth, getAllDoctors);
 
+router.get('/count', getDoctorCount);
 // Get a doctor by ID
 router.get('/:id', useroleAuth, getDoctorById);
 

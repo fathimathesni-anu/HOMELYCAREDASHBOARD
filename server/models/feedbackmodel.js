@@ -2,7 +2,7 @@ import mongoose, { Schema } from 'mongoose';
 
 const feedbackSchema = new Schema(
   {
-    patientId: { type: mongoose.Schema.Types.ObjectId, ref: 'Patient' },
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     feedbackText: { type: String },
     rating: { type: Number },
     date: { type: Date }
@@ -13,3 +13,5 @@ const feedbackSchema = new Schema(
 );
 
 export const Feedback = mongoose.model('Feedback', feedbackSchema);
+
+

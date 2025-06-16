@@ -1,4 +1,4 @@
-import { Feedback } from '../models/feedbackmodel.js'; // Make sure your model file matches
+import { Feedback } from '../models/feedbackmodel.js';
 
 // Create feedback
 export const createFeedback = async (req, res) => {
@@ -14,7 +14,7 @@ export const createFeedback = async (req, res) => {
 // Get all feedback
 export const getAllFeedback = async (req, res) => {
   try {
-    const feedbacks = await Feedback.find().populate('patientId');
+    const feedbacks = await Feedback.find().populate('userId');
     res.status(200).json(feedbacks);
   } catch (error) {
     res.status(400).json({ message: 'Error fetching feedback', error });
@@ -24,7 +24,7 @@ export const getAllFeedback = async (req, res) => {
 // Get feedback by ID
 export const getFeedbackById = async (req, res) => {
   try {
-    const feedback = await Feedback.findById(req.params.id).populate('patientId');
+    const feedback = await Feedback.findById(req.params.id).populate('userId');
     if (!feedback) return res.status(404).json({ message: 'Feedback not found' });
     res.status(200).json(feedback);
   } catch (error) {
@@ -54,7 +54,7 @@ export const deleteFeedback = async (req, res) => {
   }
 };
 
-
+// Get total feedback count
 export const getFeedbackCount = async (req, res) => {
   try {
     const count = await Feedback.countDocuments();
@@ -63,3 +63,6 @@ export const getFeedbackCount = async (req, res) => {
     res.status(500).json({ message: 'Failed to count feedback', error });
   }
 };
+
+
+

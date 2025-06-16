@@ -56,4 +56,13 @@ export const deleteDoctor = async (req, res) => {
   }
 };
 
+// Get doctor count
+export const getDoctorCount = async (req, res) => {
+  try {
+    const count = await Doctor.countDocuments();
+    res.status(200).json({ count });
+  } catch (error) {
+    res.status(400).json({ message: 'Error counting doctors', error });
+  }
+};
 
