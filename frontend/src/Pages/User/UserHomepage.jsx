@@ -1,21 +1,27 @@
-import { PaperClipIcon, PencilSquareIcon } from '@heroicons/react/24/outline';
+import React from 'react';
 import { Link } from 'react-router-dom';
+import { PaperClipIcon, PencilSquareIcon } from '@heroicons/react/24/outline';
+
+// Widget Imports
 import DashboardNotificationWidget from '../../Components/Widgets/DashboardNotificationWidget';
 import TodaysAppointmentsWidget from '../../Components/Widgets/TodaysAppointmentsWidget';
-import BloodBankInventoryWidget from '../../Components/Widgets/BloodBankInventoryWidget'; // ✅ Import added
+import BloodBankInventoryWidget from '../../Components/Widgets/BloodBankInventoryWidget';
+import DoctorListWidget from '../../Components/Widgets/DoctorListWidget';
 
 export default function UserHomepage() {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      {/* Dynamic Next Appointment Widget */}
+      {/* 📅 Today's Appointments */}
       <TodaysAppointmentsWidget />
 
-      {/* Notifications Widget (Dynamic) */}
+      {/* 🔔 Notifications */}
       <DashboardNotificationWidget />
 
-      {/* Quick Actions Widget */}
+      {/* ⚡ Quick Actions */}
       <div className="bg-white p-6 rounded-lg shadow-lg dark:bg-gray-800">
-        <h2 className="text-xl font-semibold text-gray-700 dark:text-white mb-4">Quick Actions</h2>
+        <h2 className="text-xl font-semibold text-gray-700 dark:text-white mb-4">
+          Quick Actions
+        </h2>
         <div className="space-y-4">
           <Link
             to="/user/dashboard/appointments"
@@ -34,11 +40,15 @@ export default function UserHomepage() {
         </div>
       </div>
 
-      {/* ✅ Blood Bank Inventory Widget */}
+      {/* 🩸 Blood Bank Inventory */}
       <BloodBankInventoryWidget />
+
+      {/* 👩‍⚕️ Doctor List */}
+      <DoctorListWidget />
     </div>
   );
 }
+
 
 
 

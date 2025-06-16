@@ -117,8 +117,8 @@ const AppointmentBooking = () => {
     setEditDate(appt.date);
     setEditTime(appt.time);
     setEditStatus(appt.status);
-    setEditDoctorId(appt.doctorId?._id || '');
-    setEditSelectedDoctor(appt.doctorId || null);
+    setEditDoctorId(appt.doctor?.id || ''); // ✅ UPDATED
+    setEditSelectedDoctor(appt.doctor || null); // ✅ UPDATED
   };
 
   return (
@@ -214,8 +214,8 @@ const AppointmentBooking = () => {
                       onChange={(e) => setEditStatus(e.target.value)}
                       className="w-full border border-gray-300 rounded px-3 py-2"
                     >
-                      <option value="booked">Booked</option>
-                      <option value="completed">Completed</option>
+                      <option value="pending">Pending</option>
+                      <option value="confirmed">Confirmed</option>
                       <option value="cancelled">Cancelled</option>
                     </select>
                     <div className="flex flex-wrap gap-4">
@@ -236,7 +236,7 @@ const AppointmentBooking = () => {
                 ) : (
                   <div>
                     <p className="text-gray-700">
-                      <strong>Doctor:</strong> {appt.doctorId?.userId?.name}
+                      <strong>Doctor:</strong> {appt.doctor?.name || 'Unknown'} {/* ✅ UPDATED */}
                     </p>
                     <p className="text-gray-700">
                       <strong>Date:</strong> {appt.date}
@@ -272,6 +272,8 @@ const AppointmentBooking = () => {
 };
 
 export default AppointmentBooking;
+
+
 
 
 

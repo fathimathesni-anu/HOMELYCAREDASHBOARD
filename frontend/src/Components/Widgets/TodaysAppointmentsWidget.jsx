@@ -46,7 +46,8 @@ const TodaysAppointmentsWidget = () => {
 
   const renderAppointmentItem = (appointment) => (
     <li key={appointment._id} className="text-gray-600 dark:text-gray-300 text-sm">
-      With <strong>{appointment.doctorId?.userId?.name || 'Unknown Doctor'}</strong>
+      With <strong>{appointment.doctor?.name || appointment.doctorId?.userId?.name || appointment.doctorId?.name || 'Unknown Doctor'}
+</strong>
       {appointment.reason && <> for <strong>{appointment.reason}</strong></>},
       at {new Date(`${appointment.date}T${appointment.time}`).toLocaleTimeString([], {
         hour: '2-digit',

@@ -33,12 +33,36 @@ export const bookAppointment = async (req, res) => {
 export const getPatientAppointments = async (req, res) => {
   try {
     const patientId = req.user.id;
-    const appointments = await AppointmentSchedule.find({ patientId }).populate("doctorId");
-    res.json({appointments });
+
+    const appointments = await AppointmentSchedule.find({ patientId })
+      .populate({
+        path: "doctorId",
+        populate: {
+          path: "userId",
+          select: "name", // Assuming 'name' is in Userole
+        },
+      });
+
+    // Format response to include doctor name
+    const formattedAppointments = appointments.map(app => ({
+      _id: app._id,
+      date: app.date,
+      time: app.time,
+      status: app.status,
+      createdAt: app.createdAt,
+      doctor: {
+        id: app.doctorId?._id,
+        name: app.doctorId?.userId?.name || "Unknown",
+        specialization: app.doctorId?.specialization || "Not specified",
+      },
+    }));
+
+    res.json({ appointments: formattedAppointments });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
+
 
 
 export const updateAppointmentStatus = async (req, res) => {
@@ -115,7 +139,7 @@ export const deleteAppointment = async (req, res) => {
   }
 };
 
-export const getTodaysAppointments = async (req, res) => {
+ export const getTodaysAppointments = async (req, res) => {
   try {
     const patientId = req.user.id;
     const today = new Date();
@@ -136,7 +160,11 @@ export const getTodaysAppointments = async (req, res) => {
   } catch (err) {
     res.status(500).json({ message: 'Failed to get today\'s appointments', error: err.message });
   }
-};
+}; 
+
+
+
+
 
 
 
