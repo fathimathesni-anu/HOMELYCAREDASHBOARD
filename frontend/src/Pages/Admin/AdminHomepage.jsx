@@ -13,7 +13,7 @@ import AppointmentsOverview from '../../Components/Widgets/AppointmentsOverview'
 import BloodBankInventoryWidget from '../../Components/Widgets/BloodBankInventoryWidget';
 import DoctorListWidget from '../../Components/Widgets/DoctorListWidget'; // ✅ Import the doctor widget
 import StaffListWidget from '../../Components/Widgets/StaffListWidget';
-import PatientsOverview from '../../Components/Widgets/PatientsOverview'
+import PatientsOverview from '../../Components/Widgets/Patients'
 export default function AdminHomepage() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

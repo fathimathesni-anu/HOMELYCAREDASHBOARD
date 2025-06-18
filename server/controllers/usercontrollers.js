@@ -7,19 +7,25 @@ const NODE_ENV = process.env.NODE_ENV || "development"; // Make sure this is def
 export const uploadProfilePic = async (req, res) => {
   try {
     const userId = req.user.id;
-    const profilePicUrl = `/uploads/profilePics/${req.file.filename}`;
+
+    if (!req.file || !req.file.path) {
+      return res.status(400).json({ message: "No file uploaded" });
+    }
+
+    const profilePicUrl = req.file.path; // Cloudinary URL
 
     const user = await User.findByIdAndUpdate(
       userId,
-      { profilePic: profilePicUrl },
+      { profilepic: profilePicUrl },
       { new: true }
-    );
+    ).select("-password");
 
-    res.json({ success: true, user });
+    res.json({ success: true, profilePic: profilePicUrl, user });
   } catch (error) {
     res.status(500).json({ message: "Upload failed", error: error.message });
   }
 };
+
 
 export const userSignup = async (req, res, next) => {
   try {
@@ -142,7 +148,7 @@ export const userLogout = async (req, res, next) => {
   }
 };
 
-export const updateUserProfile = async (req, res) => {
+/* export const updateUserProfile = async (req, res) => {
   try {
     const userId = req.user.id;
     const { name, email, mobile } = req.body;
@@ -179,5 +185,47 @@ export const updateUserProfile = async (req, res) => {
     return res.status(error.statusCode || 500).json({
       message: error.message || "Internal server error",
     });
+  }
+}; */
+
+export const updateUserProfile = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { name, email, mobile } = req.body;
+
+    const updateData = { name, email, mobile };
+
+    if (req.file) {
+      updateData.profilepic = req.file.path; // <-- Fix here
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(userId, updateData, {
+      new: true,
+      runValidators: true,
+    }).select("-password");
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({
+      message: "Profile updated successfully",
+      data: updatedUser,
+    });
+  } catch (error) {
+    console.error("Update profile error:", error);
+    return res.status(error.statusCode || 500).json({
+      message: error.message || "Internal server error",
+    });
+  }
+};
+
+
+export const getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find(); // Filter if needed
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(400).json({ message: 'Error fetching users', error });
   }
 };

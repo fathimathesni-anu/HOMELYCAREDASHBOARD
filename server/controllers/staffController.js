@@ -1,4 +1,4 @@
-import { Staff } from '../models/staffmodel.js'; // Adjust the path if needed
+/* import { Staff } from '../models/staffmodel.js'; // Adjust the path if needed
 
 // Create new staff
 export const createStaff = async (req, res) => {
@@ -63,6 +63,77 @@ export const countStaff = async (req, res) => {
   try {
     const count = await Staff.countDocuments();
     res.status(200).json({ count });   // <-- change here from totalStaff to count
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+}; */
+
+
+import { Staff } from '../models/staffmodel.js';
+
+export const createStaff = async (req, res) => {
+  try {
+    const newStaff = new Staff(req.body);
+    const savedStaff = await newStaff.save();
+    res.status(201).json(savedStaff);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+export const getAllStaff = async (req, res) => {
+  try {
+    const staffList = await Staff.find().populate('userId').populate('assignedTasks');
+    res.status(200).json(staffList);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const getStaffById = async (req, res) => {
+  try {
+    const staff = await Staff.findById(req.params.id).populate('userId').populate('assignedTasks');
+    if (!staff) return res.status(404).json({ message: 'Staff member not found' });
+    res.status(200).json(staff);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const updateStaff = async (req, res) => {
+  try {
+    // Optional: validate availability field
+    if (req.body.availability && !['Active', 'Inactive'].includes(req.body.availability)) {
+      return res.status(400).json({ message: 'Invalid availability value' });
+    }
+
+    const updatedStaff = await Staff.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+    });
+
+    if (!updatedStaff) return res.status(404).json({ message: 'Staff member not found' });
+
+    res.status(200).json(updatedStaff);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+export const deleteStaff = async (req, res) => {
+  try {
+    const deletedStaff = await Staff.findByIdAndDelete(req.params.id);
+    if (!deletedStaff) return res.status(404).json({ message: 'Staff member not found' });
+    res.status(200).json({ message: 'Staff member deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const countStaff = async (req, res) => {
+  try {
+    const count = await Staff.countDocuments();
+    res.status(200).json({ count });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

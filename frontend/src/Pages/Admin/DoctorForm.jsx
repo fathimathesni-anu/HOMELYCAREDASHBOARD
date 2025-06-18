@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'; 
 import axiosInstance from '../../api/axiosInstance';
 
 const DoctorForm = () => {
   const [doctors, setDoctors] = useState([]);
+  const [users, setUsers] = useState([]);
   const [formData, setFormData] = useState({
     userId: '',
     specialization: '',
@@ -15,6 +16,7 @@ const DoctorForm = () => {
 
   useEffect(() => {
     fetchDoctors();
+    fetchUsers();
   }, []);
 
   const fetchDoctors = async () => {
@@ -24,6 +26,16 @@ const DoctorForm = () => {
     } catch (error) {
       console.error('Failed to fetch doctors', error);
       setError('Failed to load doctors');
+    }
+  };
+
+  const fetchUsers = async () => {
+    try {
+      const res = await axiosInstance.get('/userole/users'); // Should only return doctors
+      setUsers(res.data);
+    } catch (error) {
+      console.error('Failed to fetch users', error);
+      setError('Failed to load users');
     }
   };
 
@@ -58,7 +70,7 @@ const DoctorForm = () => {
     setError('');
     try {
       if (!formData.userId || !formData.specialization) {
-        setError('User ID and Specialization are required');
+        setError('User and Specialization are required');
         return;
       }
 
@@ -111,15 +123,22 @@ const DoctorForm = () => {
       )}
 
       <form onSubmit={handleSubmit} className="space-y-6 bg-white p-6 rounded-xl shadow">
-        <input
-          type="text"
+        <select
           name="userId"
-          placeholder="User ID"
           value={formData.userId}
           onChange={handleChange}
           required
           className="w-full border rounded-lg p-3"
-        />
+        >
+          <option value="">Select a Doctor User</option>
+          {users
+            .filter((user) => user.role === 'doctor') // Optional frontend safeguard
+            .map((user) => (
+              <option key={user._id} value={user._id}>
+                {user.name || user.email || user.username}
+              </option>
+            ))}
+        </select>
 
         <input
           type="text"
@@ -233,6 +252,8 @@ const DoctorForm = () => {
 };
 
 export default DoctorForm;
+
+
 
 
 

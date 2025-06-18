@@ -8,6 +8,9 @@ const BloodBankManager = () => {
   });
 
   const [bloodBankEntries, setBloodBankEntries] = useState([]);
+  const [editingId, setEditingId] = useState(null);
+  const [editFormData, setEditFormData] = useState({ bloodGroup: '', availableUnits: '' });
+
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
 
@@ -57,6 +60,41 @@ const BloodBankManager = () => {
       fetchBloodBankEntries();
     } catch (err) {
       setError('Failed to delete entry');
+    }
+  };
+
+  // Edit handlers
+  const handleEditClick = (entry) => {
+    setEditingId(entry._id);
+    setEditFormData({
+      bloodGroup: entry.bloodGroup,
+      availableUnits: entry.availableUnits,
+    });
+    setError('');
+    setMessage('');
+  };
+
+  const handleEditChange = (e) => {
+    const { name, value } = e.target;
+    setEditFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleEditCancel = () => {
+    setEditingId(null);
+    setEditFormData({ bloodGroup: '', availableUnits: '' });
+  };
+
+  const handleEditSave = async (id) => {
+    setError('');
+    setMessage('');
+    try {
+      await axiosInstance.put(`/bloodbank/update/${id}`, editFormData);
+      setMessage('Entry updated successfully!');
+      setEditingId(null);
+      setEditFormData({ bloodGroup: '', availableUnits: '' });
+      fetchBloodBankEntries();
+    } catch (err) {
+      setError(err.response?.data?.message || 'Error updating entry');
     }
   };
 
@@ -123,17 +161,67 @@ const BloodBankManager = () => {
             {bloodBankEntries.length > 0 ? (
               bloodBankEntries.map(entry => (
                 <tr key={entry._id} className="hover:bg-gray-50">
-                  <td className="p-3 border">{entry.bloodGroup}</td>
-                  <td className="p-3 border">{entry.availableUnits}</td>
-                  <td className="p-3 border">{new Date(entry.lastUpdated).toLocaleString()}</td>
-                  <td className="p-3 border text-center">
-                    <button
-                      onClick={() => handleDelete(entry._id)}
-                      className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 text-xs"
-                    >
-                      Delete
-                    </button>
-                  </td>
+                  {editingId === entry._id ? (
+                    <>
+                      <td className="p-3 border">
+                        <select
+                          name="bloodGroup"
+                          value={editFormData.bloodGroup}
+                          onChange={handleEditChange}
+                          className="w-full border p-1 rounded text-sm"
+                        >
+                          {bloodGroups.map(bg => (
+                            <option key={bg} value={bg}>{bg}</option>
+                          ))}
+                        </select>
+                      </td>
+                      <td className="p-3 border">
+                        <input
+                          type="number"
+                          name="availableUnits"
+                          value={editFormData.availableUnits}
+                          onChange={handleEditChange}
+                          min="0"
+                          className="w-full border p-1 rounded text-sm"
+                        />
+                      </td>
+                      <td className="p-3 border">{new Date(entry.lastUpdated).toLocaleString()}</td>
+                      <td className="p-3 border text-center space-x-2">
+                        <button
+                          onClick={() => handleEditSave(entry._id)}
+                          className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 text-xs"
+                        >
+                          Save
+                        </button>
+                        <button
+                          onClick={handleEditCancel}
+                          className="bg-gray-300 text-gray-800 px-3 py-1 rounded hover:bg-gray-400 text-xs"
+                        >
+                          Cancel
+                        </button>
+                      </td>
+                    </>
+                  ) : (
+                    <>
+                      <td className="p-3 border">{entry.bloodGroup}</td>
+                      <td className="p-3 border">{entry.availableUnits}</td>
+                      <td className="p-3 border">{new Date(entry.lastUpdated).toLocaleString()}</td>
+                      <td className="p-3 border text-center space-x-2">
+                        <button
+                          onClick={() => handleEditClick(entry)}
+                          className="bg-yellow-400 text-white px-3 py-1 rounded hover:bg-yellow-500 text-xs"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDelete(entry._id)}
+                          className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 text-xs"
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </>
+                  )}
                 </tr>
               ))
             ) : (
@@ -149,6 +237,7 @@ const BloodBankManager = () => {
 };
 
 export default BloodBankManager;
+
 
 
 

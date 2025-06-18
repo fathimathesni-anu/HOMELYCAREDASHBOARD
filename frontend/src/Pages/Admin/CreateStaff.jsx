@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import axiosInstance from '../../api/axiosInstance'; // Adjust path if necessary
+import axiosInstance from '../../api/axiosInstance';
 
 const CreateStaff = () => {
-  const [formData, setFormData] = useState({
+  const emptyForm = {
     userId: '',
     position: '',
     department: '',
@@ -12,25 +12,29 @@ const CreateStaff = () => {
     },
     schedule: [{ day: '', startTime: '', endTime: '' }],
     assignedTasks: [],
-  });
+  };
 
-  const [message, setMessage] = useState('');
+  const [formData, setFormData] = useState(emptyForm);
   const [staffList, setStaffList] = useState([]);
+  const [message, setMessage] = useState('');
   const [searchDept, setSearchDept] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [editingId, setEditingId] = useState(null); // Track which staff is being edited
+
   const itemsPerPage = 5;
 
   useEffect(() => {
-    const fetchStaffList = async () => {
-      try {
-        const response = await axiosInstance.get('/staff');
-        setStaffList(response.data);
-      } catch (error) {
-        console.error('Failed to fetch staff list:', error);
-      }
-    };
     fetchStaffList();
   }, []);
+
+  const fetchStaffList = async () => {
+    try {
+      const res = await axiosInstance.get('/staff');
+      setStaffList(res.data);
+    } catch (err) {
+      console.error('Failed to fetch staff:', err);
+    }
+  };
 
   const handleChange = (e, field, index = null) => {
     const { name, value } = e.target;
@@ -65,17 +69,37 @@ const CreateStaff = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axiosInstance.post('/staff/create', formData);
-      setMessage('Staff member created successfully!');
-      const response = await axiosInstance.get('/staff');
-      setStaffList(response.data);
-    } catch (error) {
-      setMessage(error.response?.data?.message || 'Failed to create staff');
+      if (editingId) {
+        await axiosInstance.put(`/staff/update/${editingId}`, formData);
+        setMessage('Staff updated successfully!');
+      } else {
+        await axiosInstance.post('/staff/create', formData);
+        setMessage('Staff created successfully!');
+      }
+
+      fetchStaffList();
+      resetForm();
+    } catch (err) {
+      setMessage(err.response?.data?.message || 'Submission failed');
     }
   };
 
+  const handleEdit = (staff) => {
+    setFormData({
+      userId: staff.userId?._id || staff.userId || '',
+      position: staff.position || '',
+      department: staff.department || '',
+      contactInfo: staff.contactInfo || { phone: '', email: '' },
+      schedule: staff.schedule.length ? staff.schedule : [{ day: '', startTime: '', endTime: '' }],
+      assignedTasks: staff.assignedTasks || [],
+    });
+    setEditingId(staff._id);
+    setMessage('');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this staff member?')) return;
+    if (!window.confirm('Delete this staff member?')) return;
     try {
       await axiosInstance.delete(`/staff/delete/${id}`);
       setStaffList((prev) => prev.filter((s) => s._id !== id));
@@ -85,20 +109,26 @@ const CreateStaff = () => {
     }
   };
 
+  const resetForm = () => {
+    setFormData(emptyForm);
+    setEditingId(null);
+  };
+
   const filteredStaff = staffList.filter((staff) =>
     staff.department?.toLowerCase().includes(searchDept.toLowerCase())
   );
 
   const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentStaff = filteredStaff.slice(indexOfFirstItem, indexOfLastItem);
+  const currentStaff = filteredStaff.slice(indexOfLastItem - itemsPerPage, indexOfLastItem);
   const totalPages = Math.ceil(filteredStaff.length / itemsPerPage);
 
   return (
     <div className="max-w-7xl mx-auto p-4 sm:p-6 bg-white shadow-lg rounded-xl mt-6">
-      <h2 className="text-2xl sm:text-3xl font-bold mb-6 text-blue-700">Create Staff Member</h2>
+      <h2 className="text-2xl sm:text-3xl font-bold mb-6 text-blue-700">
+        {editingId ? 'Update Staff Member' : 'Create Staff Member'}
+      </h2>
 
-      {message && <div className="mb-4 text-red-600">{message}</div>}
+      {message && <div className="mb-4 text-green-600">{message}</div>}
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid sm:grid-cols-2 gap-4">
@@ -189,15 +219,26 @@ const CreateStaff = () => {
           </button>
         </div>
 
-        <button
-          type="submit"
-          className="w-full bg-blue-600 text-white font-semibold py-3 rounded hover:bg-blue-700 transition"
-        >
-          Create Staff
-        </button>
+        <div className="flex gap-3">
+          <button
+            type="submit"
+            className="bg-blue-600 text-white font-semibold py-3 px-6 rounded hover:bg-blue-700 transition"
+          >
+            {editingId ? 'Update Staff' : 'Create Staff'}
+          </button>
+          {editingId && (
+            <button
+              type="button"
+              onClick={resetForm}
+              className="bg-gray-300 text-gray-800 font-semibold py-3 px-6 rounded hover:bg-gray-400 transition"
+            >
+              Cancel
+            </button>
+          )}
+        </div>
       </form>
 
-      {/* Staff List Section */}
+      {/* Staff List */}
       <div className="mt-10">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
           <h3 className="text-xl font-semibold text-gray-800">Staff List</h3>
@@ -240,7 +281,7 @@ const CreateStaff = () => {
                       <div className="space-x-2">
                         <button
                           className="text-blue-600 hover:underline"
-                          onClick={() => alert('Edit feature coming soon')}
+                          onClick={() => handleEdit(staff)}
                         >
                           Edit
                         </button>
@@ -280,6 +321,7 @@ const CreateStaff = () => {
 };
 
 export default CreateStaff;
+
 
 
 

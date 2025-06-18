@@ -19,6 +19,10 @@ export default function UserNavbar({ toggleSidebar }) {
 
   const navigate = useNavigate();
 
+  // Your Cloudinary info - REPLACE with your actual values
+  const cloudName = "dv9uopxjf";
+  const uploadPreset = "unsigned_profile_pics";
+
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -29,7 +33,7 @@ export default function UserNavbar({ toggleSidebar }) {
           },
         });
         setUser(res.data.data);
-        setProfilePic(res.data.data.profilePic);
+        setProfilePic(res.data.data.profilepic || null);
       } catch (err) {
         console.error("Failed to fetch profile:", err);
       }
@@ -58,18 +62,42 @@ export default function UserNavbar({ toggleSidebar }) {
   const handleUpload = async () => {
     if (!file) return;
 
-    const formData = new FormData();
-    formData.append("profilePic", file);
+    setUploading(true);
 
     try {
-      setUploading(true);
-      const res = await axiosInstance.post("/user/upload-profile-pic", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
-      setProfilePic(res.data.profilePic);
+      // Upload image file to Cloudinary
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("upload_preset", uploadPreset);
+
+      const cloudinaryRes = await fetch(
+        `https://api.cloudinary.com/v1_1/${cloudName}/upload`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+      const cloudinaryData = await cloudinaryRes.json();
+
+      if (!cloudinaryRes.ok) {
+        throw new Error(cloudinaryData.error.message || "Cloudinary upload failed");
+      }
+
+      const uploadedUrl = cloudinaryData.secure_url;
+
+      // Send the Cloudinary URL to your backend to save in DB
+      const res = await axiosInstance.post(
+        "/user/upload-profile-pic",
+        { profilePic: uploadedUrl }, // JSON payload, not multipart/form-data
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+
+      // Update UI with the new profile picture URL
+      setProfilePic(uploadedUrl);
       setFile(null);
       setPreview(null);
       setDropdownOpen(false);
@@ -116,11 +144,10 @@ export default function UserNavbar({ toggleSidebar }) {
             <img
               src={
                 preview ||
-                (profilePic
-                  ? `/user/uploads/${profilePic}`
-                  : `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                      user.name || "User"
-                    )}&background=random&size=128`)
+                profilePic || // full Cloudinary URL from backend
+                `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                  user.name || "User"
+                )}&background=random&size=128`
               }
               alt="Profile"
               className="h-8 w-8 rounded-full object-cover border"
@@ -142,11 +169,10 @@ export default function UserNavbar({ toggleSidebar }) {
                   <img
                     src={
                       preview ||
-                      (profilePic
-                        ? `/user/uploads/${profilePic}`
-                        : `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                            user.name || "User"
-                          )}&background=random&size=128`)
+                      profilePic ||
+                      `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                        user.name || "User"
+                      )}&background=random&size=128`
                     }
                     alt="Preview"
                     className="object-cover w-full h-full"
@@ -181,6 +207,8 @@ export default function UserNavbar({ toggleSidebar }) {
     </header>
   );
 }
+
+
 
 
 

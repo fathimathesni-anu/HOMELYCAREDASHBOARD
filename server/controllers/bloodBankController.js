@@ -1,4 +1,4 @@
-import { BloodBank } from '../models/bloodbankmodel.js';
+ import { BloodBank } from '../models/bloodbankmodel.js';
 
 // Create a blood bank entry
 export const createBloodBankEntry = async (req, res) => {
@@ -64,4 +64,4 @@ export const getcountBloodBankEntries = async (req, res) => {
   } catch (error) {
     res.status(400).json({ message: 'Error fetching blood bank entries', error });
   }
-};
+};  

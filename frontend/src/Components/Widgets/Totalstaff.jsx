@@ -10,7 +10,7 @@ const Totalstaff = () => {
       try {
         const res = await axiosInstance.get('/staff');
         if (Array.isArray(res.data)) {
-          setStaff(res.data.slice(0, 8)); // Display first 8 only
+          setStaff(res.data.slice(0, 8));
         } else {
           console.error('Unexpected staff response:', res.data);
           setStaff([]);
@@ -24,6 +24,20 @@ const Totalstaff = () => {
     const interval = setInterval(fetchStaff, 30000);
     return () => clearInterval(interval);
   }, []);
+
+  const toggleAvailability = async (id, currentStatus) => {
+    const newStatus = currentStatus === 'Active' ? 'Inactive' : 'Active';
+    try {
+      await axiosInstance.put(`/staff/update/${id}`, { availability: newStatus });
+      setStaff((prev) =>
+        prev.map((member) =>
+          member._id === id ? { ...member, availability: newStatus } : member
+        )
+      );
+    } catch (error) {
+      console.error('Failed to update availability:', error);
+    }
+  };
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-lg dark:bg-gray-800 w-full max-w-sm">
@@ -49,15 +63,17 @@ const Totalstaff = () => {
                   </span>
                 </div>
               </div>
-              <span
-                className={`text-sm font-medium ${
-                  member.availability === 'Active'
-                    ? 'text-green-500'
-                    : 'text-red-500'
-                }`}
-              >
-                {member.availability || 'Unknown'}
-              </span>
+              {/* Alternative Toggle switch with animation */}
+              <label className="relative inline-block w-12 h-6 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={member.availability === 'Active'}
+                  onChange={() => toggleAvailability(member._id, member.availability)}
+                  className="absolute opacity-0 w-0 h-0 peer"
+                />
+                <span className="absolute inset-0 bg-gray-400 rounded-full transition-colors duration-300 peer-checked:bg-green-500"></span>
+                <span className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform duration-300 transform peer-checked:translate-x-6"></span>
+              </label>
             </li>
           ))
         )}
@@ -67,5 +83,9 @@ const Totalstaff = () => {
 };
 
 export default Totalstaff;
+
+
+
+
 
 

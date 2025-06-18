@@ -1,8 +1,30 @@
-import React from 'react';
+// Components/Widgets/PatientsOverview.jsx
+import React, { useEffect, useState } from 'react';
+import axiosInstance from '../../api/axiosInstance';
 import { UserGroupIcon } from '@heroicons/react/24/outline';
 import { Link } from 'react-router-dom';
 
-const Patients = ({ patients, loading, error }) => {
+const Patients = () => {
+  const [patients, setPatients] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchPatients = async () => {
+      try {
+        const res = await axiosInstance.get('/patient');
+        setPatients(res.data || []);
+      } catch (err) {
+        console.error('Error fetching patients:', err);
+        setError('Failed to load patients');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPatients();
+  }, []);
+
   return (
     <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md">
       <h2 className="text-lg font-semibold text-gray-700 dark:text-white">Patients Overview</h2>
@@ -26,7 +48,7 @@ const Patients = ({ patients, loading, error }) => {
           ))}
           {patients.length > 5 && (
             <li className="mt-2">
-              <Link to="/admin/dashboard/patients" className="flex items-center text-blue-500 hover:underline">
+              <Link to="/dashboard/patients" className="flex items-center text-blue-500 hover:underline">
                 <UserGroupIcon className="h-5 w-5 mr-2" />
                 <span>View More Patients</span>
               </Link>
@@ -38,5 +60,8 @@ const Patients = ({ patients, loading, error }) => {
   );
 };
 
-export default Patients;
+export default Patients; 
+
+
+
 

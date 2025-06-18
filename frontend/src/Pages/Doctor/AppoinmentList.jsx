@@ -5,47 +5,47 @@ import 'react-datepicker/dist/react-datepicker.css';
 import ScheduleViewer from '../../Components/ScheduleViewer';
 
 const Appointment = ({ appointment, onEdit, onDelete, onMarkStatus, doctors }) => {
-  const doctor = typeof appointment.doctorId === 'string'
-    ? doctors.find((doc) => doc._id === appointment.doctorId)
-    : appointment.doctorId;
+  const doctor = doctors.find((doc) => {
+    if (typeof appointment.doctorId === 'string') {
+      return doc._id === appointment.doctorId;
+    } else {
+      return doc._id === appointment.doctorId?._id;
+    }
+  });
 
-  const doctorName = doctor?.userId?.name || doctor?.name || 'Unknown Doctor';
+  const doctorName =
+    doctor?.userId?.name ||
+    doctor?.name ||
+    `${doctor?.firstName || ''} ${doctor?.lastName || ''}`.trim() ||
+    'Unknown Doctor';
+
+  const doctorSpecialization = doctor?.specialization || 'General';
 
   return (
-    <div className="appointment p-4 border rounded-md shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-6 bg-white">
-      <div className="appointment-content flex-1 space-y-1 text-gray-800">
-        <h4 className="text-lg font-semibold">Patient: {appointment.patientId?.name}</h4>
-        <p><strong>Doctor:</strong> {doctorName}</p>
-        <p><strong>Appointment Date:</strong> {new Date(appointment.appointmentDate).toLocaleString()}</p>
-        <p><strong>Status:</strong> {appointment.status}</p>
-        <p><strong>Reason:</strong> {appointment.reason}</p>
-        <p><strong>Notes:</strong> {appointment.notes || '-'}</p>
+    <div className="p-4 border rounded-lg shadow-sm bg-white dark:bg-gray-800 space-y-2 md:space-y-0 md:flex md:justify-between md:items-center">
+      <div className="flex items-center space-x-4">
+        {doctor?.profilePicUrl && (
+          <img
+            src={doctor.profilePicUrl}
+            alt={`${doctorName} profile`}
+            className="w-16 h-16 rounded-full object-cover"
+          />
+        )}
+        <div className="space-y-1 text-sm md:text-base">
+          <h4 className="font-semibold">Patient: {appointment.patientId?.name}</h4>
+          <p><strong>Doctor:</strong> {doctorName}</p>
+          <p><strong>Specialization:</strong> {doctorSpecialization}</p>
+          <p><strong>Date:</strong> {new Date(appointment.appointmentDate).toLocaleString()}</p>
+          <p><strong>Status:</strong> {appointment.status}</p>
+          <p><strong>Reason:</strong> {appointment.reason}</p>
+          <p><strong>Notes:</strong> {appointment.notes}</p>
+        </div>
       </div>
-      <div className="flex flex-wrap gap-2 sm:flex-col sm:space-y-2">
-        <button
-          onClick={() => onEdit(appointment)}
-          className="px-3 py-1 bg-yellow-500 text-white text-sm rounded-md hover:bg-yellow-600 transition"
-        >
-          Edit
-        </button>
-        <button
-          onClick={() => onDelete(appointment._id)}
-          className="px-3 py-1 bg-red-500 text-white text-sm rounded-md hover:bg-red-600 transition"
-        >
-          Delete
-        </button>
-        <button
-          onClick={() => onMarkStatus(appointment._id, 'Completed')}
-          className="px-3 py-1 bg-blue-500 text-white text-sm rounded-md hover:bg-blue-600 transition"
-        >
-          Mark as Completed
-        </button>
-        <button
-          onClick={() => onMarkStatus(appointment._id, 'Cancelled')}
-          className="px-3 py-1 bg-gray-500 text-white text-sm rounded-md hover:bg-gray-600 transition"
-        >
-          Mark as Cancelled
-        </button>
+      <div className="flex flex-wrap gap-2 mt-4 md:mt-0 md:ml-4">
+        <button onClick={() => onEdit(appointment)} className="px-3 py-1 bg-yellow-500 text-white text-sm rounded-md hover:bg-yellow-600">Edit</button>
+        <button onClick={() => onDelete(appointment._id)} className="px-3 py-1 bg-red-500 text-white text-sm rounded-md hover:bg-red-600">Delete</button>
+        <button onClick={() => onMarkStatus(appointment._id, 'Completed')} className="px-3 py-1 bg-blue-500 text-white text-sm rounded-md hover:bg-blue-600">Mark Completed</button>
+        <button onClick={() => onMarkStatus(appointment._id, 'Cancelled')} className="px-3 py-1 bg-gray-500 text-white text-sm rounded-md hover:bg-gray-600">Cancel</button>
       </div>
     </div>
   );
@@ -85,10 +85,7 @@ const AppointmentList = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
@@ -100,11 +97,7 @@ const AppointmentList = () => {
           formData
         );
         setAppointments((prev) =>
-          prev.map((appointment) =>
-            appointment._id === editingAppointment._id
-              ? response.data.appointment
-              : appointment
-          )
+          prev.map((a) => (a._id === editingAppointment._id ? response.data.appointment : a))
         );
         setEditingAppointment(null);
       } else {
@@ -140,7 +133,7 @@ const AppointmentList = () => {
   const handleDelete = async (id) => {
     try {
       await axiosInstance.delete(`/appointment/delete/${id}`);
-      setAppointments((prev) => prev.filter((appointment) => appointment._id !== id));
+      setAppointments((prev) => prev.filter((a) => a._id !== id));
     } catch (error) {
       console.error('Error deleting appointment', error);
     }
@@ -150,9 +143,7 @@ const AppointmentList = () => {
     try {
       await axiosInstance.put(`/appointment/update/${id}`, { status });
       setAppointments((prev) =>
-        prev.map((appointment) =>
-          appointment._id === id ? { ...appointment, status } : appointment
-        )
+        prev.map((a) => (a._id === id ? { ...a, status } : a))
       );
     } catch (error) {
       console.error('Error updating status', error);
@@ -160,68 +151,58 @@ const AppointmentList = () => {
   };
 
   return (
-    <div className="appointment-list max-w-4xl mx-auto p-6 space-y-8">
-      <form
-        onSubmit={handleSubmit}
-        className="space-y-6 bg-white p-6 rounded-md shadow-md"
-      >
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <select
-            name="patientId"
-            value={formData.patientId}
-            onChange={handleChange}
-            className="border p-3 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
-          >
-            <option value="">Select patient</option>
-            {patients.map((patient) => (
-              <option key={patient._id} value={patient._id}>
-                {patient.name}
-              </option>
-            ))}
-          </select>
+    <div className="p-6 space-y-8">
+      <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white dark:bg-gray-900 p-6 rounded-lg shadow-md">
+        <select
+          name="patientId"
+          value={formData.patientId}
+          onChange={handleChange}
+          className="border p-2 rounded-md w-full"
+          required
+        >
+          <option value="">Select patient</option>
+          {patients.map((p) => (
+            <option key={p._id} value={p._id}>
+              {p.name}
+            </option>
+          ))}
+        </select>
 
-          <select
-            name="doctorId"
-            value={formData.doctorId}
-            onChange={handleChange}
-            className="border p-3 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
-          >
-            <option value="">Select doctor</option>
-            {doctors.map((doctor) => (
-              <option key={doctor._id} value={doctor._id}>
-                {doctor.userId?.name || doctor.name || `${doctor.firstName || ''} ${doctor.lastName || ''}`}
-              </option>
-            ))}
-          </select>
-        </div>
+        <select
+          name="doctorId"
+          value={formData.doctorId}
+          onChange={handleChange}
+          className="border p-2 rounded-md w-full"
+          required
+        >
+          <option value="">Select doctor</option>
+          {doctors.map((d) => (
+            <option key={d._id} value={d._id}>
+              {d.userId?.name || d.name || `${d.firstName || ''} ${d.lastName || ''}`}
+            </option>
+          ))}
+        </select>
 
         {formData.doctorId && (
-          <div className="mb-4">
-            <ScheduleViewer
-              doctorId={formData.doctorId}
-              token={localStorage.getItem('token')}
-            />
+          <div className="md:col-span-2">
+            <ScheduleViewer doctorId={formData.doctorId} token={localStorage.getItem('token')} />
           </div>
         )}
 
-        <DatePicker
-          selected={formData.appointmentDate ? new Date(formData.appointmentDate) : null}
-          onChange={(date) =>
-            setFormData((prev) => ({
-              ...prev,
-              appointmentDate: date ? date.toISOString() : '',
-            }))
-          }
-          showTimeSelect
-          timeIntervals={30}
-          dateFormat="Pp"
-          placeholderText="Select appointment date and time"
-          className="border p-3 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-          disabled={!formData.doctorId}
-          wrapperClassName="w-full"
-        />
+        <div className="md:col-span-2">
+          <DatePicker
+            selected={formData.appointmentDate ? new Date(formData.appointmentDate) : null}
+            onChange={(date) =>
+              setFormData((prev) => ({ ...prev, appointmentDate: date.toISOString() }))
+            }
+            showTimeSelect
+            timeIntervals={30}
+            dateFormat="Pp"
+            placeholderText="Select appointment date and time"
+            className="border p-2 rounded-md w-full"
+            disabled={!formData.doctorId}
+          />
+        </div>
 
         <input
           type="text"
@@ -229,7 +210,7 @@ const AppointmentList = () => {
           value={formData.reason}
           onChange={handleChange}
           placeholder="Reason for appointment"
-          className="border p-3 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="border p-2 rounded-md w-full"
           required
         />
 
@@ -238,18 +219,13 @@ const AppointmentList = () => {
           value={formData.notes}
           onChange={handleChange}
           placeholder="Notes"
-          className="border p-3 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-          rows={3}
+          className="border p-2 rounded-md w-full"
         />
 
-        <div className="flex flex-col sm:flex-row gap-4 justify-end">
-          <button
-            type="submit"
-            className="px-6 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 transition"
-          >
+        <div className="md:col-span-2 flex flex-col sm:flex-row gap-2">
+          <button type="submit" className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
             {editingAppointment ? 'Update' : 'Create'} Appointment
           </button>
-
           {editingAppointment && (
             <button
               type="button"
@@ -264,7 +240,7 @@ const AppointmentList = () => {
                   notes: '',
                 });
               }}
-              className="px-6 py-3 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition"
+              className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600"
             >
               Cancel
             </button>
@@ -272,11 +248,11 @@ const AppointmentList = () => {
         </div>
       </form>
 
-      {appointments.length === 0 ? (
-        <p className="text-center text-gray-500">No appointments</p>
-      ) : (
-        <div className="space-y-4">
-          {appointments.map((appointment) => (
+      <div className="space-y-4">
+        {appointments.length === 0 ? (
+          <p className="text-center text-gray-500">No appointments</p>
+        ) : (
+          appointments.map((appointment) => (
             <Appointment
               key={appointment._id}
               appointment={appointment}
@@ -285,9 +261,9 @@ const AppointmentList = () => {
               onMarkStatus={handleMarkStatus}
               doctors={doctors}
             />
-          ))}
-        </div>
-      )}
+          ))
+        )}
+      </div>
     </div>
   );
 };

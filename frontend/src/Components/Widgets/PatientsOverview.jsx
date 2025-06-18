@@ -28,7 +28,7 @@ const PatientsOverview = () => {
   return (
     <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md">
       <h2 className="text-lg font-semibold text-gray-700 dark:text-white">Patients Overview</h2>
-      <Link to="/admin/dashboard/patients" className="flex items-center text-blue-500 hover:underline mb-2">
+      <Link to="/dashboard/patients" className="flex items-center text-blue-500 hover:underline mb-2">
         <UserGroupIcon className="h-5 w-5 mr-2" />
         <span>Add New Patient</span>
       </Link>

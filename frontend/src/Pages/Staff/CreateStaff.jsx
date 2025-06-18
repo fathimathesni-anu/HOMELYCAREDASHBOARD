@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import axiosInstance from '../../api/axiosInstance'; // Adjust path as needed
+import axiosInstance from '../../api/axiosInstance';
 
 const CreateStaff = () => {
-  const [formData, setFormData] = useState({
+  const emptyForm = {
     userId: '',
     position: '',
     department: '',
@@ -12,25 +12,29 @@ const CreateStaff = () => {
     },
     schedule: [{ day: '', startTime: '', endTime: '' }],
     assignedTasks: [],
-  });
+  };
 
-  const [message, setMessage] = useState('');
+  const [formData, setFormData] = useState(emptyForm);
   const [staffList, setStaffList] = useState([]);
+  const [message, setMessage] = useState('');
   const [searchDept, setSearchDept] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [editingId, setEditingId] = useState(null); // Track which staff is being edited
+
   const itemsPerPage = 5;
 
   useEffect(() => {
-    const fetchStaffList = async () => {
-      try {
-        const response = await axiosInstance.get('/staff');
-        setStaffList(response.data);
-      } catch (error) {
-        console.error('Failed to fetch staff list:', error);
-      }
-    };
     fetchStaffList();
   }, []);
+
+  const fetchStaffList = async () => {
+    try {
+      const res = await axiosInstance.get('/staff');
+      setStaffList(res.data);
+    } catch (err) {
+      console.error('Failed to fetch staff:', err);
+    }
+  };
 
   const handleChange = (e, field, index = null) => {
     const { name, value } = e.target;
@@ -65,17 +69,37 @@ const CreateStaff = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axiosInstance.post('/staff/create', formData);
-      setMessage('Staff member created successfully!');
-      const response = await axiosInstance.get('/staff');
-      setStaffList(response.data);
-    } catch (error) {
-      setMessage(error.response?.data?.message || 'Failed to create staff');
+      if (editingId) {
+        await axiosInstance.put(`/staff/update/${editingId}`, formData);
+        setMessage('Staff updated successfully!');
+      } else {
+        await axiosInstance.post('/staff/create', formData);
+        setMessage('Staff created successfully!');
+      }
+
+      fetchStaffList();
+      resetForm();
+    } catch (err) {
+      setMessage(err.response?.data?.message || 'Submission failed');
     }
   };
 
+  const handleEdit = (staff) => {
+    setFormData({
+      userId: staff.userId?._id || staff.userId || '',
+      position: staff.position || '',
+      department: staff.department || '',
+      contactInfo: staff.contactInfo || { phone: '', email: '' },
+      schedule: staff.schedule.length ? staff.schedule : [{ day: '', startTime: '', endTime: '' }],
+      assignedTasks: staff.assignedTasks || [],
+    });
+    setEditingId(staff._id);
+    setMessage('');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this staff member?')) return;
+    if (!window.confirm('Delete this staff member?')) return;
     try {
       await axiosInstance.delete(`/staff/delete/${id}`);
       setStaffList((prev) => prev.filter((s) => s._id !== id));
@@ -85,56 +109,66 @@ const CreateStaff = () => {
     }
   };
 
+  const resetForm = () => {
+    setFormData(emptyForm);
+    setEditingId(null);
+  };
+
   const filteredStaff = staffList.filter((staff) =>
     staff.department?.toLowerCase().includes(searchDept.toLowerCase())
   );
 
   const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentStaff = filteredStaff.slice(indexOfFirstItem, indexOfLastItem);
+  const currentStaff = filteredStaff.slice(indexOfLastItem - itemsPerPage, indexOfLastItem);
   const totalPages = Math.ceil(filteredStaff.length / itemsPerPage);
 
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-white shadow-md rounded-xl">
-      <h2 className="text-2xl font-bold mb-6 text-center">Create Staff Member</h2>
-      {message && <div className="mb-4 text-red-500 text-center">{message}</div>}
+    <div className="max-w-7xl mx-auto p-4 sm:p-6 bg-white shadow-lg rounded-xl mt-6">
+      <h2 className="text-2xl sm:text-3xl font-bold mb-6 text-blue-700">
+        {editingId ? 'Update Staff Member' : 'Create Staff Member'}
+      </h2>
 
-      <form onSubmit={handleSubmit} className="space-y-5">
-        <input
-          type="text"
-          name="userId"
-          placeholder="User ID"
-          value={formData.userId}
-          onChange={handleChange}
-          className="w-full border p-3 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          required
-        />
-        <input
-          type="text"
-          name="position"
-          placeholder="Position"
-          value={formData.position}
-          onChange={handleChange}
-          className="w-full border p-3 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          required
-        />
+      {message && <div className="mb-4 text-green-600">{message}</div>}
+
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="grid sm:grid-cols-2 gap-4">
+          <input
+            type="text"
+            name="userId"
+            placeholder="User ID"
+            value={formData.userId}
+            onChange={handleChange}
+            className="border p-3 rounded w-full"
+            required
+          />
+          <input
+            type="text"
+            name="position"
+            placeholder="Position"
+            value={formData.position}
+            onChange={handleChange}
+            className="border p-3 rounded w-full"
+            required
+          />
+        </div>
+
         <input
           type="text"
           name="department"
           placeholder="Department"
           value={formData.department}
           onChange={handleChange}
-          className="w-full border p-3 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full border p-3 rounded"
         />
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid sm:grid-cols-2 gap-4">
           <input
             type="text"
             name="phone"
             placeholder="Phone"
             value={formData.contactInfo.phone}
             onChange={(e) => handleChange(e, 'contactInfo')}
-            className="border p-3 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="border p-3 rounded"
           />
           <input
             type="email"
@@ -142,24 +176,21 @@ const CreateStaff = () => {
             placeholder="Email"
             value={formData.contactInfo.email}
             onChange={(e) => handleChange(e, 'contactInfo')}
-            className="border p-3 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="border p-3 rounded"
           />
         </div>
 
         <div>
-          <h3 className="font-semibold mb-3">Schedule</h3>
+          <h3 className="font-semibold mb-2">Schedule</h3>
           {formData.schedule.map((slot, index) => (
-            <div
-              key={index}
-              className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-3"
-            >
+            <div key={index} className="grid sm:grid-cols-3 gap-2 mb-2">
               <input
                 type="text"
                 name="day"
                 placeholder="Day"
                 value={slot.day}
                 onChange={(e) => handleChange(e, 'schedule', index)}
-                className="border p-3 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="border p-2 rounded"
               />
               <input
                 type="text"
@@ -167,7 +198,7 @@ const CreateStaff = () => {
                 placeholder="Start Time"
                 value={slot.startTime}
                 onChange={(e) => handleChange(e, 'schedule', index)}
-                className="border p-3 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="border p-2 rounded"
               />
               <input
                 type="text"
@@ -175,35 +206,46 @@ const CreateStaff = () => {
                 placeholder="End Time"
                 value={slot.endTime}
                 onChange={(e) => handleChange(e, 'schedule', index)}
-                className="border p-3 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="border p-2 rounded"
               />
             </div>
           ))}
           <button
             type="button"
             onClick={handleAddSchedule}
-            className="text-blue-600 hover:underline"
+            className="text-blue-600 font-medium hover:underline mt-2"
           >
             + Add Schedule Slot
           </button>
         </div>
 
-        <button
-          type="submit"
-          className="w-full bg-blue-600 text-white py-3 rounded hover:bg-blue-700 transition"
-        >
-          Create Staff
-        </button>
+        <div className="flex gap-3">
+          <button
+            type="submit"
+            className="bg-blue-600 text-white font-semibold py-3 px-6 rounded hover:bg-blue-700 transition"
+          >
+            {editingId ? 'Update Staff' : 'Create Staff'}
+          </button>
+          {editingId && (
+            <button
+              type="button"
+              onClick={resetForm}
+              className="bg-gray-300 text-gray-800 font-semibold py-3 px-6 rounded hover:bg-gray-400 transition"
+            >
+              Cancel
+            </button>
+          )}
+        </div>
       </form>
 
-      {/* Staff List Section */}
+      {/* Staff List */}
       <div className="mt-10">
-        <div className="flex flex-col sm:flex-row justify-between items-center mb-4 gap-3">
-          <h3 className="text-xl font-semibold">Staff List</h3>
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+          <h3 className="text-xl font-semibold text-gray-800">Staff List</h3>
           <input
             type="text"
             placeholder="Filter by department"
-            className="border p-3 rounded w-full sm:w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="border p-2 rounded w-full sm:w-64"
             value={searchDept}
             onChange={(e) => {
               setSearchDept(e.target.value);
@@ -213,41 +255,43 @@ const CreateStaff = () => {
         </div>
 
         {currentStaff.length === 0 ? (
-          <p className="text-center text-gray-500 py-6">No staff found.</p>
+          <p className="text-gray-500">No staff found.</p>
         ) : (
-          <div className="overflow-auto max-h-[400px] border rounded">
+          <div className="overflow-x-auto border rounded">
             <table className="min-w-full text-sm table-auto">
-              <thead className="bg-gray-100 sticky top-0 z-10">
+              <thead className="bg-gray-100 text-left">
                 <tr>
-                  <th className="px-4 py-3 text-left">Name</th>
-                  <th className="px-4 py-3 text-left">Position</th>
-                  <th className="px-4 py-3 text-left">Department</th>
-                  <th className="px-4 py-3 text-left">Phone</th>
-                  <th className="px-4 py-3 text-left">Email</th>
-                  <th className="px-4 py-3 text-left">Actions</th>
+                  <th className="px-4 py-2">Name</th>
+                  <th className="px-4 py-2">Position</th>
+                  <th className="px-4 py-2">Department</th>
+                  <th className="px-4 py-2">Phone</th>
+                  <th className="px-4 py-2">Email</th>
+                  <th className="px-4 py-2">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {currentStaff.map((staff) => (
-                  <tr key={staff._id} className="border-t even:bg-gray-50">
+                  <tr key={staff._id} className="border-t">
                     <td className="px-4 py-2">{staff.userId?.name || 'N/A'}</td>
                     <td className="px-4 py-2">{staff.position}</td>
                     <td className="px-4 py-2">{staff.department}</td>
                     <td className="px-4 py-2">{staff.contactInfo?.phone}</td>
                     <td className="px-4 py-2">{staff.contactInfo?.email}</td>
-                    <td className="px-4 py-2 space-x-3 whitespace-nowrap">
-                      <button
-                        className="text-blue-600 hover:underline"
-                        onClick={() => alert('Edit feature coming soon')}
-                      >
-                        Edit
-                      </button>
-                      <button
-                        className="text-red-600 hover:underline"
-                        onClick={() => handleDelete(staff._id)}
-                      >
-                        Delete
-                      </button>
+                    <td className="px-4 py-2">
+                      <div className="space-x-2">
+                        <button
+                          className="text-blue-600 hover:underline"
+                          onClick={() => handleEdit(staff)}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          className="text-red-600 hover:underline"
+                          onClick={() => handleDelete(staff._id)}
+                        >
+                          Delete
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -256,12 +300,12 @@ const CreateStaff = () => {
           </div>
         )}
 
-        <div className="flex justify-center mt-6 space-x-2 flex-wrap">
+        <div className="flex flex-wrap justify-center mt-6 gap-2">
           {Array.from({ length: totalPages }, (_, i) => (
             <button
               key={i}
               onClick={() => setCurrentPage(i + 1)}
-              className={`px-4 py-2 rounded transition ${
+              className={`px-4 py-1 rounded-full border transition ${
                 currentPage === i + 1
                   ? 'bg-blue-600 text-white'
                   : 'bg-gray-200 hover:bg-gray-300'

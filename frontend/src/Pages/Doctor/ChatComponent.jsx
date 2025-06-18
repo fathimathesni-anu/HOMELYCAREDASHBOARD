@@ -3,12 +3,19 @@ import axiosInstance from '../../api/axiosInstance';
 
 const ChatComponent = () => {
   const [chats, setChats] = useState([]);
+  const [users, setUsers] = useState([]);
   const [receiverId, setReceiverId] = useState('');
-  const [receiverModel, setReceiverModel] = useState('User'); // New field
+  const [receiverModel, setReceiverModel] = useState('User');
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const [editId, setEditId] = useState(null);
   const [editMessage, setEditMessage] = useState('');
+
+  // Fetch chats and users on load
+  useEffect(() => {
+    fetchChats();
+    fetchUsers();
+  }, []);
 
   const fetchChats = async () => {
     try {
@@ -22,8 +29,19 @@ const ChatComponent = () => {
     }
   };
 
+  const fetchUsers = async () => {
+    try {
+      const res = await axiosInstance.get('/userole/users'); // Adjust endpoint if needed
+      setUsers(res.data);
+    } catch (error) {
+      console.error('Error fetching users:', error.response?.data || error.message);
+    }
+  };
+
   const sendMessage = async () => {
-    if (!receiverId || !message || !receiverModel) return alert('All fields are required');
+    if (!receiverId || !message || !receiverModel) {
+      return alert('All fields are required');
+    }
 
     try {
       const res = await axiosInstance.post('/chat', {
@@ -60,23 +78,27 @@ const ChatComponent = () => {
     }
   };
 
-  useEffect(() => {
-    fetchChats();
-  }, []);
-
   return (
     <div className="p-4 sm:p-6 max-w-4xl mx-auto bg-white shadow-md rounded-xl mt-6">
       <h2 className="text-2xl sm:text-3xl font-bold text-center mb-6 text-blue-700">💬 Chat Box</h2>
 
       {/* Message Form */}
       <div className="mb-6 space-y-4">
-        <input
-          type="text"
-          placeholder="Receiver User ID"
+        {/* Receiver Dropdown */}
+        <select
           value={receiverId}
           onChange={(e) => setReceiverId(e.target.value)}
           className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-        />
+        >
+          <option value="">Select Receiver</option>
+          {users.map(user => (
+            <option key={user._id} value={user._id}>
+              {user.name || user.username || user.email}
+            </option>
+          ))}
+        </select>
+
+        {/* Receiver Model Dropdown */}
         <select
           value={receiverModel}
           onChange={(e) => setReceiverModel(e.target.value)}
@@ -85,6 +107,8 @@ const ChatComponent = () => {
           <option value="User">User</option>
           <option value="Userole">Doctor/Admin/Staff</option>
         </select>
+
+        {/* Message Input */}
         <textarea
           rows="4"
           placeholder="Type your message..."
@@ -92,6 +116,7 @@ const ChatComponent = () => {
           onChange={(e) => setMessage(e.target.value)}
           className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"
         />
+
         <button
           onClick={sendMessage}
           className="w-full bg-blue-600 text-white font-semibold py-2 rounded-lg hover:bg-blue-700 transition"

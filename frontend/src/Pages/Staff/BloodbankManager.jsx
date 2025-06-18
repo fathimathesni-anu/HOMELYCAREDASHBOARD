@@ -8,6 +8,9 @@ const BloodBankManager = () => {
   });
 
   const [bloodBankEntries, setBloodBankEntries] = useState([]);
+  const [editingId, setEditingId] = useState(null);
+  const [editFormData, setEditFormData] = useState({ bloodGroup: '', availableUnits: '' });
+
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
 
@@ -60,23 +63,58 @@ const BloodBankManager = () => {
     }
   };
 
+  // Edit handlers
+  const handleEditClick = (entry) => {
+    setEditingId(entry._id);
+    setEditFormData({
+      bloodGroup: entry.bloodGroup,
+      availableUnits: entry.availableUnits,
+    });
+    setError('');
+    setMessage('');
+  };
+
+  const handleEditChange = (e) => {
+    const { name, value } = e.target;
+    setEditFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleEditCancel = () => {
+    setEditingId(null);
+    setEditFormData({ bloodGroup: '', availableUnits: '' });
+  };
+
+  const handleEditSave = async (id) => {
+    setError('');
+    setMessage('');
+    try {
+      await axiosInstance.put(`/bloodbank/update/${id}`, editFormData);
+      setMessage('Entry updated successfully!');
+      setEditingId(null);
+      setEditFormData({ bloodGroup: '', availableUnits: '' });
+      fetchBloodBankEntries();
+    } catch (err) {
+      setError(err.response?.data?.message || 'Error updating entry');
+    }
+  };
+
   return (
-    <div className="max-w-3xl mx-auto p-4">
+    <div className="max-w-4xl mx-auto px-4 py-6">
       <h2 className="text-2xl font-bold mb-4 text-center">Blood Bank Management</h2>
 
-      {message && <div className="text-green-600 mb-4 text-center">{message}</div>}
-      {error && <div className="text-red-600 mb-4 text-center">{error}</div>}
+      {message && <div className="text-green-600 mb-2 text-sm">{message}</div>}
+      {error && <div className="text-red-600 mb-2 text-sm">{error}</div>}
 
-      <form onSubmit={handleSubmit} className="mb-8 space-y-6 bg-white p-6 rounded-lg shadow-md">
-        <div className="flex flex-col sm:flex-row sm:space-x-4 gap-4">
+      <form onSubmit={handleSubmit} className="mb-6 space-y-4 bg-white p-4 rounded shadow-sm">
+        <div className="flex flex-col sm:flex-row sm:space-x-4">
           <div className="flex-1">
-            <label className="block mb-1 font-medium">Blood Group</label>
+            <label className="block text-sm mb-1 font-medium">Blood Group</label>
             <select
               name="bloodGroup"
               value={formData.bloodGroup}
               onChange={handleChange}
               required
-              className="w-full border p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border p-2 rounded text-sm"
             >
               <option value="">Select Blood Group</option>
               {bloodGroups.map(bg => (
@@ -84,9 +122,8 @@ const BloodBankManager = () => {
               ))}
             </select>
           </div>
-
-          <div className="flex-1">
-            <label className="block mb-1 font-medium">Available Units</label>
+          <div className="flex-1 mt-4 sm:mt-0">
+            <label className="block text-sm mb-1 font-medium">Available Units</label>
             <input
               type="number"
               name="availableUnits"
@@ -94,11 +131,10 @@ const BloodBankManager = () => {
               onChange={handleChange}
               required
               min="0"
-              className="w-full border p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border p-2 rounded text-sm"
             />
           </div>
         </div>
-
         <div className="text-center">
           <button
             type="submit"
@@ -109,43 +145,88 @@ const BloodBankManager = () => {
         </div>
       </form>
 
-      <h3 className="text-xl font-semibold mb-3 text-center">Current Inventory</h3>
+      <h3 className="text-xl font-semibold mb-3">Current Inventory</h3>
 
-      {/* Responsive table wrapper */}
-      <div className="overflow-x-auto">
-        <table className="w-full border table-auto min-w-[600px] sm:min-w-full">
-          <thead>
-            <tr className="bg-gray-200 text-center">
+      <div className="overflow-x-auto bg-white rounded shadow-sm">
+        <table className="w-full table-auto text-sm text-left">
+          <thead className="bg-gray-100 text-gray-700">
+            <tr>
               <th className="p-3 border">Blood Group</th>
               <th className="p-3 border">Units</th>
               <th className="p-3 border">Last Updated</th>
-              <th className="p-3 border">Actions</th>
+              <th className="p-3 border text-center">Actions</th>
             </tr>
           </thead>
           <tbody>
-            {Array.isArray(bloodBankEntries) && bloodBankEntries.length > 0 ? (
+            {bloodBankEntries.length > 0 ? (
               bloodBankEntries.map(entry => (
-                <tr key={entry._id} className="text-center hover:bg-gray-50">
-                  <td className="border p-3">{entry.bloodGroup}</td>
-                  <td className="border p-3">{entry.availableUnits}</td>
-                  <td className="border p-3 whitespace-nowrap">
-                    {new Date(entry.lastUpdated).toLocaleString()}
-                  </td>
-                  <td className="border p-3">
-                    <button
-                      onClick={() => handleDelete(entry._id)}
-                      className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition"
-                    >
-                      Delete
-                    </button>
-                  </td>
+                <tr key={entry._id} className="hover:bg-gray-50">
+                  {editingId === entry._id ? (
+                    <>
+                      <td className="p-3 border">
+                        <select
+                          name="bloodGroup"
+                          value={editFormData.bloodGroup}
+                          onChange={handleEditChange}
+                          className="w-full border p-1 rounded text-sm"
+                        >
+                          {bloodGroups.map(bg => (
+                            <option key={bg} value={bg}>{bg}</option>
+                          ))}
+                        </select>
+                      </td>
+                      <td className="p-3 border">
+                        <input
+                          type="number"
+                          name="availableUnits"
+                          value={editFormData.availableUnits}
+                          onChange={handleEditChange}
+                          min="0"
+                          className="w-full border p-1 rounded text-sm"
+                        />
+                      </td>
+                      <td className="p-3 border">{new Date(entry.lastUpdated).toLocaleString()}</td>
+                      <td className="p-3 border text-center space-x-2">
+                        <button
+                          onClick={() => handleEditSave(entry._id)}
+                          className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 text-xs"
+                        >
+                          Save
+                        </button>
+                        <button
+                          onClick={handleEditCancel}
+                          className="bg-gray-300 text-gray-800 px-3 py-1 rounded hover:bg-gray-400 text-xs"
+                        >
+                          Cancel
+                        </button>
+                      </td>
+                    </>
+                  ) : (
+                    <>
+                      <td className="p-3 border">{entry.bloodGroup}</td>
+                      <td className="p-3 border">{entry.availableUnits}</td>
+                      <td className="p-3 border">{new Date(entry.lastUpdated).toLocaleString()}</td>
+                      <td className="p-3 border text-center space-x-2">
+                        <button
+                          onClick={() => handleEditClick(entry)}
+                          className="bg-yellow-400 text-white px-3 py-1 rounded hover:bg-yellow-500 text-xs"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDelete(entry._id)}
+                          className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 text-xs"
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </>
+                  )}
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan="4" className="p-4 text-gray-500 text-center">
-                  No entries found.
-                </td>
+                <td colSpan="4" className="p-4 text-center text-gray-500">No entries found.</td>
               </tr>
             )}
           </tbody>

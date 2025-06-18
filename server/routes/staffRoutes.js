@@ -1,4 +1,4 @@
-// routes/staffRoutes.js
+/* // routes/staffRoutes.js
 import express from 'express';
 const router = express.Router();
 
@@ -31,6 +31,30 @@ router.put('/update/:id', useroleAuth, authorizeRoles('admin', 'staff','doctor')
 // Delete staff member (admin only)
 router.delete('/delete/:id', useroleAuth, authorizeRoles('admin','staff','doctor'), deleteStaff);
 
+
+export { router as staffRouter }; */
+
+
+import express from 'express';
+const router = express.Router();
+
+import {
+  createStaff,
+  getAllStaff,
+  getStaffById,
+  updateStaff,
+  deleteStaff,
+  countStaff
+} from '../controllers/staffController.js';
+
+import { useroleAuth, authorizeRoles } from '../middleware/useroleAuth.js';
+
+router.post('/create', useroleAuth, authorizeRoles('admin','staff','doctor'), createStaff);
+router.get('/', useroleAuth, getAllStaff);
+router.get('/count', useroleAuth, authorizeRoles('admin','staff','doctor'), countStaff);
+router.get('/:id', useroleAuth, getStaffById);
+router.put('/update/:id', useroleAuth, authorizeRoles('admin', 'staff','doctor'), updateStaff);
+router.delete('/delete/:id', useroleAuth, authorizeRoles('admin','staff','doctor'), deleteStaff);
 
 export { router as staffRouter };
 

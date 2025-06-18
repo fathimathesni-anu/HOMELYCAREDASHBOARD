@@ -1,5 +1,5 @@
 import express from "express";
-import { useroleSignup, useroleLogin,useroleProfile,useroleLogout } from "../controllers/userolecontrollers.js";
+import { useroleSignup, useroleLogin,useroleProfile,useroleLogout ,getAllUsers} from "../controllers/userolecontrollers.js";
 import { useroleAuth } from "../middleware/useroleAuth.js";
 import { authorizeRoles } from "../middleware/authorizeRole.js";
 import { upload } from "../middleware/upload.js";
@@ -13,6 +13,9 @@ router.post("/signup", useroleSignup);
 router.put("/login", useroleLogin);
 router.get("/profile",useroleAuth,useroleProfile);
 router.get("/logout",useroleAuth,useroleLogout);
+// Example route in routes/useroleRoutes.js
+router.get('/users', useroleAuth, authorizeRoles('admin', 'staff','doctor'), getAllUsers);
+
 
 // Protected: Only admin can access
 router.get(

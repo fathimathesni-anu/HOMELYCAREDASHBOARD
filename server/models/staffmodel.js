@@ -1,4 +1,4 @@
-import mongoose, { Schema } from 'mongoose';
+/* import mongoose, { Schema } from 'mongoose';
 
 // Optional: Define a separate Schedule schema if it's reused
 const scheduleSchema = new Schema({
@@ -16,6 +16,39 @@ const staffSchema = new Schema(
     contactInfo: {
       phone: { type: String },
       email: { type: String },
+    },
+    schedule: [scheduleSchema],
+    assignedTasks: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Task' }],
+  },
+  {
+    timestamps: true,
+  }
+);
+
+export const Staff = mongoose.model('Staff', staffSchema); */
+
+
+import mongoose, { Schema } from 'mongoose';
+
+const scheduleSchema = new Schema({
+  day: { type: String },
+  startTime: { type: String },
+  endTime: { type: String },
+});
+
+const staffSchema = new Schema(
+  {
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'Userole', required: true },
+    position: { type: String, required: true },
+    department: { type: String },
+    contactInfo: {
+      phone: { type: String },
+      email: { type: String },
+    },
+    availability: {
+      type: String,
+      enum: ['Active', 'Inactive'],
+      default: 'Inactive',
     },
     schedule: [scheduleSchema],
     assignedTasks: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Task' }],

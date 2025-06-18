@@ -4,7 +4,7 @@ import { genarateToken } from "../utils/token.js";
 const NODE_ENV = process.env.NODE_ENV || "development";
 
 
-export const uploadProfilePic = async (req, res) => {
+/* export const uploadProfilePic = async (req, res) => {
   try {
     const userId = req.user.id;
     const profilePicUrl = `/uploads/profilePics/${req.file.filename}`;
@@ -19,7 +19,35 @@ export const uploadProfilePic = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: "Upload failed", error: error.message });
   }
+}; */
+
+export const uploadProfilePic = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    if (!req.file || !req.file.path) {
+      return res.status(400).json({ message: "No image uploaded" });
+    }
+
+    const user = await Userole.findByIdAndUpdate(
+      userId,
+      { profilepic: req.file.path }, // path is Cloudinary URL
+      { new: true }
+    );
+
+    return res.json({
+      success: true,
+      message: "Profile picture updated",
+      profilePic: user.profilepic,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Failed to upload profile picture",
+      error: error.message,
+    });
+  }
 };
+
 
 export const useroleSignup = async (req, res, next) => {
   try {
@@ -157,5 +185,15 @@ export const useroleLogout = async (req, res, next) => {
     return res.status(error.statusCode || 500).json({
       message: error.message || "Internal server error"
     });
+  }
+};
+
+// controllers/useroleController.js
+export const getAllUsers = async (req, res) => {
+  try {
+    const users = await Userole.find({ role: 'doctor' }); // Filter if needed
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(400).json({ message: 'Error fetching users', error });
   }
 };

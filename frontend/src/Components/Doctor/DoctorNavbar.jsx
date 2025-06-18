@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import {
   MoonIcon,
   SunIcon,
   ChevronDownIcon,
   Bars3Icon,
-} from '@heroicons/react/24/outline';
-import { useNavigate } from 'react-router-dom';
-import axiosInstance from '../../api/axiosInstance';
+} from "@heroicons/react/24/outline";
+import { useNavigate } from "react-router-dom";
+import axiosinstance from "../../api/axiosInstance";
 
 export default function DoctorNavbar({ toggleSidebar }) {
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -22,15 +22,16 @@ export default function DoctorNavbar({ toggleSidebar }) {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const res = await axiosInstance.get('/userole/profile', {
+        const token = localStorage.getItem("token");
+        const res = await axiosinstance.get("/userole/profile", {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
+            Authorization: `Bearer ${token}`,
           },
         });
         setDoctor(res.data.data);
-        setProfilePic(res.data.data.profilePic);
+        setProfilePic(res.data.data.profilepic); // Cloudinary or direct URL
       } catch (err) {
-        console.error('Failed to fetch profile:', err);
+        console.error("Failed to fetch doctor profile", err);
       }
     };
     fetchProfile();
@@ -39,12 +40,12 @@ export default function DoctorNavbar({ toggleSidebar }) {
   const toggleTheme = () => {
     const newMode = !isDarkMode;
     setIsDarkMode(newMode);
-    document.documentElement.classList.toggle('dark', newMode);
+    document.documentElement.classList.toggle("dark", newMode);
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    navigate('/');
+    localStorage.removeItem("token");
+    navigate("/");
   };
 
   const handleFileChange = (e) => {
@@ -56,31 +57,42 @@ export default function DoctorNavbar({ toggleSidebar }) {
 
   const handleUpload = async () => {
     if (!file) return;
+
     const formData = new FormData();
-    formData.append('profilePic', file);
+    formData.append("profilePic", file);
 
     try {
       setUploading(true);
-      const res = await axiosInstance.post('/doctor/upload-profile-pic', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-      });
+      const res = await axiosinstance.post(
+        "/doctor/upload-profile-pic",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
       setProfilePic(res.data.profilePic);
       setFile(null);
       setPreview(null);
       setDropdownOpen(false);
     } catch (err) {
-      console.error('Upload failed:', err);
+      console.error("Upload failed", err);
     } finally {
       setUploading(false);
     }
   };
 
+  const displayedImage =
+    preview ||
+    profilePic ||
+    `https://ui-avatars.com/api/?name=${encodeURIComponent(
+      doctor.name || "Doctor"
+    )}&background=random&size=128`;
+
   return (
     <header className="sticky top-0 z-40 w-full bg-white dark:bg-gray-900 shadow px-4 py-3 flex items-center justify-between md:px-6">
-      {/* Mobile sidebar toggle */}
       <button
         onClick={toggleSidebar}
         className="md:hidden text-gray-600 dark:text-white"
@@ -94,16 +106,18 @@ export default function DoctorNavbar({ toggleSidebar }) {
       </div>
 
       <div className="flex items-center gap-3 relative">
-        {/* Dark mode toggle */}
         <button
           onClick={toggleTheme}
           className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-white"
           aria-label="Toggle dark mode"
         >
-          {isDarkMode ? <SunIcon className="h-5 w-5" /> : <MoonIcon className="h-5 w-5" />}
+          {isDarkMode ? (
+            <SunIcon className="h-5 w-5" />
+          ) : (
+            <MoonIcon className="h-5 w-5" />
+          )}
         </button>
 
-        {/* Profile Dropdown */}
         <div className="relative">
           <button
             onClick={() => setDropdownOpen(!dropdownOpen)}
@@ -112,19 +126,12 @@ export default function DoctorNavbar({ toggleSidebar }) {
             aria-expanded={dropdownOpen}
           >
             <img
-              src={
-                preview ||
-                (profilePic
-                  ? `/doctor/uploads/${profilePic}`
-                  : `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                      doctor.name || 'Doctor'
-                    )}&background=random&size=128`)
-              }
+              src={displayedImage}
               alt="Profile"
               className="h-8 w-8 rounded-full object-cover border"
             />
             <span className="hidden sm:block text-sm font-medium text-gray-700 dark:text-white">
-              {doctor.name || 'Doctor'}
+              {doctor.name || "Doctor"}
             </span>
             <ChevronDownIcon className="h-4 w-4 text-gray-600 dark:text-white" />
           </button>
@@ -138,14 +145,7 @@ export default function DoctorNavbar({ toggleSidebar }) {
               <div className="flex items-center space-x-2">
                 <div className="w-10 h-10 rounded-full overflow-hidden border">
                   <img
-                    src={
-                      preview ||
-                      (profilePic
-                        ? `/doctor/uploads/${profilePic}`
-                        : `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                            doctor.name || 'Doctor'
-                          )}&background=random&size=128`)
-                    }
+                    src={displayedImage}
                     alt="Preview"
                     className="object-cover w-full h-full"
                   />
@@ -163,7 +163,7 @@ export default function DoctorNavbar({ toggleSidebar }) {
                 className="w-full px-3 py-1.5 text-sm text-white bg-blue-600 hover:bg-blue-700 rounded"
                 disabled={uploading}
               >
-                {uploading ? 'Uploading...' : 'Upload'}
+                {uploading ? "Uploading..." : "Upload"}
               </button>
 
               <button
@@ -179,6 +179,9 @@ export default function DoctorNavbar({ toggleSidebar }) {
     </header>
   );
 }
+
+
+
 
 
 

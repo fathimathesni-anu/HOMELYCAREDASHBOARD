@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import {
   MoonIcon,
@@ -30,7 +29,7 @@ export default function AdminNavbar({ toggleSidebar }) {
           },
         });
         setAdmin(res.data.data);
-        setProfilePic(res.data.data.profilePic);
+        setProfilePic(res.data.data.profilepic); // Using Cloudinary URL now
       } catch (err) {
         console.error("Failed to fetch profile:", err);
       }
@@ -65,7 +64,7 @@ export default function AdminNavbar({ toggleSidebar }) {
     try {
       setUploading(true);
       const res = await axiosinstance.post(
-        "/admin/upload-profile-pic",
+        "/userole/upload-profile-pic", // Updated path to match backend
         formData,
         {
           headers: {
@@ -74,6 +73,7 @@ export default function AdminNavbar({ toggleSidebar }) {
           },
         }
       );
+
       setProfilePic(res.data.profilePic);
       setFile(null);
       setPreview(null);
@@ -85,9 +85,10 @@ export default function AdminNavbar({ toggleSidebar }) {
     }
   };
 
+  const displayedImage = preview || profilePic || `https://ui-avatars.com/api/?name=${encodeURIComponent(admin.name || "Admin")}&background=random&size=128`;
+
   return (
     <header className="sticky top-0 z-40 w-full bg-white dark:bg-gray-900 shadow px-4 py-3 flex items-center justify-between md:px-6">
-      {/* Mobile sidebar toggle */}
       <button
         onClick={toggleSidebar}
         className="md:hidden text-gray-600 dark:text-white"
@@ -101,20 +102,14 @@ export default function AdminNavbar({ toggleSidebar }) {
       </div>
 
       <div className="flex items-center gap-3 relative">
-        {/* Dark mode toggle */}
         <button
           onClick={toggleTheme}
           className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-white"
           aria-label="Toggle dark mode"
         >
-          {isDarkMode ? (
-            <SunIcon className="h-5 w-5" />
-          ) : (
-            <MoonIcon className="h-5 w-5" />
-          )}
+          {isDarkMode ? <SunIcon className="h-5 w-5" /> : <MoonIcon className="h-5 w-5" />}
         </button>
 
-        {/* Profile Dropdown */}
         <div className="relative">
           <button
             onClick={() => setDropdownOpen(!dropdownOpen)}
@@ -123,14 +118,7 @@ export default function AdminNavbar({ toggleSidebar }) {
             aria-expanded={dropdownOpen}
           >
             <img
-              src={
-                preview ||
-                (profilePic
-                  ? `/admin/uploads/${profilePic}`
-                  : `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                      admin.name || "Admin"
-                    )}&background=random&size=128`)
-              }
+              src={displayedImage}
               alt="Profile"
               className="h-8 w-8 rounded-full object-cover border"
             />
@@ -149,14 +137,7 @@ export default function AdminNavbar({ toggleSidebar }) {
               <div className="flex items-center space-x-2">
                 <div className="w-10 h-10 rounded-full overflow-hidden border">
                   <img
-                    src={
-                      preview ||
-                      (profilePic
-                        ? `/admin/uploads/${profilePic}`
-                        : `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                            admin.name || "Admin"
-                          )}&background=random&size=128`)
-                    }
+                    src={displayedImage}
                     alt="Preview"
                     className="object-cover w-full h-full"
                   />
@@ -190,6 +171,7 @@ export default function AdminNavbar({ toggleSidebar }) {
     </header>
   );
 }
+
 
 
 

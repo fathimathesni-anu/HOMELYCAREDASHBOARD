@@ -61,25 +61,24 @@ const FeedbackComponent = () => {
   }, []);
 
   return (
-    <div className="max-w-3xl mx-auto p-4 sm:p-6">
-      <h2 className="text-2xl sm:text-3xl font-bold mb-6 text-center text-blue-700">
+    <div className="max-w-3xl mx-auto p-4 md:p-8">
+      <h2 className="text-2xl md:text-3xl font-bold mb-6 text-center md:text-left">
         {editingFeedbackId ? 'Edit' : 'Submit'} Feedback
       </h2>
+
       <form onSubmit={handleSubmit} className="space-y-4 mb-8">
         <textarea
-          className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"
+          className="w-full p-3 border border-gray-300 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+          rows={4}
           placeholder="Write your feedback..."
           value={newFeedback.feedbackText}
           onChange={e => setNewFeedback({ ...newFeedback, feedbackText: e.target.value })}
-          rows={4}
           required
-          aria-label="Feedback Text"
         />
         <select
-          className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+          className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
           value={newFeedback.rating}
-          onChange={e => setNewFeedback({ ...newFeedback, rating: parseInt(e.target.value, 10) })}
-          aria-label="Rating"
+          onChange={e => setNewFeedback({ ...newFeedback, rating: parseInt(e.target.value) })}
         >
           {[1, 2, 3, 4, 5].map(n => (
             <option key={n} value={n}>
@@ -89,45 +88,47 @@ const FeedbackComponent = () => {
         </select>
         <button
           type="submit"
-          className="w-full bg-blue-600 text-white font-semibold py-3 rounded-lg hover:bg-blue-700 transition"
-          aria-label={editingFeedbackId ? 'Update Feedback' : 'Submit Feedback'}
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-md transition"
         >
           {editingFeedbackId ? 'Update Feedback' : 'Submit Feedback'}
         </button>
       </form>
 
-      <h3 className="text-xl sm:text-2xl font-semibold mb-4 text-center">All Feedback</h3>
+      <h3 className="text-xl md:text-2xl font-semibold mb-4">All Feedback</h3>
       <div className="space-y-6">
-        {feedbacks.map(fb => (
-          <div
-            key={fb._id}
-            className="border border-gray-300 p-4 rounded-lg bg-gray-50 shadow-sm flex flex-col sm:flex-row sm:justify-between sm:items-center"
-          >
-            <div className="mb-3 sm:mb-0 sm:flex-1">
-              <p className="mb-2 text-gray-800 whitespace-pre-wrap">{fb.feedbackText}</p>
-              <p className="text-sm text-gray-600 font-medium">Rating: {fb.rating} ⭐</p>
-              <p className="text-xs text-gray-400 mt-1">
-                By: {fb.userId?.name || 'Unknown'} on {new Date(fb.createdAt).toLocaleDateString()}
+        {feedbacks.length === 0 ? (
+          <p className="text-center text-gray-500">No feedback yet.</p>
+        ) : (
+          feedbacks.map(fb => (
+            <div
+              key={fb._id}
+              className="border border-gray-300 rounded-lg bg-gray-50 p-5 shadow-sm"
+            >
+              <p className="mb-3 text-gray-800 whitespace-pre-wrap">{fb.feedbackText}</p>
+              <p className="text-sm font-medium text-yellow-600">
+                Rating: {fb.rating} ⭐
               </p>
+              <p className="text-xs text-gray-500 mt-1">
+                By: {fb.patientId?.name || 'Unknown'} on{' '}
+                {new Date(fb.createdAt).toLocaleDateString()}
+              </p>
+              <div className="flex space-x-4 mt-4 text-sm">
+                <button
+                  onClick={() => handleEdit(fb)}
+                  className="text-blue-600 hover:underline focus:outline-none focus:ring-2 focus:ring-blue-400 rounded"
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={() => handleDelete(fb._id)}
+                  className="text-red-600 hover:underline focus:outline-none focus:ring-2 focus:ring-red-400 rounded"
+                >
+                  Delete
+                </button>
+              </div>
             </div>
-            <div className="flex space-x-4 sm:flex-col sm:space-x-0 sm:space-y-2">
-              <button
-                onClick={() => handleEdit(fb)}
-                className="text-blue-600 hover:underline text-sm font-semibold"
-                aria-label="Edit Feedback"
-              >
-                Edit
-              </button>
-              <button
-                onClick={() => handleDelete(fb._id)}
-                className="text-red-600 hover:underline text-sm font-semibold"
-                aria-label="Delete Feedback"
-              >
-                Delete
-              </button>
-            </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
     </div>
   );

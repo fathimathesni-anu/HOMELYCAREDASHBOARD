@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import axiosInstance from '../../api/axiosInstance'; // Make sure this includes auth headers if required
+import React, { useState, useEffect } from 'react'; 
+import axiosInstance from '../../api/axiosInstance';
 
 const DoctorForm = () => {
   const [doctors, setDoctors] = useState([]);
+  const [users, setUsers] = useState([]);
   const [formData, setFormData] = useState({
     userId: '',
     specialization: '',
@@ -15,6 +16,7 @@ const DoctorForm = () => {
 
   useEffect(() => {
     fetchDoctors();
+    fetchUsers();
   }, []);
 
   const fetchDoctors = async () => {
@@ -24,6 +26,16 @@ const DoctorForm = () => {
     } catch (error) {
       console.error('Failed to fetch doctors', error);
       setError('Failed to load doctors');
+    }
+  };
+
+  const fetchUsers = async () => {
+    try {
+      const res = await axiosInstance.get('/userole/users'); // Should only return doctors
+      setUsers(res.data);
+    } catch (error) {
+      console.error('Failed to fetch users', error);
+      setError('Failed to load users');
     }
   };
 
@@ -42,7 +54,13 @@ const DoctorForm = () => {
       ...formData,
       schedule: [
         ...formData.schedule,
-        { doctorName: '', specialization: '', availableDays: [], startTime: '', endTime: '' },
+        {
+          doctorName: '',
+          specialization: '',
+          availableDays: [],
+          startTime: '',
+          endTime: '',
+        },
       ],
     });
   };
@@ -52,7 +70,7 @@ const DoctorForm = () => {
     setError('');
     try {
       if (!formData.userId || !formData.specialization) {
-        setError('User ID and Specialization are required');
+        setError('User and Specialization are required');
         return;
       }
 
@@ -75,7 +93,7 @@ const DoctorForm = () => {
     setFormData({
       userId: doctor.userId?._id || '',
       specialization: doctor.specialization,
-      schedule: doctor.schedule,
+      schedule: doctor.schedule || [],
     });
     setEditMode(true);
     setEditId(doctor._id);
@@ -97,27 +115,30 @@ const DoctorForm = () => {
   );
 
   return (
-    <div className="max-w-5xl mx-auto p-4 sm:p-6 lg:p-8">
-      <h2 className="text-2xl sm:text-3xl font-bold mb-6 text-center sm:text-left">
-        {editMode ? 'Edit Doctor' : 'Add Doctor'}
-      </h2>
+    <div className="p-4 md:p-8 max-w-5xl mx-auto">
+      <h2 className="text-3xl font-bold mb-6">{editMode ? 'Edit Doctor' : 'Add Doctor'}</h2>
 
       {error && (
-        <div className="bg-red-100 text-red-700 p-3 rounded mb-6 max-w-full text-center sm:text-left">
-          {error}
-        </div>
+        <div className="bg-red-100 text-red-700 px-4 py-2 rounded mb-6">{error}</div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-6 bg-white p-6 rounded shadow-md">
-        <input
-          type="text"
+      <form onSubmit={handleSubmit} className="space-y-6 bg-white p-6 rounded-xl shadow">
+        <select
           name="userId"
-          placeholder="User ID"
           value={formData.userId}
           onChange={handleChange}
           required
-          className="w-full border border-gray-300 rounded p-3 focus:outline-none focus:ring-2 focus:ring-blue-400"
-        />
+          className="w-full border rounded-lg p-3"
+        >
+          <option value="">Select a Doctor User</option>
+          {users
+            .filter((user) => user.role === 'doctor') // Optional frontend safeguard
+            .map((user) => (
+              <option key={user._id} value={user._id}>
+                {user.name || user.email || user.username}
+              </option>
+            ))}
+        </select>
 
         <input
           type="text"
@@ -126,13 +147,13 @@ const DoctorForm = () => {
           value={formData.specialization}
           onChange={handleChange}
           required
-          className="w-full border border-gray-300 rounded p-3 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          className="w-full border rounded-lg p-3"
         />
 
         <button
           type="button"
           onClick={addScheduleField}
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg"
         >
           + Add Schedule
         </button>
@@ -140,96 +161,91 @@ const DoctorForm = () => {
         {formData.schedule.map((sched, index) => (
           <div
             key={index}
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 bg-gray-50 p-4 rounded"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 bg-gray-50 p-4 rounded-xl border"
           >
             <input
               type="text"
               placeholder="Doctor Name"
               value={sched.doctorName}
               onChange={(e) => handleScheduleChange(index, 'doctorName', e.target.value)}
-              className="border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="border rounded-lg p-2"
             />
             <input
               type="text"
               placeholder="Schedule Specialization"
               value={sched.specialization}
               onChange={(e) => handleScheduleChange(index, 'specialization', e.target.value)}
-              className="border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="border rounded-lg p-2"
             />
             <input
               type="text"
               placeholder="Available Days (comma separated)"
               value={sched.availableDays.join(', ')}
               onChange={(e) =>
-                handleScheduleChange(
-                  index,
-                  'availableDays',
-                  e.target.value.split(',').map((day) => day.trim())
-                )
+                handleScheduleChange(index, 'availableDays', e.target.value.split(',').map(day => day.trim()))
               }
-              className="border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="border rounded-lg p-2 col-span-1 md:col-span-2 lg:col-span-3"
             />
-            <div className="flex gap-2">
-              <input
-                type="time"
-                value={sched.startTime}
-                onChange={(e) => handleScheduleChange(index, 'startTime', e.target.value)}
-                className="border border-gray-300 rounded p-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
-              />
-              <input
-                type="time"
-                value={sched.endTime}
-                onChange={(e) => handleScheduleChange(index, 'endTime', e.target.value)}
-                className="border border-gray-300 rounded p-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
-              />
-            </div>
+            <input
+              type="time"
+              value={sched.startTime}
+              onChange={(e) => handleScheduleChange(index, 'startTime', e.target.value)}
+              className="border rounded-lg p-2"
+            />
+            <input
+              type="time"
+              value={sched.endTime}
+              onChange={(e) => handleScheduleChange(index, 'endTime', e.target.value)}
+              className="border rounded-lg p-2"
+            />
           </div>
         ))}
 
         <button
           type="submit"
-          className="bg-green-600 text-white px-6 py-3 rounded text-lg font-semibold hover:bg-green-700 transition"
+          className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg"
         >
-          {editMode ? 'Update' : 'Create'}
+          {editMode ? 'Update Doctor' : 'Create Doctor'}
         </button>
       </form>
 
       <div className="mt-10">
-        <h3 className="text-xl sm:text-2xl font-semibold mb-4 text-center sm:text-left">All Doctors</h3>
+        <h3 className="text-2xl font-semibold mb-4">All Doctors</h3>
         <input
           type="text"
           placeholder="Filter by specialization..."
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
-          className="border border-gray-300 rounded p-3 w-full mb-6 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          className="border rounded-lg p-3 w-full mb-6"
         />
-        <ul className="space-y-4">
+
+        <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2">
           {filteredDoctors.map((doc) => (
-            <li
+            <div
               key={doc._id}
-              className="bg-white p-4 rounded shadow flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
+              className="bg-white p-5 rounded-xl shadow flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4"
             >
               <div>
-                <p className="font-medium text-lg">{doc.specialization}</p>
-                <p className="text-gray-600">{doc.userId?.name || 'No user name'}</p>
+                <p className="text-lg font-semibold">{doc.specialization}</p>
+                <p className="text-sm text-gray-600">{doc.userId?.name || 'No user name'}</p>
               </div>
-              <div className="flex gap-3">
+              <div className="flex gap-2">
                 <button
                   onClick={() => handleEdit(doc)}
-                  className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded transition"
+                  className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg text-sm"
                 >
                   Edit
                 </button>
                 <button
                   onClick={() => handleDelete(doc._id)}
-                  className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded transition"
+                  className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm"
                 >
                   Delete
                 </button>
               </div>
-            </li>
+            </div>
           ))}
-        </ul>
+        </div>
       </div>
     </div>
   );

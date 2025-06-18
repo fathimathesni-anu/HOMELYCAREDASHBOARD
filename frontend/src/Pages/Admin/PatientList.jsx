@@ -9,11 +9,7 @@ const PatientList = () => {
     name: '',
     age: '',
     gender: '',
-    contactInfo: {
-      phone: '',
-      email: '',
-      address: ''
-    },
+    contactInfo: { phone: '', email: '', address: '' },
     medicalHistory: [],
     assignedDoctor: ''
   });
@@ -92,11 +88,7 @@ const PatientList = () => {
       name: '',
       age: '',
       gender: '',
-      contactInfo: {
-        phone: '',
-        email: '',
-        address: ''
-      },
+      contactInfo: { phone: '', email: '', address: '' },
       medicalHistory: [],
       assignedDoctor: ''
     });
@@ -104,58 +96,64 @@ const PatientList = () => {
   };
 
   return (
-    <div className="p-4 max-w-4xl mx-auto">
+    <div className="max-w-4xl mx-auto p-4 sm:p-6">
       <h2 className="text-2xl font-bold mb-6">{editingId ? 'Edit Patient' : 'Add New Patient'}</h2>
+
       <form onSubmit={handleSubmit} className="space-y-5">
-        <input
-          name="name"
-          value={formData.name}
-          onChange={handleChange}
-          placeholder="Name"
-          required
-          className="border p-3 rounded-md w-full focus:outline-blue-500 focus:ring-1 focus:ring-blue-500"
-        />
-        <input
-          name="age"
-          value={formData.age}
-          onChange={handleChange}
-          placeholder="Age"
-          type="number"
-          required
-          className="border p-3 rounded-md w-full focus:outline-blue-500 focus:ring-1 focus:ring-blue-500"
-        />
-        <select
-          name="gender"
-          value={formData.gender}
-          onChange={handleChange}
-          required
-          className="border p-3 rounded-md w-full focus:outline-blue-500 focus:ring-1 focus:ring-blue-500"
-        >
-          <option value="">Select Gender</option>
-          <option value="male">Male</option>
-          <option value="female">Female</option>
-        </select>
-        <input
-          name="contactInfo.phone"
-          value={formData.contactInfo.phone}
-          onChange={handleChange}
-          placeholder="Phone"
-          className="border p-3 rounded-md w-full focus:outline-blue-500 focus:ring-1 focus:ring-blue-500"
-        />
-        <input
-          name="contactInfo.email"
-          value={formData.contactInfo.email}
-          onChange={handleChange}
-          placeholder="Email"
-          className="border p-3 rounded-md w-full focus:outline-blue-500 focus:ring-1 focus:ring-blue-500"
-        />
-        <input
-          name="contactInfo.address"
-          value={formData.contactInfo.address}
-          onChange={handleChange}
-          placeholder="Address"
-          className="border p-3 rounded-md w-full focus:outline-blue-500 focus:ring-1 focus:ring-blue-500"
-        />
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <input
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            placeholder="Name"
+            required
+            className="border p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <input
+            name="age"
+            value={formData.age}
+            onChange={handleChange}
+            placeholder="Age"
+            type="number"
+            required
+            className="border p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <select
+            name="gender"
+            value={formData.gender}
+            onChange={handleChange}
+            required
+            className="border p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">Select Gender</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+          </select>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <input
+            name="contactInfo.phone"
+            value={formData.contactInfo.phone}
+            onChange={handleChange}
+            placeholder="Phone"
+            className="border p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <input
+            name="contactInfo.email"
+            value={formData.contactInfo.email}
+            onChange={handleChange}
+            placeholder="Email"
+            className="border p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <input
+            name="contactInfo.address"
+            value={formData.contactInfo.address}
+            onChange={handleChange}
+            placeholder="Address"
+            className="border p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
 
         <DoctorSelector
           onDoctorSelect={(doctorId) =>
@@ -165,7 +163,7 @@ const PatientList = () => {
 
         {formData.assignedDoctor && (
           <div className="border rounded-md p-4 bg-gray-50 mt-4">
-            <h4 className="font-semibold mb-3 text-lg">Doctor's Schedule</h4>
+            <h4 className="font-semibold mb-3">Doctor&apos;s Schedule</h4>
             <ScheduleViewer
               doctorId={formData.assignedDoctor._id}
               token={localStorage.getItem('token')}
@@ -175,7 +173,7 @@ const PatientList = () => {
 
         <button
           type="submit"
-          className="bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition"
+          className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-md transition"
         >
           {editingId ? 'Update' : 'Create'}
         </button>
@@ -188,25 +186,25 @@ const PatientList = () => {
         {patients.map((patient) => (
           <li
             key={patient._id}
-            className="border p-4 rounded-md flex flex-col sm:flex-row sm:justify-between sm:items-center bg-white shadow-sm"
+            className="border p-4 rounded-md flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white shadow-sm"
           >
             <div className="mb-3 sm:mb-0">
               <strong className="text-lg">{patient.name}</strong> — {patient.age} yrs — {patient.gender}
               <br />
-              <span className="text-gray-600">
-                📞 {patient.contactInfo.phone || '-'} | 📧 {patient.contactInfo.email || '-'}
+              <span className="text-sm text-gray-600">
+                📞 {patient.contactInfo.phone || 'N/A'} | 📧 {patient.contactInfo.email || 'N/A'}
               </span>
             </div>
-            <div className="flex space-x-3">
+            <div className="space-x-2 flex">
               <button
                 onClick={() => handleEdit(patient)}
-                className="bg-yellow-400 px-4 py-2 rounded-md hover:bg-yellow-500 transition"
+                className="bg-yellow-400 hover:bg-yellow-500 text-white px-4 py-1 rounded-md transition"
               >
                 Edit
               </button>
               <button
                 onClick={() => handleDelete(patient._id)}
-                className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition"
+                className="bg-red-600 hover:bg-red-700 text-white px-4 py-1 rounded-md transition"
               >
                 Delete
               </button>

@@ -9,13 +9,9 @@ const PatientList = () => {
     name: '',
     age: '',
     gender: '',
-    contactInfo: {
-      phone: '',
-      email: '',
-      address: '',
-    },
+    contactInfo: { phone: '', email: '', address: '' },
     medicalHistory: [],
-    assignedDoctor: '',
+    assignedDoctor: ''
   });
   const [editingId, setEditingId] = useState(null);
 
@@ -40,13 +36,13 @@ const PatientList = () => {
         ...prev,
         contactInfo: {
           ...prev.contactInfo,
-          [field]: value,
-        },
+          [field]: value
+        }
       }));
     } else {
       setFormData((prev) => ({
         ...prev,
-        [name]: value,
+        [name]: value
       }));
     }
   };
@@ -73,7 +69,7 @@ const PatientList = () => {
       gender: patient.gender,
       contactInfo: patient.contactInfo,
       medicalHistory: patient.medicalHistory,
-      assignedDoctor: patient.assignedDoctor,
+      assignedDoctor: patient.assignedDoctor
     });
     setEditingId(patient._id);
   };
@@ -92,24 +88,18 @@ const PatientList = () => {
       name: '',
       age: '',
       gender: '',
-      contactInfo: {
-        phone: '',
-        email: '',
-        address: '',
-      },
+      contactInfo: { phone: '', email: '', address: '' },
       medicalHistory: [],
-      assignedDoctor: '',
+      assignedDoctor: ''
     });
     setEditingId(null);
   };
 
   return (
     <div className="max-w-4xl mx-auto p-4 sm:p-6">
-      <h2 className="text-2xl font-bold mb-6 text-center sm:text-left">
-        {editingId ? 'Edit Patient' : 'Add New Patient'}
-      </h2>
+      <h2 className="text-2xl font-bold mb-6">{editingId ? 'Edit Patient' : 'Add New Patient'}</h2>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-5">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <input
             name="name"
@@ -117,7 +107,7 @@ const PatientList = () => {
             onChange={handleChange}
             placeholder="Name"
             required
-            className="border p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+            className="border p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <input
             name="age"
@@ -126,14 +116,14 @@ const PatientList = () => {
             placeholder="Age"
             type="number"
             required
-            className="border p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+            className="border p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <select
             name="gender"
             value={formData.gender}
             onChange={handleChange}
             required
-            className="border p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+            className="border p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="">Select Gender</option>
             <option value="male">Male</option>
@@ -147,39 +137,35 @@ const PatientList = () => {
             value={formData.contactInfo.phone}
             onChange={handleChange}
             placeholder="Phone"
-            className="border p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+            className="border p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <input
             name="contactInfo.email"
             value={formData.contactInfo.email}
             onChange={handleChange}
             placeholder="Email"
-            type="email"
-            className="border p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+            className="border p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <input
             name="contactInfo.address"
             value={formData.contactInfo.address}
             onChange={handleChange}
             placeholder="Address"
-            className="border p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+            className="border p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
 
-        <div>
-          <DoctorSelector
-            onDoctorSelect={(doctorId) =>
-              setFormData((prev) => ({ ...prev, assignedDoctor: doctorId }))
-            }
-            selectedDoctor={formData.assignedDoctor}
-          />
-        </div>
+        <DoctorSelector
+          onDoctorSelect={(doctorId) =>
+            setFormData((prev) => ({ ...prev, assignedDoctor: doctorId }))
+          }
+        />
 
         {formData.assignedDoctor && (
           <div className="border rounded-md p-4 bg-gray-50 mt-4">
-            <h4 className="font-semibold mb-3 text-lg">Doctor&apos;s Schedule</h4>
+            <h4 className="font-semibold mb-3">Doctor&apos;s Schedule</h4>
             <ScheduleViewer
-              doctorId={formData.assignedDoctor._id || formData.assignedDoctor}
+              doctorId={formData.assignedDoctor._id}
               token={localStorage.getItem('token')}
             />
           </div>
@@ -187,52 +173,44 @@ const PatientList = () => {
 
         <button
           type="submit"
-          className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-md transition"
+          className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-md transition"
         >
-          {editingId ? 'Update Patient' : 'Create Patient'}
+          {editingId ? 'Update' : 'Create'}
         </button>
       </form>
 
       <hr className="my-8" />
 
-      <h2 className="text-2xl font-bold mb-4 text-center sm:text-left">Patients List</h2>
-
+      <h2 className="text-2xl font-bold mb-4">Patients List</h2>
       <ul className="space-y-4">
-        {patients.length === 0 ? (
-          <p className="text-center text-gray-500">No patients found.</p>
-        ) : (
-          patients.map((patient) => (
-            <li
-              key={patient._id}
-              className="border rounded-md p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
-            >
-              <div className="flex-1 min-w-0">
-                <p className="font-semibold text-lg truncate">{patient.name}</p>
-                <p className="text-sm text-gray-600">
-                  {patient.age} years — {patient.gender}
-                </p>
-                <p className="text-sm text-gray-700 mt-1 truncate">
-                  📞 {patient.contactInfo.phone || 'N/A'} | 📧 {patient.contactInfo.email || 'N/A'}
-                </p>
-                <p className="text-sm text-gray-700 truncate">{patient.contactInfo.address}</p>
-              </div>
-              <div className="flex space-x-2 flex-shrink-0">
-                <button
-                  onClick={() => handleEdit(patient)}
-                  className="bg-yellow-400 hover:bg-yellow-500 px-4 py-2 rounded-md text-sm font-semibold transition"
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={() => handleDelete(patient._id)}
-                  className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-semibold transition"
-                >
-                  Delete
-                </button>
-              </div>
-            </li>
-          ))
-        )}
+        {patients.map((patient) => (
+          <li
+            key={patient._id}
+            className="border p-4 rounded-md flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white shadow-sm"
+          >
+            <div className="mb-3 sm:mb-0">
+              <strong className="text-lg">{patient.name}</strong> — {patient.age} yrs — {patient.gender}
+              <br />
+              <span className="text-sm text-gray-600">
+                📞 {patient.contactInfo.phone || 'N/A'} | 📧 {patient.contactInfo.email || 'N/A'}
+              </span>
+            </div>
+            <div className="space-x-2 flex">
+              <button
+                onClick={() => handleEdit(patient)}
+                className="bg-yellow-400 hover:bg-yellow-500 text-white px-4 py-1 rounded-md transition"
+              >
+                Edit
+              </button>
+              <button
+                onClick={() => handleDelete(patient._id)}
+                className="bg-red-600 hover:bg-red-700 text-white px-4 py-1 rounded-md transition"
+              >
+                Delete
+              </button>
+            </div>
+          </li>
+        ))}
       </ul>
     </div>
   );
