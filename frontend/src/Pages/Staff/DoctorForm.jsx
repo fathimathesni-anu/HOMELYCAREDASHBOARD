@@ -130,7 +130,7 @@ const DoctorForm = () => {
           required
           className="w-full border rounded-lg p-3"
         >
-          <option value="">Select a Doctor User</option>
+          <option value="">Select a Doctor </option>
           {users
             .filter((user) => user.role === 'doctor') // Optional frontend safeguard
             .map((user) => (
