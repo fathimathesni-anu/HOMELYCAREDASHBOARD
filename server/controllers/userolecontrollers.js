@@ -197,3 +197,13 @@ export const getAllUsers = async (req, res) => {
     res.status(400).json({ message: 'Error fetching users', error });
   }
 };
+
+
+export const getAllStaffs = async (req, res) => {
+  try {
+    const users = await Userole.find({ role: 'staff' }); // Filter if needed
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(400).json({ message: 'Error fetching users', error });
+  }
+};

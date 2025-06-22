@@ -16,15 +16,17 @@ const CreateStaff = () => {
 
   const [formData, setFormData] = useState(emptyForm);
   const [staffList, setStaffList] = useState([]);
+  const [availableUsers, setAvailableUsers] = useState([]);
   const [message, setMessage] = useState('');
   const [searchDept, setSearchDept] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [editingId, setEditingId] = useState(null); // Track which staff is being edited
+  const [editingId, setEditingId] = useState(null);
 
   const itemsPerPage = 5;
 
   useEffect(() => {
     fetchStaffList();
+    fetchAvailableUsers();
   }, []);
 
   const fetchStaffList = async () => {
@@ -33,6 +35,15 @@ const CreateStaff = () => {
       setStaffList(res.data);
     } catch (err) {
       console.error('Failed to fetch staff:', err);
+    }
+  };
+
+  const fetchAvailableUsers = async () => {
+    try {
+      const res = await axiosInstance.get('userole/staffs'); // route to fetch users with role 'staff'
+      setAvailableUsers(res.data);
+    } catch (err) {
+      console.error('Failed to fetch available staff users:', err);
     }
   };
 
@@ -132,15 +143,21 @@ const CreateStaff = () => {
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid sm:grid-cols-2 gap-4">
-          <input
-            type="text"
+          <select
             name="userId"
-            placeholder="User ID"
             value={formData.userId}
             onChange={handleChange}
             className="border p-3 rounded w-full"
             required
-          />
+          >
+            <option value="">Select Staff </option>
+            {availableUsers.map((user) => (
+              <option key={user._id} value={user._id}>
+                {user.name || `${user.firstName} ${user.lastName}`}
+              </option>
+            ))}
+          </select>
+
           <input
             type="text"
             name="position"
