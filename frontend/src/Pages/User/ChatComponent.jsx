@@ -31,7 +31,7 @@ const ChatComponent = () => {
 
   const fetchUsers = async () => {
     try {
-      const res = await axiosInstance.get('/userole/users'); // Adjust endpoint if needed
+      const res = await axiosInstance.get('/user/users'); // Adjust endpoint if needed
       setUsers(res.data);
     } catch (error) {
       console.error('Error fetching users:', error.response?.data || error.message);
